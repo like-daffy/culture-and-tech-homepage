@@ -34,7 +34,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
           title: "Contract Details",
           items: [
             "Deliverables: Full Mix, Instrumental, Stems (Drum, Bass, Synth, Lead, FX)",
-            "Lyrics: Adaptation allowed (language/meaning), melody/harmony/structure changes not allowed",
+            "Lyrics: Adaptation allowed (language/meaning), harmony/structure changes not allowed",
             "Local work: Vocal recording/mix/master handled by client",
             "Scope: Live-only (venue performance). Digital release requires 'Produced By Sochan' credit",
             "Revisions: Non-exclusive 2 times / Exclusive 3 times (small audio tweaks only)",
@@ -72,7 +72,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       discography: {
         title: "최근 작품",
         items: [
-          "(2024) Oh My Sunshine - Uzuki",
+          "Oh My Sunshine - 유츠키",
           "(2024) NEK1 PR4DE SE (오프닝 음악)",
         ],
       },
@@ -83,9 +83,9 @@ export function MusicDetails({ language }: MusicDetailsProps) {
           title: "계약 세부사항",
           items: [
             "제공물: 풀 믹스, 인스트루멘탈, 스템 (드럼, 베이스, 신스, 리드, FX)",
-            "가사: 적응 허용 (언어/의미), 멜로디/하모니/구조 변경 불가",
+            "가사: 변경 및 재작사 허용, 하모니/구조 변경 불가",
             "로컬 작업: 보컬 녹음/믹스/마스터는 클라이언트 담당",
-            "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By 소찬' 크레딧 필수",
+            "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By Sochan' 크레딧 필수",
             "수정: 비독점 2회 / 독점 3회 (작은 오디오 조정만)",
             "가사 적응은 수정 횟수에 포함되지 않음",
             "최대 수정 횟수 초과 불가",

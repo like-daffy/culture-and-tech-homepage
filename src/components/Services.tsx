@@ -81,7 +81,6 @@ export function Services({ language }: ServicesProps) {
           features: [
             "라이브 공연 세션",
             "스튜디오 녹음",
-            "전문 장비",
             "유연한 일정 조정",
           ],
         },
