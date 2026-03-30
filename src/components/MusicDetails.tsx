@@ -78,6 +78,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       },
       contract: {
         title: "계약 정보",
+        payment: undefined,
         details: {
           title: "계약 세부사항",
           items: [
