@@ -16,7 +16,7 @@ export function Footer({ language }: FooterProps) {
       registration: "사업자 등록번호",
       address: "주소",
       addressText: "서울특별시 광진구 자양2동",
-      rights: "모든 권리 보유.",
+      rights: "All right reserved.",
     },
   };
 

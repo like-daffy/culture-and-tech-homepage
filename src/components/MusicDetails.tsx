@@ -68,7 +68,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
     },
     ko: {
       title: "라이브 아이돌 음악 제작 상세",
-      subtitle: "by Sochan - 라이브 아이돌 음악 프로듀서",
+      subtitle: "by 소찬 - 라이브 아이돌 음악 프로듀서",
       discography: {
         title: "최근 작품",
         items: [
@@ -78,23 +78,13 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       },
       contract: {
         title: "계약 정보",
-        payment: {
-          title: "결제 (해외)",
-          details: [
-            "빠른 확인을 위한 PayPal 인보이스",
-            "낮은 비용을 위한 Wise 은행 송금 (USD/JPY)",
-            "통화: JPY / USD",
-            "발송자가 모든 수수료 부담 (송금/플랫폼/환전)",
-            "인보이스 기반 상품 및 서비스만 가능 (F&F 불가)",
-          ],
-        },
         details: {
           title: "계약 세부사항",
           items: [
             "제공물: 풀 믹스, 인스트루멘탈, 스템 (드럼, 베이스, 신스, 리드, FX)",
             "가사: 적응 허용 (언어/의미), 멜로디/하모니/구조 변경 불가",
             "로컬 작업: 보컬 녹음/믹스/마스터는 클라이언트 담당",
-            "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By Sochan' 크레딧 필수",
+            "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By 소찬' 크레딧 필수",
             "수정: 비독점 2회 / 독점 3회 (작은 오디오 조정만)",
             "가사 적응은 수정 횟수에 포함되지 않음",
             "최대 수정 횟수 초과 불가",
@@ -168,18 +158,20 @@ export function MusicDetails({ language }: MusicDetailsProps) {
               <CardTitle>{contract.title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Payment */}
-              <div>
-                <h4 className="font-semibold text-lg mb-3">{contract.payment.title}</h4>
-                <ul className="space-y-2">
-                  {contract.payment.details.map((detail, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground flex items-start">
-                      <span className="text-accent mr-2">•</span>
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* Payment - only show if exists */}
+              {contract.payment && (
+                <div>
+                  <h4 className="font-semibold text-lg mb-3">{contract.payment.title}</h4>
+                  <ul className="space-y-2">
+                    {contract.payment.details.map((detail, idx) => (
+                      <li key={idx} className="text-sm text-muted-foreground flex items-start">
+                        <span className="text-accent mr-2">•</span>
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Details */}
               <div>

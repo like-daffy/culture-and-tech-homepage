@@ -65,12 +65,11 @@ export function Services({ language }: ServicesProps) {
         {
           icon: Music,
           title: "라이브 아이돌 음악 제작",
-          description: "라이브 아이돌 음악 프로듀서 Sochan의 전문 음악 제작 서비스.",
+          description: "라이브 아이돌 음악 프로듀서 소찬의 전문 음악 제작 서비스.",
           features: [
             "독점 및 비독점 라이선스",
             "풀 믹스, 인스트루멘탈 및 스템 제공",
             "다양한 수정 옵션",
-            "해외 결제 지원",
           ],
           cta: "자세히 보기",
           link: "#music-details",
