@@ -20,11 +20,6 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       },
       contract: {
         title: "Contract Information",
-        fee: {
-          title: "Contract Fee",
-          nonExclusive: "Non-exclusive: 100,000 KRW",
-          exclusive: "Exclusive: 200,000 KRW",
-        },
         payment: {
           title: "Payment (Overseas)",
           details: [
@@ -83,11 +78,6 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       },
       contract: {
         title: "계약 정보",
-        fee: {
-          title: "계약 비용",
-          nonExclusive: "비독점: 100,000 KRW",
-          exclusive: "독점: 200,000 KRW",
-        },
         payment: {
           title: "결제 (해외)",
           details: [
@@ -178,15 +168,6 @@ export function MusicDetails({ language }: MusicDetailsProps) {
               <CardTitle>{contract.title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Fee */}
-              <div>
-                <h4 className="font-semibold text-lg mb-3">{contract.fee.title}</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">{contract.fee.nonExclusive}</Badge>
-                  <Badge variant="secondary">{contract.fee.exclusive}</Badge>
-                </div>
-              </div>
-
               {/* Payment */}
               <div>
                 <h4 className="font-semibold text-lg mb-3">{contract.payment.title}</h4>

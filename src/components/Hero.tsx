@@ -10,8 +10,8 @@ export function Hero({ language }: HeroProps) {
       description: "Quality Assurance, Music Production, and Professional Session Services",
     },
     ko: {
-      title: "Culture & Tech",
-      subtitle: "현대 비즈니스를 위한 혁신적인 솔루션",
+      title: "컬처앤테크",
+      subtitle: "컬처와 테크의 조화를 모토",
       description: "품질 보증, 음악 제작 및 전문 세션 서비스",
     },
   };

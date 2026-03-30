@@ -42,7 +42,7 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container flex items-center justify-between h-16">
         <Link href="#home" className="text-xl font-semibold text-primary">
-          Culture & Tech
+          {language === "ko" ? "컬처앤테크" : "Culture & Tech"}
         </Link>
 
         {/* Desktop Navigation */}

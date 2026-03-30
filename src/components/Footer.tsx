@@ -36,7 +36,7 @@ export function Footer({ language }: FooterProps) {
             {address}: {addressText}
           </p>
           <p className="text-sm text-muted-foreground pt-4">
-            © {new Date().getFullYear()} Culture & Tech. {rights}
+            © {new Date().getFullYear()} {language === "ko" ? "컬처앤테크" : "Culture & Tech"}. {rights}
           </p>
         </div>
       </div>
