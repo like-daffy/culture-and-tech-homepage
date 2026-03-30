@@ -7,7 +7,6 @@ import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Services } from "@/components/Services";
 import { MusicDetails } from "@/components/MusicDetails";
-import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -28,7 +27,6 @@ export default function Home() {
           <About language={language} />
           <Services language={language} />
           <MusicDetails language={language} />
-          <Contact language={language} />
         </main>
         <Footer language={language} />
       </div>

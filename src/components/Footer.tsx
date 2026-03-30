@@ -25,27 +25,17 @@ export function Footer({ language }: FooterProps) {
   return (
     <footer className="border-t border-border bg-muted/30 py-12">
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          <div>
-            <h4 className="font-semibold text-sm text-primary mb-2">{email}</h4>
-            <a
-              href="mailto:sochan@cultureand.tech"
-              className="text-sm text-muted-foreground hover:text-accent"
-            >
-              sochan@cultureand.tech
-            </a>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm text-primary mb-2">{registration}</h4>
-            <p className="text-sm text-muted-foreground">111-20-53033</p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-sm text-primary mb-2">{address}</h4>
-            <p className="text-sm text-muted-foreground">{addressText}</p>
-          </div>
-        </div>
-        <div className="text-center pt-8 border-t border-border">
+        <div className="text-center space-y-2">
           <p className="text-sm text-muted-foreground">
+            {email}: <a href="mailto:sochan@cultureand.tech" className="hover:text-accent">sochan@cultureand.tech</a>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {registration}: 111-20-53033
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {address}: {addressText}
+          </p>
+          <p className="text-sm text-muted-foreground pt-4">
             © {new Date().getFullYear()} Culture & Tech. {rights}
           </p>
         </div>
