@@ -29,6 +29,8 @@ function getTurboRules() {
 
 const nextConfig = {
   output: "export",
+  // basePath is managed by build scripts
+  trailingSlash: true,
   reactStrictMode: true,
   experimental: {
     turbo: {
