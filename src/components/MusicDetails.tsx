@@ -207,7 +207,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
           </Card>
 
           {/* Inquiry */}
-          <Card className="border-accent/20 bg-accent/5">
+          <Card id="contact" className="border-accent/20 bg-accent/5">
             <CardHeader>
               <CardTitle className="text-accent">{inquiry.title}</CardTitle>
             </CardHeader>
