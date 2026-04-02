@@ -15,7 +15,7 @@ interface LanguageSwitchProps {
 export function LanguageSwitch({ language, onLanguageChange }: LanguageSwitchProps) {
   return (
     <Select value={language} onValueChange={(value) => onLanguageChange(value as "en" | "ko")}>
-      <SelectTrigger className="w-[100px] h-9 bg-background border-border">
+      <SelectTrigger className="w-[150px] h-9 bg-background border-border">
         <Languages className="h-4 w-4 mr-2" />
         <SelectValue />
       </SelectTrigger>

@@ -61,6 +61,8 @@ export function Services({ language }: ServicesProps) {
             "현장 지원 가능",
             "맞춤형 솔루션 개발",
           ],
+          cta: "자세히 보기",
+          link: "http://kmong.com/gig/748195",
         },
         {
           icon: Music,
@@ -125,9 +127,13 @@ export function Services({ language }: ServicesProps) {
                       size="sm"
                       className="w-full"
                       onClick={() => {
-                        const element = document.querySelector(service.link);
-                        if (element) {
-                          element.scrollIntoView({ behavior: "smooth" });
+                        if (service.link.startsWith("http")) {
+                          window.open(service.link, "_blank", "noopener,noreferrer");
+                        } else {
+                          const element = document.querySelector(service.link);
+                          if (element) {
+                            element.scrollIntoView({ behavior: "smooth" });
+                          }
                         }
                       }}
                     >
