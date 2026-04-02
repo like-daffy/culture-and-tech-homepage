@@ -9,35 +9,43 @@ export function Footer({ language }: FooterProps) {
       registration: "Business Registration",
       address: "Address",
       addressText: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, South Korea",
-      rights: "All rights reserved.",
+      copyright: "© 2026 Culture & Tech. All rights reserved.",
     },
     ko: {
       email: "이메일",
       registration: "사업자 등록번호",
       address: "주소",
       addressText: "서울시 광진구 자양번영로 18, 3층",
-      rights: "All right reserved.",
+      copyright: "© 2026 컬처앤테크. All right reserved.",
     },
   };
 
-  const { email, registration, address, addressText, rights } = content[language];
+  const { email, registration, address, addressText, copyright } = content[language];
 
   return (
-    <footer className="border-t border-border bg-muted/30 py-12">
+    <footer className="border-t border-border bg-muted/30 py-8">
       <div className="container">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-3">
+          {/* Email and Business Registration - Same Line */}
           <p className="text-sm text-muted-foreground">
-            {email}: <a href="mailto:sochan@cultureand.tech" className="hover:text-accent">sochan@cultureand.tech</a>
+            {email}: <a href="mailto:sochan@cultureand.tech" className="hover:text-accent transition-colors">sochan@cultureand.tech</a>
+            <span className="mx-3">|</span>
+            {registration}: <span className="font-medium">111-20-53033</span>
           </p>
-          <p className="text-sm text-muted-foreground">
-            {registration}: 111-20-53033
-          </p>
+          
+          {/* Address */}
           <p className="text-sm text-muted-foreground">
             {address}: {addressText}
           </p>
-          <p className="text-sm text-muted-foreground pt-4">
-            © {new Date().getFullYear()} {language === "ko" ? "컬처앤테크" : "Culture & Tech"}. {rights}
-          </p>
+
+          {/* Separator */}
+          <div className="pt-4">
+            <div className="w-full max-w-md mx-auto border-t border-border/50 mb-4"></div>
+            {/* Copyright - Smaller */}
+            <p className="text-xs text-muted-foreground/80">
+              {copyright}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
