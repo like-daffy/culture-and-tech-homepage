@@ -8,14 +8,14 @@ export function Footer({ language }: FooterProps) {
       email: "Email",
       registration: "Business Registration",
       address: "Address",
-      addressText: "Jayang 2-Dong, Gwangjingu, Seoul, South Korea",
+      addressText: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, South Korea",
       rights: "All rights reserved.",
     },
     ko: {
       email: "이메일",
       registration: "사업자 등록번호",
       address: "주소",
-      addressText: "서울특별시 광진구 자양2동",
+      addressText: "서울시 광진구 자양번영로 18, 3층",
       rights: "All right reserved.",
     },
   };
