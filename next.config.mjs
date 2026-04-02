@@ -28,6 +28,7 @@ function getTurboRules() {
 }
 
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
   experimental: {
     turbo: {
@@ -35,6 +36,7 @@ const nextConfig = {
     },
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
