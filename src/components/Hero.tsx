@@ -19,16 +19,30 @@ export function Hero({ language }: HeroProps) {
   const { title, subtitle, description } = content[language];
 
   return (
-    <section id="home" className="pt-32 pb-20 md:pt-40 md:pb-32">
-      <div className="container">
+    <section id="home" className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
+      {/* Video Preview Background */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundImage: "url('https://img.youtube.com/vi/ClIMiux5hjE/maxresdefault.jpg')",
+        }}
+      />
+      
+      {/* Dark Overlay for Text Readability */}
+      <div className="absolute inset-0 bg-black/50 z-0" />
+      
+      {/* Content */}
+      <div className="container relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-lg">
             {title}
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-4 font-medium">
+          <p className="text-xl md:text-2xl text-white/90 mb-4 font-medium drop-shadow-md">
             {subtitle}
           </p>
-          <p className="text-base md:text-lg text-muted-foreground">
+          <p className="text-base md:text-lg text-white/80 drop-shadow-md">
             {description}
           </p>
         </div>
