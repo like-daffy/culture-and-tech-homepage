@@ -4,7 +4,14 @@ export function Footer() {
   const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const content = {
+  type FooterContent = {
+    companyInfo: string;
+    address: string;
+    email?: string;
+    rights: string;
+  };
+
+  const content: Record<"en" | "ko", FooterContent> = {
     en: {
       companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
       address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
@@ -14,7 +21,7 @@ export function Footer() {
     ko: {
       companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
       address: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
-      rights: "모든 권리 보유.",
+      rights: "All rights reserved.",
     },
   };
 
@@ -23,7 +30,7 @@ export function Footer() {
   return (
     <footer className="relative border-t border-border py-8 overflow-hidden">
       {/* Video Background Preview (Thumbnail) */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('https://img.youtube.com/vi/ynYmTnt9xjY/maxresdefault.jpg')",
@@ -59,7 +66,7 @@ export function Footer() {
               {currentContent.email}
             </p>
           )}
-          
+
           {/* Separator */}
           <div className="pt-4">
             <div className="w-full max-w-md mx-auto border-t border-white/30 mb-4"></div>
