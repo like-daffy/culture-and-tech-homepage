@@ -21,30 +21,33 @@ interface LanguageProviderProps {
 }
 
 export function LanguageProvider({ children }: LanguageProviderProps) {
-  // Initialize with synchronous detection to avoid hydration mismatch
-  const [language, setLanguageState] = useState<SupportedLanguage>(() => {
-    if (typeof window !== "undefined") {
-      return detectUserLanguageSync();
-    }
-    return "en";
-  });
-
+  // Always initialize with "en" to prevent hydration mismatch
+  // Detection happens in useEffect after mount
+  const [language, setLanguageState] = useState<SupportedLanguage>("en");
   const [isLoading, setIsLoading] = useState(true);
-  const [translations, setTranslations] = useState<Translations>(getTranslations(language));
+  const [translations, setTranslations] = useState<Translations>(getTranslations("en"));
 
-  // Perform async detection after mount
+  // Detect and apply language after component mounts (client-side only)
   useEffect(() => {
     let mounted = true;
 
-    async function performAsyncDetection() {
+    async function detectAndApplyLanguage() {
       try {
-        const detectedLanguage = await detectUserLanguage();
-        if (mounted && detectedLanguage !== language) {
-          setLanguageState(detectedLanguage);
-          setTranslations(getTranslations(detectedLanguage));
+        // First try synchronous detection (stored preference + browser)
+        const syncDetected = detectUserLanguageSync();
+        if (mounted && syncDetected !== "en") {
+          setLanguageState(syncDetected);
+          setTranslations(getTranslations(syncDetected));
+        }
+
+        // Then try async detection (geolocation)
+        const asyncDetected = await detectUserLanguage();
+        if (mounted && asyncDetected !== syncDetected) {
+          setLanguageState(asyncDetected);
+          setTranslations(getTranslations(asyncDetected));
         }
       } catch (error) {
-        console.error("Error during async language detection:", error);
+        console.error("Error during language detection:", error);
       } finally {
         if (mounted) {
           setIsLoading(false);
@@ -52,14 +55,14 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       }
     }
 
-    performAsyncDetection();
+    detectAndApplyLanguage();
 
     return () => {
       mounted = false;
     };
   }, []);
 
-  // Handle language changes
+  // Handle manual language changes
   const setLanguage = (newLanguage: SupportedLanguage) => {
     setLanguageState(newLanguage);
     setTranslations(getTranslations(newLanguage));
@@ -68,11 +71,6 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     // Log language change for analytics (optional)
     console.log("Language changed to:", newLanguage);
   };
-
-  // Update translations when language changes
-  useEffect(() => {
-    setTranslations(getTranslations(language));
-  }, [language]);
 
   const value: LanguageContextValue = {
     language,
