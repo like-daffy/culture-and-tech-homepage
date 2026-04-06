@@ -6,13 +6,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLanguage } from "@/contexts/LanguageProvider";
 
-export function LanguageSwitch() {
-  const { language, setLanguage } = useLanguage();
+interface LanguageSwitchProps {
+  language: "en" | "ko";
+  onLanguageChange: (lang: "en" | "ko") => void;
+}
 
+export function LanguageSwitch({ language, onLanguageChange }: LanguageSwitchProps) {
   return (
-    <Select value={language} onValueChange={setLanguage}>
+    <Select value={language} onValueChange={(value) => onLanguageChange(value as "en" | "ko")}>
       <SelectTrigger className="w-[150px] h-9 bg-background border-border">
         <Languages className="h-4 w-4 mr-2" />
         <SelectValue />
