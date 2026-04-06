@@ -29,7 +29,7 @@ function getTurboRules() {
 
 const nextConfig = {
   output: "export",
-  // basePath is managed by build scripts
+  basePath: "/culture",
   trailingSlash: true,
   reactStrictMode: true,
   experimental: {
