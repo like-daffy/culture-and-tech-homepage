@@ -14,7 +14,7 @@ export function Footer() {
     ko: {
       companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
       address: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
-      rights: "모든 권리 보유.",
+      rights: "All rights reserved.",
     },
   };
 
@@ -30,10 +30,16 @@ export function Footer() {
         }}
       />
 
-      {/* Video Background (Auto-play) */}
+      {/* Video Background (Auto-play) - Responsive */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <iframe
-          className="absolute top-1/2 left-1/2 w-[200%] h-[200%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none min-w-full min-h-full w-auto h-auto"
+          style={{
+            width: "100vw",
+            height: "56.25vw", // 16:9 aspect ratio
+            minHeight: "100%",
+            minWidth: "177.78vh", // 16:9 aspect ratio
+          }}
           src="https://www.youtube.com/embed/ynYmTnt9xjY?autoplay=1&mute=1&loop=1&playlist=ynYmTnt9xjY&controls=0&showinfo=0&modestbranding=1&playsinline=1&enablejsapi=1&rel=0"
           frameBorder="0"
           allow="autoplay; encrypted-media"
