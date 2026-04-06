@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
@@ -10,8 +7,6 @@ import { MusicDetails } from "@/components/MusicDetails";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
-  const [language, setLanguage] = useState<"en" | "ko">("en");
-
   return (
     <>
       <SEO
@@ -20,15 +15,15 @@ export default function Home() {
         image="/og-image.png"
         url="https://cultureand.tech"
       />
-      <div className="min-h-screen" lang={language}>
-        <Navigation language={language} onLanguageChange={setLanguage} />
+      <div className="min-h-screen">
+        <Navigation />
         <main>
-          <Hero language={language} />
-          <About language={language} />
-          <Services language={language} />
-          <MusicDetails language={language} />
+          <Hero />
+          <About />
+          <Services />
+          <MusicDetails />
         </main>
-        <Footer language={language} />
+        <Footer />
       </div>
     </>
   );
