@@ -1,12 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageProvider";
 
-interface MusicDetailsProps {
-  language: "en" | "ko";
-}
+export function MusicDetails() {
+  const { language } = useLanguage();
 
-export function MusicDetails({ language }: MusicDetailsProps) {
   const content = {
     en: {
       title: "Live-Idol Discogs",
