@@ -9,13 +9,11 @@ export function Footer() {
       companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
       address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
       email: "sochan@cultureand.tech",
-      description: "Specialized in Live-Idol and K-Pop music production, mixing, and mastering services.",
       rights: "All rights reserved.",
     },
     ko: {
       companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
       address: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
-      description: "라이브아이돌 및 K-Pop 음악 제작, 믹싱, 마스터링 서비스 전문.",
       rights: "모든 권리 보유.",
     },
   };
@@ -61,9 +59,6 @@ export function Footer() {
               {currentContent.email}
             </p>
           )}
-          <p className="text-sm text-white/90 drop-shadow-lg">
-            {currentContent.description}
-          </p>
           
           {/* Separator */}
           <div className="pt-4">
