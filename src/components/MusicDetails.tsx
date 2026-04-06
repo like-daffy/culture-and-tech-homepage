@@ -52,7 +52,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
           },
           {
             question: "What counts as 'one' revision?",
-            answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Melody changes, verse/chorus replacements, and structural changes are not permitted.",
+            answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Modifications to the melody, structure, or arrangement may be accommodated upon further discussion.",
           },
           {
             question: "Can I cancel after payment?",
@@ -101,7 +101,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
           },
           {
             question: "'한 번'의 수정은 무엇을 의미하나요?",
-            answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 허용되지 않습니다.",
+            answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 별도 협의가 필요합니다.",
           },
           {
             question: "결제 후 취소할 수 있나요?",
