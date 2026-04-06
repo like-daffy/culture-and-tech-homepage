@@ -9,8 +9,8 @@ interface MusicDetailsProps {
 export function MusicDetails({ language }: MusicDetailsProps) {
   const content = {
     en: {
-      title: "Live-Idol Music Production Details",
-      subtitle: "by Sochan - The Live-Idol Music Producer",
+      title: "Live-Idol Discogs",
+      subtitle: "Produced By Sochan",
       discography: {
         title: "Recent Works",
         items: [
@@ -67,8 +67,8 @@ export function MusicDetails({ language }: MusicDetailsProps) {
       },
     },
     ko: {
-      title: "라이브 아이돌 음악 제작 상세",
-      subtitle: "by 소찬 - 라이브 아이돌 음악 프로듀서",
+      title: "라이브아이돌 작업 목록",
+      subtitle: "",
       discography: {
         title: "최근 작품",
         items: [
@@ -134,7 +134,7 @@ export function MusicDetails({ language }: MusicDetailsProps) {
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
               {title}
             </h2>
-            <p className="text-lg text-muted-foreground">{subtitle}</p>
+            {subtitle && <p className="text-lg text-muted-foreground">{subtitle}</p>}
           </div>
 
           {/* Discography */}
