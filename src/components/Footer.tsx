@@ -5,44 +5,80 @@ interface FooterProps {
 export function Footer({ language }: FooterProps) {
   const content = {
     en: {
-      email: "Email",
-      registration: "Business Registration",
-      address: "Address",
-      addressText: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, South Korea",
+      companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
+      address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, South Korea",
+      email: "sochan@cultureand.tech",
       copyright: "© 2026 Culture & Tech. All rights reserved.",
     },
     ko: {
-      email: "이메일",
-      registration: "사업자 등록번호",
-      address: "주소",
-      addressText: "서울시 광진구 자양번영로 18, 3층",
+      companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
+      addressWithEmail: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
       copyright: "© 2026 컬처앤테크. All right reserved.",
     },
   };
 
-  const { email, registration, address, addressText, copyright } = content[language];
+  const isKorean = language === "ko";
+  const { copyright } = content[language];
 
   return (
-    <footer className="border-t border-border bg-muted/30 py-8">
-      <div className="container">
+    <footer className="relative border-t border-border py-8 overflow-hidden">
+      {/* Video Background Preview (Thumbnail) */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('https://img.youtube.com/vi/ynYmTnt9xjY/maxresdefault.jpg')",
+        }}
+      />
+
+      {/* Video Background (Auto-play) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <iframe
+          className="absolute top-1/2 left-1/2 w-[200%] h-[200%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          src="https://www.youtube.com/embed/ynYmTnt9xjY?autoplay=1&mute=1&loop=1&playlist=ynYmTnt9xjY&controls=0&showinfo=0&modestbranding=1&playsinline=1&enablejsapi=1&rel=0"
+          frameBorder="0"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          title="Footer Background Video"
+        />
+      </div>
+
+      {/* Dark Overlay for readability */}
+      <div className="absolute inset-0 bg-black/50" />
+
+      {/* Content */}
+      <div className="container relative z-10">
         <div className="text-center space-y-3">
-          {/* Email and Business Registration - Same Line */}
-          <p className="text-sm text-muted-foreground">
-            {email}: <a href="mailto:sochan@cultureand.tech" className="hover:text-accent transition-colors">sochan@cultureand.tech</a>
-            <span className="mx-3">|</span>
-            {registration}: <span className="font-medium">111-20-53033</span>
-          </p>
-          
-          {/* Address */}
-          <p className="text-sm text-muted-foreground">
-            {address}: {addressText}
-          </p>
+          {isKorean ? (
+            <>
+              {/* Company Info */}
+              <p className="text-sm text-white/90 drop-shadow-lg">
+                {content.ko.companyInfo}
+              </p>
+              
+              {/* Address with Email - Same Line */}
+              <p className="text-sm text-white/90 drop-shadow-lg">
+                {content.ko.addressWithEmail}
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Company Info and Email - Same Line */}
+              <p className="text-sm text-white/90 drop-shadow-lg">
+                {content.en.email} | {content.en.companyInfo}
+              </p>
+              
+              {/* Address */}
+              <p className="text-sm text-white/90 drop-shadow-lg">
+                {content.en.address}
+              </p>
+            </>
+          )}
 
           {/* Separator */}
           <div className="pt-4">
-            <div className="w-full max-w-md mx-auto border-t border-border/50 mb-4"></div>
+            <div className="w-full max-w-md mx-auto border-t border-white/30 mb-4"></div>
             {/* Copyright - Smaller */}
-            <p className="text-xs text-muted-foreground/80">
+            <p className="text-xs text-white/80 drop-shadow-lg">
               {copyright}
             </p>
           </div>

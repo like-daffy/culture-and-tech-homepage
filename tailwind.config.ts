@@ -54,8 +54,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Montserrat', 'Noto Sans KR', 'system-ui', 'sans-serif'],
-        korean: ['Noto Sans KR', 'Montserrat', 'system-ui', 'sans-serif'],
+        sans: ['Quicksand', 'Noto Sans KR', 'system-ui', 'sans-serif'],
+        korean: ['Noto Sans KR', 'Quicksand', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
