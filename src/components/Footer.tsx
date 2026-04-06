@@ -1,8 +1,24 @@
 import { useLanguage } from "@/contexts/LanguageProvider";
 
 export function Footer() {
-  const { translations } = useLanguage();
+  const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
+
+  const content = {
+    en: {
+      companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
+      address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
+      email: "sochan@cultureand.tech",
+      rights: "All rights reserved.",
+    },
+    ko: {
+      companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
+      address: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
+      rights: "모든 권리 보유.",
+    },
+  };
+
+  const currentContent = content[language];
 
   return (
     <footer className="relative border-t border-border py-8 overflow-hidden">
@@ -33,17 +49,22 @@ export function Footer() {
       <div className="container relative z-10">
         <div className="text-center space-y-3">
           <p className="text-sm text-white/90 drop-shadow-lg">
-            {translations.contact.email}: {translations.contact.address}
+            {currentContent.companyInfo}
           </p>
           <p className="text-sm text-white/90 drop-shadow-lg">
-            {translations.footer.description}
+            {currentContent.address}
           </p>
+          {language === "en" && (
+            <p className="text-sm text-white/90 drop-shadow-lg">
+              {currentContent.email}
+            </p>
+          )}
           
           {/* Separator */}
           <div className="pt-4">
             <div className="w-full max-w-md mx-auto border-t border-white/30 mb-4"></div>
             <p className="text-xs text-white/80 drop-shadow-lg">
-              © {currentYear} Culture & Tech. {translations.footer.rights}
+              © {currentYear} Culture & Tech. {currentContent.rights}
             </p>
           </div>
         </div>
