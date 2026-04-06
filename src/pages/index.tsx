@@ -10,8 +10,8 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Culture & Tech | QA Automation, Music Production, Session Services"
-        description="Professional QA automation solutions, live-idol music production by Sochan, and expert keyboardist session services in Seoul, South Korea."
+        title="Culture & Tech"
+        description="Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea."
         image="/og-image.png"
         url="https://cultureand.tech"
       />

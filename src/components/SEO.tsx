@@ -10,7 +10,7 @@ interface SEOProps {
 // SEO elements that can be used in _document.tsx (returns JSX without Head wrapper)
 export function SEOElements({
   title = "Culture & Tech",
-  description = "Culture & Tech offers software consultation and live-idol music production. Providing business solutions and contact services.",
+  description = "Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea.",
   image = "/og-image.png",
   url,
 }: SEOProps) {
@@ -40,7 +40,7 @@ export function SEOElements({
 // Note: Flattened structure (no fragment) for better Next.js Head compatibility during hot reload
 export function SEO({
   title = "Culture & Tech",
-  description = "Culture & Tech offers software consultation and live-idol music production. Providing business solutions and contact services.",
+  description = "Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea.",
   image = "/og-image.png",
   url,
 }: SEOProps) {
