@@ -7,38 +7,52 @@ export function Footer({ language }: FooterProps) {
     en: {
       companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
       address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
+      email: "sochan@cultureand.tech",
       copyright: "© 2026 Culture & Tech. All rights reserved.",
     },
     ko: {
       companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
-      address: "05098 서울특별시 광진구 자양번영로 18, 3층",
-      email: "sochan@cultureand.tech",
+      addressWithEmail: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
       copyright: "© 2026 컬처앤테크. All right reserved.",
     },
   };
 
   const isKorean = language === "ko";
-  const { companyInfo, address, copyright } = content[language];
+  const { copyright } = content[language];
 
   return (
     <footer className="border-t border-border bg-muted/30 py-8">
       <div className="container">
         <div className="text-center space-y-3">
-          {/* Company Info and Business Registration */}
-          <p className="text-sm text-muted-foreground">
-            {companyInfo}
-          </p>
-          
-          {/* Address */}
-          <p className="text-sm text-muted-foreground">
-            {address}
-          </p>
+          {isKorean ? (
+            <>
+              {/* Company Info */}
+              <p className="text-sm text-muted-foreground">
+                {content.ko.companyInfo}
+              </p>
+              
+              {/* Address with Email - Same Line */}
+              <p className="text-sm text-muted-foreground">
+                {content.ko.addressWithEmail}
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Company Info */}
+              <p className="text-sm text-muted-foreground">
+                {content.en.companyInfo}
+              </p>
+              
+              {/* Address */}
+              <p className="text-sm text-muted-foreground">
+                {content.en.address}
+              </p>
 
-          {/* Email - Korean only */}
-          {isKorean && (
-            <p className="text-sm text-muted-foreground">
-              {content.ko.email}
-            </p>
+              {/* Email */}
+              <p className="text-sm text-muted-foreground">
+                {content.en.email}
+              </p>
+            </>
           )}
 
           {/* Separator */}
