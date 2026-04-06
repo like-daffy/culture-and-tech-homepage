@@ -1,0 +1,15 @@
+RewriteEngine On
+RewriteBase /
+
+# 1. HTTPS 강제 리다이렉트 (프록시 환경 대응)
+# HTTPS가 꺼져 있고, 프록시 헤더도 https가 아닐 때만 리다이렉트
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2. cultureand.tech 접속 시 /culture 폴더 연결
+# 내부 리다이렉트 루프 방지를 위해 ENV:REDIRECT_STATUS 체크 추가
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{HTTP_HOST} ^(www.)?cultureand.tech$ [NC]
+RewriteCond %{REQUEST_URI} !^/culture/
+RewriteRule ^(.*)$ culture/$1 [L]
