@@ -1,12 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Code, Music, Keyboard, ExternalLink } from "lucide-react";
+import { Code, Music, Keyboard } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageProvider";
 
-interface ServicesProps {
-  language: "en" | "ko";
-}
+export function Services() {
+  const { language } = useLanguage();
 
-export function Services({ language }: ServicesProps) {
   const content = {
     en: {
       title: "Our Services",
@@ -66,8 +65,8 @@ export function Services({ language }: ServicesProps) {
         },
         {
           icon: Music,
-          title: "라이브 아이돌 음악 제작",
-          description: "라이브 아이돌 음악 프로듀서 소찬의 전문 음악 제작 서비스.",
+          title: "라이브아이돌 음악 제작",
+          description: "라이브아이돌 음악 프로듀서 소찬의 전문 음악 제작 서비스.",
           features: [
             "독점 및 비독점 라이선스",
             "풀 믹스, 인스트루멘탈 및 스템 제공",
@@ -90,19 +89,21 @@ export function Services({ language }: ServicesProps) {
     },
   };
 
-  const { title, services } = content[language];
+  const currentContent = content[language];
 
   return (
     <section id="services" className="py-20">
       <div className="container">
-        <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-12">
-          {title}
-        </h2>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            {currentContent.title}
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, index) => {
+          {currentContent.services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <Card key={index} className="border-border hover:shadow-lg transition-shadow">
+              <Card key={index} className="border-border hover:shadow-lg transition-shadow flex flex-col">
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-accent" />
@@ -112,33 +113,28 @@ export function Services({ language }: ServicesProps) {
                     {service.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-4">
-                    {service.features.map((feature, idx) => (
-                      <li key={idx} className="text-sm text-muted-foreground flex items-start">
-                        <span className="text-accent mr-2">•</span>
-                        {feature}
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {service.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="text-sm text-muted-foreground flex items-start">
+                        <span className="mr-2 text-accent">•</span>
+                        <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
                   {service.cta && service.link && (
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <Button 
+                      asChild 
+                      variant="outline" 
                       className="w-full"
-                      onClick={() => {
-                        if (service.link.startsWith("http")) {
-                          window.open(service.link, "_blank", "noopener,noreferrer");
-                        } else {
-                          const element = document.querySelector(service.link);
-                          if (element) {
-                            element.scrollIntoView({ behavior: "smooth" });
-                          }
-                        }
-                      }}
                     >
-                      {service.cta}
-                      <ExternalLink className="w-4 h-4 ml-2" />
+                      <a 
+                        href={service.link}
+                        target={service.link.startsWith("http") ? "_blank" : undefined}
+                        rel={service.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                      >
+                        {service.cta}
+                      </a>
                     </Button>
                   )}
                 </CardContent>

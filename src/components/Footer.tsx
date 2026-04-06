@@ -1,31 +1,36 @@
-interface FooterProps {
-  language: "en" | "ko";
-}
+import { useLanguage } from "@/contexts/LanguageProvider";
 
-export function Footer({ language }: FooterProps) {
+type FooterContent = {
+  companyInfo: string;
+  address: string;
+  email?: string;
+  rights: string;
+};
+
+export function Footer() {
+  const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const content = {
+  const content: Record<"en" | "ko", FooterContent> = {
     en: {
       companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
       address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
-      copyright: `© ${currentYear} Culture & Tech. All rights reserved.`,
+      email: "sochan@cultureand.tech",
+      rights: "All rights reserved.",
     },
     ko: {
       companyInfo: "Culture & Tech | 대표자: 백찬 | 사업자등록번호: 111-20-53033",
-      address: "05098 서울특별시 광진구 자양번영로 18, 3층",
-      email: "sochan@cultureand.tech",
-      copyright: `© ${currentYear} 컬처앤테크. All right reserved.`,
+      address: "05098 서울특별시 광진구 자양번영로 18, 3층 | sochan@cultureand.tech",
+      rights: "All rights reserved.",
     },
   };
 
-  const isKorean = language === "ko";
-  const { companyInfo, address, copyright } = content[language];
+  const currentContent = content[language];
 
   return (
-    <footer className="relative border-t border-border bg-muted/30 py-8 overflow-hidden">
+    <footer className="relative border-t border-border py-8 overflow-hidden">
       {/* Video Background Preview (Thumbnail) */}
-      <div
+      <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('https://img.youtube.com/vi/ynYmTnt9xjY/maxresdefault.jpg')",
@@ -56,29 +61,23 @@ export function Footer({ language }: FooterProps) {
       {/* Content */}
       <div className="container relative z-10">
         <div className="text-center space-y-3">
-          {/* Company Info and Business Registration */}
-          <p className="text-sm text-muted-foreground">
-            {companyInfo}
+          <p className="text-sm text-white/90 drop-shadow-lg">
+            {currentContent.companyInfo}
           </p>
-
-          {/* Address */}
-          <p className="text-sm text-muted-foreground">
-            {address}
+          <p className="text-sm text-white/90 drop-shadow-lg">
+            {currentContent.address}
           </p>
-
-          {/* Email - Korean only */}
-          {isKorean && (
-            <p className="text-sm text-muted-foreground">
-              {content.ko.email}
+          {language === "en" && (
+            <p className="text-sm text-white/90 drop-shadow-lg">
+              {currentContent.email}
             </p>
           )}
-
+          
           {/* Separator */}
           <div className="pt-4">
-            <div className="w-full max-w-md mx-auto border-t border-border/50 mb-4"></div>
-            {/* Copyright - Smaller */}
-            <p className="text-xs text-muted-foreground/80">
-              {copyright}
+            <div className="w-full max-w-md mx-auto border-t border-white/30 mb-4"></div>
+            <p className="text-xs text-white/80 drop-shadow-lg">
+              © {currentYear} Culture & Tech. {currentContent.rights}
             </p>
           </div>
         </div>
