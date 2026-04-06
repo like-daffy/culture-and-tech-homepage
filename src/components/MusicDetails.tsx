@@ -1,15 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageProvider";
 
-export function MusicDetails() {
-  const { language } = useLanguage();
+interface MusicDetailsProps {
+  language: "en" | "ko";
+}
 
+export function MusicDetails({ language }: MusicDetailsProps) {
   const content = {
     en: {
-      title: "Live-Idol Discogs",
-      subtitle: "Produced By Sochan",
+      title: "Live-Idol Music Production Details",
+      subtitle: "by Sochan - The Live-Idol Music Producer",
       discography: {
         title: "Recent Works",
         items: [
@@ -51,7 +52,7 @@ export function MusicDetails() {
           },
           {
             question: "What counts as 'one' revision?",
-            answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Modifications to the melody, structure, or arrangement may be accommodated upon further discussion.",
+            answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Melody changes, verse/chorus replacements, and structural changes are not permitted.",
           },
           {
             question: "Can I cancel after payment?",
@@ -66,8 +67,8 @@ export function MusicDetails() {
       },
     },
     ko: {
-      title: "라이브아이돌 작업 목록",
-      subtitle: "",
+      title: "라이브 아이돌 음악 제작 상세",
+      subtitle: "by 소찬 - 라이브 아이돌 음악 프로듀서",
       discography: {
         title: "최근 작품",
         items: [
@@ -100,7 +101,7 @@ export function MusicDetails() {
           },
           {
             question: "'한 번'의 수정은 무엇을 의미하나요?",
-            answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 별도 협의가 필요합니다.",
+            answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 허용되지 않습니다.",
           },
           {
             question: "결제 후 취소할 수 있나요?",
@@ -133,7 +134,7 @@ export function MusicDetails() {
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
               {title}
             </h2>
-            {subtitle && <p className="text-lg text-muted-foreground">{subtitle}</p>}
+            <p className="text-lg text-muted-foreground">{subtitle}</p>
           </div>
 
           {/* Discography */}
