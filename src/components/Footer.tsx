@@ -1,10 +1,17 @@
 import { useLanguage } from "@/contexts/LanguageProvider";
 
+type FooterContent = {
+  companyInfo: string;
+  address: string;
+  email?: string;
+  rights: string;
+};
+
 export function Footer() {
   const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const content = {
+  const content: Record<"en" | "ko", FooterContent> = {
     en: {
       companyInfo: "Culture & Tech | Representative: Chan Baek | Business Registration: 111-20-53033",
       address: "3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul, 05098, South Korea",
