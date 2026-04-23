@@ -12,7 +12,7 @@ export default function Home() {
       <SEO
         title="Culture & Tech"
         description="Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea."
-        image="/og-image.png"
+        image="https://cultureand.tech/og-image.png"
         url="https://cultureand.tech"
       />
       <div className="min-h-screen">

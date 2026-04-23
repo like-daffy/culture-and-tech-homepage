@@ -1,5 +1,11 @@
 import Head from 'next/head';
 
+const SITE_URL = "https://cultureand.tech";
+const DEFAULT_TITLE = "Culture & Tech";
+const DEFAULT_DESCRIPTION =
+  "Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea.";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
+
 interface SEOProps {
   title?: string;
   description?: string;
@@ -7,61 +13,44 @@ interface SEOProps {
   url?: string;
 }
 
-// SEO elements that can be used in _document.tsx (returns JSX without Head wrapper)
-export function SEOElements({
-  title = "Culture & Tech",
-  description = "Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea.",
-  image = "/og-image.png",
-  url,
-}: SEOProps) {
-  return (
-    <>
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <link rel="icon" href="/favicon.ico" />
-
-      {/* Open Graph */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      {image && <meta property="og:image" content={image} />}
-      {url && <meta property="og:url" content={url} />}
-      <meta property="og:type" content="website" />
-
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      {image && <meta name="twitter:image" content={image} />}
-    </>
-  );
-}
-
-// SEO component for use in pages/_app.tsx or individual pages (uses next/head)
-// Note: Flattened structure (no fragment) for better Next.js Head compatibility during hot reload
+/**
+ * SEO component for use in individual pages (uses next/head).
+ *
+ * Place this as the FIRST child in each page component to ensure
+ * meta tags appear early in the <head> for social media crawlers.
+ * All image URLs are automatically converted to absolute URLs.
+ *
+ * With `output: "export"`, Next.js pre-renders next/head tags into
+ * the static HTML at build time — no JS execution needed by crawlers.
+ */
 export function SEO({
-  title = "Culture & Tech",
-  description = "Culture & Tech offers software consultation and live-idol music production. Contact us for business inquiries, QA automation solutions, and music production services in Seoul, South Korea.",
-  image = "/og-image.png",
-  url,
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  image = DEFAULT_OG_IMAGE,
+  url = SITE_URL,
 }: SEOProps) {
+  // Ensure image is always an absolute URL
+  const absoluteImage = image.startsWith("http")
+    ? image
+    : `${SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+
   return (
     <Head>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="icon" href="/favicon.ico" />
 
       {/* Open Graph */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      {image && <meta property="og:image" content={image} />}
-      {url && <meta property="og:url" content={url} />}
+      <meta property="og:image" content={absoluteImage} />
+      <meta property="og:url" content={url} />
       <meta property="og:type" content="website" />
 
-      {/* Twitter */}
+      {/* Twitter / X */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      {image && <meta name="twitter:image" content={image} />}
+      <meta name="twitter:image" content={absoluteImage} />
     </Head>
   );
 }
