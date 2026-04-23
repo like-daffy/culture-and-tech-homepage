@@ -17,6 +17,9 @@ export function MusicDetails() {
           "(2024) NEK1 PR4DE SE (Opening Music)",
         ],
       },
+      demoPreview: {
+        title: "Demo Preview",
+      },
       contract: {
         title: "Contract Information",
         payment: {
@@ -75,6 +78,9 @@ export function MusicDetails() {
           "(2024) NEK1 PR4DE SE (오프닝 음악)",
         ],
       },
+      demoPreview: {
+        title: "데모 미리보기",
+      },
       contract: {
         title: "계약 정보",
         payment: undefined,
@@ -120,6 +126,7 @@ export function MusicDetails() {
     title,
     subtitle,
     discography,
+    demoPreview,
     contract,
     faq,
     inquiry,
@@ -149,6 +156,44 @@ export function MusicDetails() {
                   </li>
                 ))}
               </ul>
+            </CardContent>
+          </Card>
+
+          {/* Demo Preview */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>{demoPreview.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <iframe 
+                  width="100%" 
+                  height="300" 
+                  scrolling="no" 
+                  frameBorder="no" 
+                  allow="autoplay" 
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%253Aplaylists%253A2226399419&color=%238c7c7c&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+                  title="Demo Sets"
+                />
+                <div style={{ fontSize: "10px", color: "#cccccc", lineBreak: "anywhere", wordBreak: "normal", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", fontFamily: "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif", fontWeight: 100 }}>
+                  <a href="https://soundcloud.com/sochan_life" title="sochan" target="_blank" rel="noopener noreferrer" style={{ color: "#cccccc", textDecoration: "none" }}>sochan</a> · <a href="https://soundcloud.com/sochan_life/sets/demo-sets" title="Demo Sets" target="_blank" rel="noopener noreferrer" style={{ color: "#cccccc", textDecoration: "none" }}>Demo Sets</a>
+                </div>
+              </div>
+              
+              <div>
+                <iframe 
+                  width="100%" 
+                  height="300" 
+                  scrolling="no" 
+                  frameBorder="no" 
+                  allow="autoplay" 
+                  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%253Aplaylists%253A2226399716&color=%23d1c4ba&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"
+                  title="Demo Sets 2"
+                />
+                <div style={{ fontSize: "10px", color: "#cccccc", lineBreak: "anywhere", wordBreak: "normal", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", fontFamily: "Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif", fontWeight: 100 }}>
+                  <a href="https://soundcloud.com/sochan_life" title="sochan" target="_blank" rel="noopener noreferrer" style={{ color: "#cccccc", textDecoration: "none" }}>sochan</a> · <a href="https://soundcloud.com/sochan_life/sets/demo-sets-2" title="Demo Sets 2" target="_blank" rel="noopener noreferrer" style={{ color: "#cccccc", textDecoration: "none" }}>Demo Sets 2</a>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
