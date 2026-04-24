@@ -65,6 +65,7 @@ export function MusicDetails() {
       inquiry: {
         title: "Contract Inquiry",
         discord: "Discord ID: @sochan.kr",
+        openChat: undefined as { label: string; text: string; url: string } | undefined,
         email: "Email: sochan@cultureand.tech",
       },
     },
@@ -79,7 +80,7 @@ export function MusicDetails() {
         ],
       },
       demoPreview: {
-        title: "데모 미리보기",
+        title: "데모 미리듣기",
       },
       contract: {
         title: "계약 정보",
@@ -117,6 +118,11 @@ export function MusicDetails() {
       inquiry: {
         title: "계약 문의",
         discord: "Discord ID: @sochan.kr",
+        openChat: {
+          label: "오픈채팅",
+          text: "링크",
+          url: "https://open.kakao.com/o/sZ1fAJ3h"
+        },
         email: "이메일: sochan@cultureand.tech",
       },
     },
@@ -268,6 +274,20 @@ export function MusicDetails() {
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </p>
+              {inquiry.openChat && (
+                <p className="text-sm">
+                  <span className="font-semibold">{inquiry.openChat.label}:</span>{" "}
+                  <a
+                    href={inquiry.openChat.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline inline-flex items-center gap-1"
+                  >
+                    {inquiry.openChat.text}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
+              )}
               <p className="text-sm">
                 <span className="font-semibold">{inquiry.email.split(":")[0]}:</span>{" "}
                 <a

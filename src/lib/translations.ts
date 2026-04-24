@@ -102,7 +102,7 @@ const translations: Record<SupportedLanguage, Translations> = {
       home: "홈",
       about: "소개",
       services: "서비스",
-      contact: "연락",
+      contact: "문의",
       brandName: "컬처앤테크",
     },
     hero: {
