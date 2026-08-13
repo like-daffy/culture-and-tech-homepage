@@ -194,7 +194,7 @@ export function MusicDetails() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {discography.items.map((item, idx) => (
                   <div key={idx} className="space-y-2">
-                    {item.videoId ? (
+                    {item.videoId && (
                       <div className="relative w-full aspect-video overflow-hidden rounded-md bg-muted">
                         <iframe
                           className="absolute inset-0 w-full h-full"
@@ -203,10 +203,6 @@ export function MusicDetails() {
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
-                      </div>
-                    ) : (
-                      <div className="w-full aspect-video flex items-center justify-center rounded-md bg-muted text-sm text-muted-foreground">
-                        {language === "ko" ? "영상 준비 중" : "Video coming soon"}
                       </div>
                     )}
                     <p className="text-sm font-medium text-foreground">{item.title}</p>
