@@ -13,9 +13,23 @@ export function MusicDetails() {
       discography: {
         title: "Recent Works",
         items: [
-          "(2024) Oh My Sunshine - Uzuki",
-          "(2024) NEK1 PR4DE SE (Opening Music)",
+          {
+            title: "(2026) Keep on lovin' me - KIPUERU",
+            videoId: "2iXnfiFS91I",
+            start: 1541,
+          },
+          {
+            title: "(2026) SE - KIPUERU",
+            videoId: "2iXnfiFS91I",
+            start: 0,
+          },
+          {
+            title: "(2024) Oh My Sunshine - Utsuki (from ORIKA)",
+            videoId: "Q38vymSkv3o",
+            start: 52,
+          },
         ],
+        additionalWork: "(2024) NEK1 PR4DE SE (Opening Music)",
       },
       demoPreview: {
         title: "Demo Preview",
@@ -75,9 +89,23 @@ export function MusicDetails() {
       discography: {
         title: "최근 작품",
         items: [
-          "Oh My Sunshine - 유츠키",
-          "(2024) NEK1 PR4DE SE (오프닝 음악)",
+          {
+            title: "(2026) Keep on lovin' me - 키프에루",
+            videoId: "2iXnfiFS91I",
+            start: 1541,
+          },
+          {
+            title: "(2026) 키프에루 SE (오프닝 음악)",
+            videoId: "2iXnfiFS91I",
+            start: 0,
+          },
+          {
+            title: "(2024) Oh My Sunshine - 유츠키",
+            videoId: "Q38vymSkv3o",
+            start: 52,
+          },
         ],
+        additionalWork: "(2024) NEK1 PR4DE SE (오프닝 음악)",
       },
       demoPreview: {
         title: "데모 미리듣기",
@@ -155,13 +183,29 @@ export function MusicDetails() {
               <CardTitle>{discography.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {discography.items.map((item, idx) => (
-                  <li key={idx} className="text-muted-foreground">
-                    {item}
-                  </li>
+                  <div key={idx} className="space-y-2">
+                    {item.videoId && (
+                      <div className="relative w-full aspect-video overflow-hidden rounded-md bg-muted">
+                        <iframe
+                          className="absolute inset-0 w-full h-full"
+                          src={`https://www.youtube.com/embed/${item.videoId}${item.start ? `?start=${item.start}` : ""}`}
+                          title={item.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    <p className="text-sm font-medium text-foreground">{item.title}</p>
+                  </div>
                 ))}
-              </ul>
+              </div>
+              {discography.additionalWork && (
+                <p className="text-sm font-medium text-foreground mt-6">
+                  {discography.additionalWork}
+                </p>
+              )}
             </CardContent>
           </Card>
 
