@@ -28,12 +28,8 @@ export function MusicDetails() {
             videoId: "Q38vymSkv3o",
             start: 52,
           },
-          {
-            title: "(2024) NEK1 PR4DE SE (Opening Music)",
-            videoId: null,
-            start: 0,
-          },
         ],
+        additionalWork: "(2024) NEK1 PR4DE SE (Opening Music)",
       },
       demoPreview: {
         title: "Demo Preview",
@@ -108,12 +104,8 @@ export function MusicDetails() {
             videoId: "Q38vymSkv3o",
             start: 52,
           },
-          {
-            title: "(2024) NEK1 PR4DE SE (오프닝 음악)",
-            videoId: null,
-            start: 0,
-          },
         ],
+        additionalWork: "(2024) NEK1 PR4DE SE (오프닝 음악)",
       },
       demoPreview: {
         title: "데모 미리듣기",
@@ -209,6 +201,11 @@ export function MusicDetails() {
                   </div>
                 ))}
               </div>
+              {discography.additionalWork && (
+                <p className="text-sm font-medium text-foreground mt-6">
+                  {discography.additionalWork}
+                </p>
+              )}
             </CardContent>
           </Card>
 
