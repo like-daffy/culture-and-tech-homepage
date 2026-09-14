@@ -32,10 +32,10 @@ const nextConfig = {
   basePath: "/culture",
   trailingSlash: true,
   reactStrictMode: true,
+  turbopack: {
+    rules: getTurboRules(),
+  },
   experimental: {
-    turbo: {
-      rules: getTurboRules(),
-    },
   },
   images: {
     unoptimized: true,

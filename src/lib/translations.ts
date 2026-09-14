@@ -107,12 +107,12 @@ const translations: Record<SupportedLanguage, Translations> = {
     },
     hero: {
       title: "컬처앤테크",
-      subtitle: "지하아이돌 및 라이브아이돌 음악 제작 전문",
-      description: "지하돌 오리곡 제작, 품질 보증 및 전문 세션 서비스",
+      subtitle: "서브컬처 음악 제작 및 라이브아이돌 음악 제작 전문",
+      description: "라이브아이돌 오리지널곡 제작, 품질 보증 및 전문 세션 서비스",
     },
     about: {
       title: "회사 소개",
-      description: "저희는 지하아이돌과 라이브아이돌을 위한 오리지널곡 제작, 품질 보증 및 전문 세션 서비스를 전문으로 하는 선도적인 회사입니다. 문화와 기술의 조화로운 결합을 통해 최고의 서비스를 제공하는 것이 저희의 사명입니다.",
+      description: "저희는 서브컬처 음악과 라이브아이돌을 위한 오리지널곡 제작, 품질 보증 및 전문 세션 서비스를 전문으로 하는 회사입니다. 문화와 기술의 조화로운 결합을 통해 최고의 서비스를 제공하는 것이 저희의 사명입니다.",
     },
     services: {
       title: "서비스",
@@ -159,11 +159,11 @@ export function translate(
   key: string
 ): string {
   const keys = key.split(".");
-  let value: any = translations[language];
+  let value: unknown = translations[language];
 
   for (const k of keys) {
     if (value && typeof value === "object" && k in value) {
-      value = value[k];
+      value = (value as Record<string, unknown>)[k];
     } else {
       console.warn(`Translation key not found: ${key}`);
       return key;
