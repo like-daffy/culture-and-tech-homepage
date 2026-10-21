@@ -39,15 +39,15 @@ Channel deploys first run `npm run build`, add the Cafe24 compatibility assets a
 `out/culture/thai-learn/` (`predeploy` in `firebase.json`).
 
 ```bash
-FB="npx --yes firebase-tools@15.32.1"
+fb() { npx --yes firebase-tools@15.32.1 "$@"; }
 npm ci && npm run lint && node_modules/.bin/tsc --noEmit --incremental false
 
 # Preview: a temporary *.web.app URL, no effect on the live site
-$FB hosting:channel:deploy cafe24-migration --expires 7d --no-authorized-domains --project cultureand-tech-web
+fb hosting:channel:deploy cafe24-migration --expires 7d --no-authorized-domains --project cultureand-tech-web
 scripts/check-live.sh <preview-host> 1.1
 
 # Live: promote the tested preview (no rebuild)
-$FB hosting:clone cultureand-tech-web:cafe24-migration cultureand-tech-web:live --project cultureand-tech-web
+fb hosting:clone cultureand-tech-web:cafe24-migration cultureand-tech-web:live --project cultureand-tech-web
 scripts/check-live.sh cultureand-tech-web.web.app 1.1
 scripts/check-live.sh cultureand.tech 1.1    # passes only after the DNS cutover
 ```
