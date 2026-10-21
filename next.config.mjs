@@ -29,7 +29,6 @@ function getTurboRules() {
 
 const nextConfig = {
   output: "export",
-  basePath: "/culture",
   trailingSlash: true,
   reactStrictMode: true,
   turbopack: {

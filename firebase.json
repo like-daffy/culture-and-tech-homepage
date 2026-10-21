@@ -1,0 +1,27 @@
+{
+  "hosting": {
+    "public": "out",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "predeploy": [
+      "npm run build",
+      "bash scripts/sync-thai-legal.sh --check out/culture/thai-learn"
+    ],
+    "cleanUrls": false,
+    "redirects": [
+      { "source": "/culture", "destination": "/", "type": 301 },
+      { "source": "/culture/", "destination": "/", "type": 301 },
+      { "source": "/culture/index.html", "destination": "/", "type": 301 }
+    ],
+    "headers": [
+      { "source": "**", "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ] },
+      { "source": "/culture/**", "headers": [
+        { "key": "Referrer-Policy", "value": "no-referrer" }
+      ] },
+      { "source": "/culture/**/*.html", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=600, must-revalidate" }
+      ] }
+    ]
+  }
+}
