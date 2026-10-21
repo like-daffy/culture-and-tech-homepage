@@ -3,9 +3,9 @@
 The Culture & Tech homepage (Next.js static export) and the legal pages of our apps, served together from
 Firebase Hosting, project `cultureand-tech-web` (Spark plan, Hosting only).
 
-**Status (2026-10-22):** Firebase serves this build at `https://cultureand-tech-web.web.app/`. The custom domain
-`cultureand.tech` (and `www`) still points at Cafe24 web hosting, which serves the old `/culture` build (see
-`.htaccess` in the git history). The DNS/certificate cutover is pending; see `docs/transfer-to-firebase.md`.
+**Status (2026-10-22):** `cultureand.tech` is served by Firebase Hosting; `www.cultureand.tech` and `http://`
+redirect to `https://cultureand.tech/`. Cafe24 web hosting (the old `/culture` build, see `.htaccess` in the git
+history) is kept as the rollback target until it is retired; see `docs/transfer-to-firebase.md`.
 
 ## What is served from where
 
@@ -49,7 +49,7 @@ scripts/check-live.sh <preview-host> 1.1
 # Live: promote the tested preview (no rebuild)
 fb hosting:clone cultureand-tech-web:cafe24-migration cultureand-tech-web:live --project cultureand-tech-web
 scripts/check-live.sh cultureand-tech-web.web.app 1.1
-scripts/check-live.sh cultureand.tech 1.1    # passes only after the DNS cutover
+scripts/check-live.sh cultureand.tech 1.1
 ```
 
 Rollback of content: Firebase console → Hosting → release history → roll back to the previous release.
@@ -70,15 +70,21 @@ Never edit the copied HTML by hand.
 - Hosting only: never enable Firestore, Functions, Auth or Analytics in `cultureand-tech-web`, and never deploy
   this site to another Firebase project.
 - `Referrer-Policy: no-referrer` applies to `/culture/**` only; the homepage's YouTube embeds need a referrer.
-- No HSTS until the custom domain has been Connected for a while; if it is added later, omit `includeSubDomains`.
+- Firebase itself sends `Strict-Transport-Security: max-age=31556926` (no `includeSubDomains`) on the custom
+  domain. Do not add `includeSubDomains` or `preload`.
 
 ## DNS and rollback
 
-DNS is at Porkbun; mail is Google Workspace (MX, SPF) and does not depend on the web host. Add the custom
-domain in the Firebase console with Advanced Setup (certificate before traffic); keep its ownership TXT record
-permanently (certificate renewal).
-Until Cafe24 is cancelled, rollback is: at Porkbun, restore the apex and `www` records exported before the cutover
-(historically A `183.110.224.126`; verify against the export) and remove any records added for Firebase.
+DNS is at Porkbun; mail is Google Workspace (MX, SPF, DMARC) and does not depend on the web host. Both hostnames
+were added in the Firebase console with Advanced Setup on 2026-10-22. Keep their TXT records permanently
+(certificate renewal): `hosting-site=cultureand-tech-web` on the apex and `www`, and `_acme-challenge` /
+`_acme-challenge.www`. The web records are A `199.36.158.100` on the apex and on `www`; Firebase does the `www`
+redirect, so never use Porkbun's URL forwarding or Quick DNS Config.
+
+Until Cafe24 is cancelled, rollback is: at Porkbun, edit both A records back to `183.110.224.126` (each record's
+note holds the old IP) and leave the TXT records. Because of the HSTS header, Cafe24 must then serve valid HTTPS:
+its Sectigo certificate covers both hostnames until 2027-04-05. Keep the existing Comodo CNAME (probably that
+certificate's validation record) while Cafe24 is the fallback.
 
 `build.sh` / `build.ps1` are legacy Softgen helpers (they rewrite `basePath` and run `npm install`); do not use them
 for Firebase releases. `next.config.mjs.template` mirrors `next.config.mjs`.

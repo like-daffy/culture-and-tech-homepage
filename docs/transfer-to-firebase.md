@@ -308,7 +308,7 @@ Report source integration, local build, Firebase publication, DNS/certificate co
 | Browser (preview host) | Not done: Chrome showed a page titled "Safety warning" for both `web.app` hosts (also the unchanged live one), so the extension could not attach. Google Safe Browsing's transparency report shows no unsafe content for either host |
 | Live release | Accepted by the owner after checking the emulator build. 2026-10-22 00:59: `cafe24-migration` cloned to `live` (no rebuild); live `index.html` identical to the tested preview, build ID `Ll1tzcfuYJBtcM5Ft2I35`; `check-live.sh cultureand-tech-web.web.app 1.1` passes. Content rollback target: the previous live release (00:05) in the console's release history |
 
-Public DNS at the time of this log (authoritative Porkbun answer), for rollback reference; a full zone export from Porkbun is still needed:
+Public DNS before the cutover (authoritative Porkbun answer), kept for rollback reference. No full zone export was made; the cutover changed only the two A records:
 
 | Record | Value |
 | --- | --- |
@@ -322,4 +322,20 @@ Public DNS at the time of this log (authoritative Porkbun answer), for rollback 
 
 No CAA, wildcard, or DNSSEC (DS) records were found, so nothing blocks certificate issuance.
 
-Remaining: Cafe24 document-root backup, Firebase custom-domain Advanced Setup for both hostnames, the Porkbun web-record change, post-cutover checks, observation, and the Cafe24 retirement decision.
+### Cutover — 2026-10-22
+
+Done by the owner in the Firebase console and at Porkbun (Advanced Setup, certificates before traffic), then verified from this repository.
+
+| Step | Result |
+| --- | --- |
+| Ownership/certificate records | TXT `hosting-site=cultureand-tech-web` on the apex and `www`; TXT `_acme-challenge` and `_acme-challenge.www` |
+| Web records | Apex and `www` A records edited in place from `183.110.224.126` to `199.36.158.100`; no AAAA or CNAME; all four Porkbun nameservers agree |
+| Firebase | Both hostnames Connected; `www` redirects to the apex |
+| Certificates | Google Trust Services (WR3), one per hostname, valid until 2027-01-19 |
+| `check-live.sh cultureand.tech 1.1` | Passes, including the HTTP->HTTPS and `www` redirects |
+| Custom-domain content | `index.html` identical to the released build; the `www` redirect keeps path and query; Cafe24 `/culture/_next/` assets 200; `/api/detect-location` 404; favicon and OG image types correct |
+| Headers | Repository cache, `nosniff` and policy `Referrer-Policy` headers apply; Firebase adds `Strict-Transport-Security: max-age=31556926` (no `includeSubDomains`) on the apex |
+| Mail and other records | MX, SPF, DMARC, the OpenAI TXT, the Comodo CNAME and the nameservers unchanged |
+| Rollback | Edit both A records back to `183.110.224.126`. Cafe24 still serves the old site over HTTPS with a Sectigo certificate for both hostnames valid until 2027-04-05, which the HSTS header makes necessary |
+
+Remaining: download the Cafe24 backup started on 2026-10-22 before Cafe24 deletes it (about a day); observe the next day and after a week (HTTP failures, old chunks, embeds, policy pages, Search Console, Hosting usage); then decide whether to retire Cafe24 web hosting.
