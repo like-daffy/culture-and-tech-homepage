@@ -290,3 +290,34 @@ Firebase rollback restores hosted content/configuration; it does not restore DNS
 | Observation, documentation handoff, Cafe24 retirement decision | Pending |
 
 Report source integration, local build, Firebase publication, DNS/certificate completion, custom-domain behavior, and Cafe24 retirement separately. The migration is complete when the retained custom URLs serve the intended Firebase release, the shared policy pages and mail configuration are preserved, and release/rollback ownership is documented.
+
+## 8. Implementation log — 2026-10-22
+
+| Step | Result |
+| --- | --- |
+| Source integration | `firebase-hosting` (`52e04a6`) fast-forwarded into `main`; no divergent commits. Not pushed |
+| Language fallback | `/api/detect-location` fallback and both Pages API routes removed; detection is stored preference -> browser languages -> English, `user-language` key and cookie kept |
+| Template drift | `next.config.mjs.template` now mirrors `next.config.mjs` (Next 16 `turbopack`, no `basePath`) |
+| Old asset overlap | The 26 hashed `/culture/_next/static/` files of the Cafe24 build (byte-identical to what `cultureand.tech` serves) are committed under `compat/cafe24/`; `scripts/add-compat-assets.sh` adds them to `out/` in `predeploy`, after the build |
+| Cache headers | `/` and `*.html` revalidate; `/_next/static/**` and `/culture/_next/static/**` immutable; policy HTML keeps 600 s; `Referrer-Policy` stays on `/culture/**` |
+| Local checks | `npm ci`, lint, `tsc --noEmit`, policy guard on `public/` and `out/`, `npm run build`, `git diff --check`: pass (Node `v24.21.0`) |
+| Language scenarios | Scratch script against `src/lib/language-detection.ts`: saved/cookie priority, ko/en browser, second-choice language, unsupported fallback, invalid saved value, blocked storage: 10/10 pass. No test script exists in `package.json` |
+| Preview | Channel `cafe24-migration`, `https://cultureand-tech-web--cafe24-migration-pm9n72xd.web.app`, expires 2026-10-29, built from `cec702e`, Next build ID `Ll1tzcfuYJBtcM5Ft2I35` |
+| Preview HTTP | `scripts/check-live.sh <preview> 1.1` passes; every `/_next/` and `/culture/_next/` asset referenced by the new and the Cafe24 HTML is 200 with CSS/JS types; `/culture`, `/culture/index.html` 301 to `/` with query kept; `/api/detect-location` 404; favicon/OG image types correct; no `noindex` |
+| Browser (Hosting emulator on the same `out/`) | Homepage renders, all assets 200, no console errors or `/api/` requests; saved `ko` beats `en-US` browser; EN/KO switch persists across reloads; the Cafe24 HTML loads all 15 of its `/culture/_next/` assets and hydrates; policy page 1.1 with canonical and own CSS; unknown path shows the 404 page. Phone/tablet widths and embed playback not checked |
+| Browser (preview host) | Not done: Chrome showed a page titled "Safety warning" for both `web.app` hosts (also the unchanged live one), so the extension could not attach. Google Safe Browsing's transparency report shows no unsafe content for either host |
+| Live release | Unchanged: `live` channel last released 2026-10-22 00:05 (the earlier Firebase build) |
+
+Public DNS at the time of this log (authoritative Porkbun answer), for rollback reference; a full zone export from Porkbun is still needed:
+
+| Record | Value |
+| --- | --- |
+| `cultureand.tech` A | `183.110.224.126`, TTL 600; no AAAA/CNAME |
+| `www.cultureand.tech` A | `183.110.224.126`, TTL 600; no AAAA/CNAME |
+| NS | `curitiba`, `fortaleza`, `maceio`, `salvador` `.ns.porkbun.com` |
+| MX | Google Workspace (`aspmx.l.google.com` and alternates, `smtp.google.com`) |
+| TXT (apex) | SPF `include:_spf.google.com`, an OpenAI domain verification; no Firebase `hosting-site` ownership record |
+| `_dmarc` | `p=quarantine` |
+| `_acme-challenge` (apex, `www`) | none, so certificates for the custom domain are not prepared yet |
+
+Remaining: accept the preview, promote it to `live`, push `main`, Cafe24 document-root backup, Firebase custom-domain Advanced Setup for both hostnames, the Porkbun web-record change, post-cutover checks, observation, and the Cafe24 retirement decision.
