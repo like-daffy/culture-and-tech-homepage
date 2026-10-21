@@ -4,6 +4,7 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "predeploy": [
       "npm run build",
+      "bash scripts/add-compat-assets.sh out",
       "bash scripts/sync-thai-legal.sh --check out/culture/thai-learn"
     ],
     "cleanUrls": false,
@@ -15,6 +16,18 @@
     "headers": [
       { "source": "**", "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ] },
+      { "source": "/", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ] },
+      { "source": "**/*.html", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ] },
+      { "source": "/_next/static/**", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ] },
+      { "source": "/culture/_next/static/**", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ] },
       { "source": "/culture/**", "headers": [
         { "key": "Referrer-Policy", "value": "no-referrer" }

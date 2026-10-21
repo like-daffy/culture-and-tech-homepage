@@ -3,8 +3,9 @@
  * Implements multi-tier language detection with priority hierarchy:
  * 1. Persistent Preference (localStorage/cookies)
  * 2. Browser Settings (navigator.language)
- * 3. IP-based Geolocation
- * 4. Fallback (English)
+ * 3. Fallback (English)
+ *
+ * The site is a static export, so there is no server-side (IP) detection.
  */
 
 export type SupportedLanguage = "en" | "ko";
@@ -12,19 +13,6 @@ export type SupportedLanguage = "en" | "ko";
 const STORAGE_KEY = "user-language";
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "ko"];
 const DEFAULT_LANGUAGE: SupportedLanguage = "en";
-
-// Map country codes to languages
-const COUNTRY_LANGUAGE_MAP: Record<string, SupportedLanguage> = {
-  KR: "ko", // South Korea
-  KP: "ko", // North Korea
-  US: "en",
-  GB: "en",
-  CA: "en",
-  AU: "en",
-  NZ: "en",
-  IE: "en",
-  // Add more mappings as needed
-};
 
 /**
  * Priority 1: Check for stored language preference
@@ -86,34 +74,6 @@ function getBrowserLanguage(): SupportedLanguage | null {
 }
 
 /**
- * Priority 3: Detect language from IP-based geolocation
- */
-async function getGeolocationLanguage(): Promise<SupportedLanguage | null> {
-  if (typeof window === "undefined") return null;
-
-  try {
-    // Try Cloudflare's CF-IPCountry header first (if available via API route)
-    const response = await fetch("/api/detect-location", {
-      method: "GET",
-      cache: "no-cache",
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const countryCode = data.country as string;
-
-      if (countryCode && COUNTRY_LANGUAGE_MAP[countryCode]) {
-        return COUNTRY_LANGUAGE_MAP[countryCode];
-      }
-    }
-  } catch (error) {
-    console.warn("Geolocation detection failed, using fallback:", error);
-  }
-
-  return null;
-}
-
-/**
  * Store language preference persistently
  */
 export function storeLanguagePreference(language: SupportedLanguage): void {
@@ -134,48 +94,21 @@ export function storeLanguagePreference(language: SupportedLanguage): void {
 
 /**
  * Main language detection function
- * Follows priority hierarchy: Stored > Browser > Geolocation > Fallback
+ * Follows priority hierarchy: Stored > Browser > Fallback
  */
-export async function detectUserLanguage(): Promise<SupportedLanguage> {
+export function detectUserLanguage(): SupportedLanguage {
   // Priority 1: Stored preference
   const stored = getStoredLanguage();
-  if (stored) {
-    console.log("Language detected from storage:", stored);
-    return stored;
-  }
+  if (stored) return stored;
 
   // Priority 2: Browser settings
   const browser = getBrowserLanguage();
   if (browser) {
-    console.log("Language detected from browser:", browser);
     storeLanguagePreference(browser); // Store for future visits
     return browser;
   }
 
-  // Priority 3: Geolocation (async)
-  const geolocation = await getGeolocationLanguage();
-  if (geolocation) {
-    console.log("Language detected from geolocation:", geolocation);
-    storeLanguagePreference(geolocation); // Store for future visits
-    return geolocation;
-  }
-
-  // Priority 4: Fallback
-  console.log("Using fallback language:", DEFAULT_LANGUAGE);
-  return DEFAULT_LANGUAGE;
-}
-
-/**
- * Synchronous language detection (skips geolocation)
- * Used for initial render to avoid hydration issues
- */
-export function detectUserLanguageSync(): SupportedLanguage {
-  const stored = getStoredLanguage();
-  if (stored) return stored;
-
-  const browser = getBrowserLanguage();
-  if (browser) return browser;
-
+  // Priority 3: Fallback
   return DEFAULT_LANGUAGE;
 }
 

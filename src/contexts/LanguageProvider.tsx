@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import {
   type SupportedLanguage,
   detectUserLanguage,
-  detectUserLanguageSync,
   storeLanguagePreference,
 } from "@/lib/language-detection";
 import { getTranslations, type Translations } from "@/lib/translations";
@@ -29,37 +28,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   // Detect and apply language after component mounts (client-side only)
   useEffect(() => {
-    let mounted = true;
-
-    async function detectAndApplyLanguage() {
-      try {
-        // First try synchronous detection (stored preference + browser)
-        const syncDetected = detectUserLanguageSync();
-        if (mounted && syncDetected !== "en") {
-          setLanguageState(syncDetected);
-          setTranslations(getTranslations(syncDetected));
-        }
-
-        // Then try async detection (geolocation)
-        const asyncDetected = await detectUserLanguage();
-        if (mounted && asyncDetected !== syncDetected) {
-          setLanguageState(asyncDetected);
-          setTranslations(getTranslations(asyncDetected));
-        }
-      } catch (error) {
-        console.error("Error during language detection:", error);
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
+    try {
+      // Stored preference, then browser settings, then English
+      const detected = detectUserLanguage();
+      if (detected !== "en") {
+        setLanguageState(detected);
+        setTranslations(getTranslations(detected));
       }
+    } catch (error) {
+      console.error("Error during language detection:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    detectAndApplyLanguage();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   // Handle manual language changes
