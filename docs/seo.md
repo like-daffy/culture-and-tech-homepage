@@ -32,12 +32,20 @@ and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passe
 | Bing Webmaster Tools | Imported from Search Console | Import | Check the sitemap is listed |
 | Naver Search Advisor | `https://cultureand.tech` | HTML tag (`naver-site-verification`, added in `src/pages/_document.tsx`) | Submit `sitemap.xml`; request collection of `/ko/` |
 
+## Old address music.cafe24.com
+
+On 2026-10-22 Naver still listed the old profile pages on `https://music.cafe24.com/`, which answered 200 with
+canonical URLs on that host. `cafe24/` holds their 301s to `cultureand.tech` (Korean pages to `/ko/`, the others
+to `/`). Live since 2026-10-22; `scripts/check-music-cafe24.sh` passes. Next: request collection of the old URLs
+in Naver Search Advisor (`cafe24/README.md`).
+
 ## Measurement
 
 Re-measure on **2026-11-05** (14 days after the release), leaving out the last 2–3 days of data:
 
 - Search Console and Search Advisor: impressions, clicks, indexed pages, top queries
 - `site:cultureand.tech` on Google, Naver and Bing
+- `site:music.cafe24.com` on Naver and Google: the old pages replaced by `cultureand.tech`
 - AI citation (O/X) in ChatGPT search, Perplexity and Naver AI briefing for starter questions such as
   "라이브아이돌 오리지널곡 제작", "지하아이돌 오리곡 제작 의뢰", "컬처앤테크", "live idol original song producer Korea"
 

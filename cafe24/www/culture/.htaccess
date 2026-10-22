@@ -1,0 +1,22 @@
+RewriteEngine On
+RewriteBase /culture/
+
+# music.cafe24.com/culture/… moved to cultureand.tech (see cafe24/README.md in the cultureand.tech repository).
+# The root .htaccess does not run below /culture/, because this file has rewrite rules of its own.
+RewriteCond %{HTTP_HOST} ^music\.cafe24\.com$ [NC]
+RewriteRule ^(index\.html)?$ https://cultureand.tech/ [R=301,L]
+
+RewriteCond %{HTTP_HOST} ^music\.cafe24\.com$ [NC]
+RewriteRule ^(.+)$ https://cultureand.tech/culture/$1 [R=301,L]
+
+# Below: unchanged from the live file before this change (Cafe24 /www/culture/.htaccess, 2026-10-22). Serves the
+# old /culture build's paths when cultureand.tech points back to Cafe24 for a rollback.
+
+# (여기에 리액트, 뷰, 혹은 다른 앱 구동을 위한 기본 규칙만 남기세요)
+# 기존에 가이드해드린 HTTPS 강제 리다이렉트 코드는 여기서 삭제하십시오.
+# 루트에서 이미 처리했기 때문에 중복되면 무한 루프가 발생합니다.
+
+# 예: 내부 경로 처리용 (필요한 경우에만 사용)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /culture/index.html [L]

@@ -340,4 +340,4 @@ Done by the owner in the Firebase console and at Porkbun (Advanced Setup, certif
 
 Cafe24 backup: skipped (owner decision, 2026-10-22: Cafe24 holds no data that needs keeping). Rollback to Cafe24 relies on that hosting staying active; once it is cancelled, that rollback is no longer available.
 
-Remaining: observe the next day and after a week (HTTP failures, old chunks, embeds, policy pages, Search Console, Hosting usage); then decide whether to retire Cafe24 web hosting.
+Remaining: observe the next day and after a week (HTTP failures, old chunks, embeds, policy pages, Search Console, Hosting usage); then decide whether to retire Cafe24 web hosting. Its web root also redirects the old address `music.cafe24.com` (`cafe24/README.md`); retiring it ends those redirects.

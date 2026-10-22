@@ -1,0 +1,9 @@
+# music.cafe24.com moved to https://cultureand.tech/ (every page answers 301). Nothing is blocked, so crawlers
+# can read the old URLs and follow their redirects.
+User-agent: *
+Allow: /
+
+Sitemap: https://cultureand.tech/sitemap.xml
+
+# Daum webmaster tools verification of music.cafe24.com, kept from the old robots.txt
+#DaumWebMasterTool:15316b810db7dfc00be072afdd4fcaa6dbae1f0348dd0becdff648bc4f49095d:0/sbDtZQ+1igeUg/iXJspg==

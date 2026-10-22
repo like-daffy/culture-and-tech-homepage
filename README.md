@@ -4,8 +4,9 @@ The Culture & Tech homepage (Next.js static export) and the legal pages of our a
 Firebase Hosting, project `cultureand-tech-web` (Spark plan, Hosting only).
 
 **Status (2026-10-22):** `cultureand.tech` is served by Firebase Hosting; `www.cultureand.tech` and `http://`
-redirect to `https://cultureand.tech/`. Cafe24 web hosting (the old `/culture` build, see `.htaccess` in the git
-history) is kept as the rollback target until it is retired; see `docs/transfer-to-firebase.md`.
+redirect to `https://cultureand.tech/`. Cafe24 web hosting (the old `/culture` build) is kept as the rollback target
+until it is retired; see `docs/transfer-to-firebase.md`. Its web root files, including the `.htaccess` and the 301s
+of the old address `music.cafe24.com`, are in `cafe24/`.
 
 ## What is served from where
 
@@ -17,6 +18,7 @@ history) is kept as the rollback target until it is retired; see `docs/transfer-
 | `/culture/storage-review/privacy.html` (planned) | `public/culture/storage-review/` | from `mac-get-space` `docs/12-privacy-policy-draft.md` once approved |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
+| `https://music.cafe24.com/…` (old address, not Firebase) | `cafe24/www/` | Uploaded by hand to the Cafe24 web root: 301 to `cultureand.tech`, checked by `scripts/check-music-cafe24.sh`; see `cafe24/README.md` |
 
 The `/culture/...` legal URLs are registered in the Toss console and App Store Connect. They must keep returning
 200 at exactly these paths, so `cleanUrls` stays `false` and `trailingSlash` is unset in `firebase.json`.
@@ -93,7 +95,8 @@ redirect, so never use Porkbun's URL forwarding or Quick DNS Config.
 Until Cafe24 is cancelled, rollback is: at Porkbun, edit both A records back to `183.110.224.126` (each record's
 note holds the old IP) and leave the TXT records. Because of the HSTS header, Cafe24 must then serve valid HTTPS:
 its Sectigo certificate covers both hostnames until 2027-04-05. Keep the existing Comodo CNAME (probably that
-certificate's validation record) while Cafe24 is the fallback.
+certificate's validation record) while Cafe24 is the fallback. Cancelling Cafe24 also ends the `music.cafe24.com`
+redirects, so keep it until Naver and Google list `cultureand.tech` instead.
 
 `build.sh` / `build.ps1` are legacy Softgen helpers (they rewrite `basePath` and run `npm install`); do not use them
 for Firebase releases. `next.config.mjs.template` mirrors `next.config.mjs`.
