@@ -338,4 +338,6 @@ Done by the owner in the Firebase console and at Porkbun (Advanced Setup, certif
 | Mail and other records | MX, SPF, DMARC, the OpenAI TXT, the Comodo CNAME and the nameservers unchanged |
 | Rollback | Edit both A records back to `183.110.224.126`. Cafe24 still serves the old site over HTTPS with a Sectigo certificate for both hostnames valid until 2027-04-05, which the HSTS header makes necessary |
 
-Remaining: download the Cafe24 backup started on 2026-10-22 before Cafe24 deletes it (about a day); observe the next day and after a week (HTTP failures, old chunks, embeds, policy pages, Search Console, Hosting usage); then decide whether to retire Cafe24 web hosting.
+Cafe24 backup: skipped (owner decision, 2026-10-22: Cafe24 holds no data that needs keeping). Rollback to Cafe24 relies on that hosting staying active; once it is cancelled, that rollback is no longer available.
+
+Remaining: observe the next day and after a week (HTTP failures, old chunks, embeds, policy pages, Search Console, Hosting usage); then decide whether to retire Cafe24 web hosting.
