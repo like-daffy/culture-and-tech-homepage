@@ -2,6 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
+import { Apps } from "@/components/Apps";
 import { Services } from "@/components/Services";
 import { MusicDetails, musicDetailsContent } from "@/components/MusicDetails";
 import { Footer } from "@/components/Footer";
@@ -31,6 +32,7 @@ export function Home({ language }: HomeProps) {
         <main>
           <Hero />
           <About />
+          <Apps />
           <Services />
           <MusicDetails />
         </main>

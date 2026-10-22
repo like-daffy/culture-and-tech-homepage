@@ -1,0 +1,614 @@
+/**
+ * The apps for musicians: the homepage's Apps section, the app pages and their structured data all read this.
+ *
+ * Every app here must be about making music; that is the concept of the section. Claims must be true on the day
+ * they are published, and only what the app's own repository documents:
+ * - Chord to MIDI: chord-to-midi-web (content/, site.config.json). DAW drag and ads are left out while the
+ *   extension is not on the Chrome Web Store and AdSense has not approved the site.
+ * - Storage Review: mac-get-space (README, docs/05-protection-defaults.md, docs/09-distribution.md,
+ *   docs/plans/free-vs-expert-version.md). No price: the App Store sets it.
+ * Not introduced here: MIDI Utility (not public) and the Thai app (not a music app).
+ */
+
+import type { LucideIcon } from "lucide-react";
+import { HardDrive, KeyboardMusic } from "lucide-react";
+import type { SupportedLanguage } from "./language-detection";
+
+export type AppSlug = "chord-to-midi" | "storage-review";
+
+/** Order of the apps on the homepage and under "More apps" */
+export const APP_SLUGS: AppSlug[] = ["chord-to-midi", "storage-review"];
+
+export interface AppImage {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  caption?: string;
+}
+
+export interface AppSection {
+  title: string;
+  intro?: string;
+  /** "steps" numbers the items */
+  style?: "cards" | "steps";
+  items: { title: string; text: string }[];
+  note?: string;
+}
+
+export interface AppContent {
+  name: string;
+  /** Availability, shown as a badge */
+  status: string;
+  tagline: string;
+  /** The homepage card's text */
+  summary: string;
+  /** The homepage card's bullets; also the structured data's featureList */
+  highlights: string[];
+  /** Opening paragraphs of the app page */
+  intro: string[];
+  /** Link to the app itself; absent while the app is not available */
+  cta?: { label: string; href: string };
+  screenshots: AppImage[];
+  sections: AppSection[];
+  /** Shown on the app page and repeated in its FAQPage structured data */
+  faq: { question: string; answer: string }[];
+  /** Support line; "{email}" becomes a mail link to supportEmail */
+  support: string;
+}
+
+export interface AppInfo {
+  slug: AppSlug;
+  /** Square app icon; without one, fallbackIcon is drawn on a tile */
+  icon?: string;
+  fallbackIcon: LucideIcon;
+  /** Link preview image, 1200 x 630 */
+  ogImage: string;
+  supportEmail: string;
+  /** The app's privacy policy on this site, once it is published there */
+  privacyPolicyPath?: string;
+  /** schema.org facts for the app page's structured data */
+  schema: {
+    type: "WebApplication" | "SoftwareApplication";
+    applicationCategory: string;
+    operatingSystem: string;
+    /** Every feature is free; adds an Offer with price 0 */
+    free?: boolean;
+  };
+  content: Record<SupportedLanguage, AppContent>;
+}
+
+const SUPPORT_EMAIL = "contact@cultureand.tech";
+
+const chordToMidi: AppInfo = {
+  slug: "chord-to-midi",
+  icon: "/images/apps/chord-to-midi/icon.png",
+  fallbackIcon: KeyboardMusic,
+  ogImage: "/images/apps/chord-to-midi/og.png",
+  supportEmail: SUPPORT_EMAIL,
+  schema: {
+    type: "WebApplication",
+    applicationCategory: "MultimediaApplication",
+    operatingSystem: "Any (web browser)",
+    free: true,
+  },
+  content: {
+    en: {
+      name: "Chord to MIDI",
+      status: "Free web app",
+      tagline: "From a chord progression to a MIDI clip in your DAW, in a minute.",
+      summary:
+        "Type a progression, hear it on a piano and download a MIDI file for your DAW. Open a MIDI file to read its chords. Free, in your browser.",
+      highlights: [
+        "Reads chord spellings from real charts, from Cm7-5 and CΔ7 to E7/G#",
+        "Turns a MIDI file back into chord symbols, spelled for the song's key",
+        "Runs in your browser: progressions and MIDI files are never uploaded",
+        "Free, with nothing to install, on a computer or a phone",
+      ],
+      intro: [
+        "You can hear the changes in your head. Chord to MIDI gets them into your DAW without drawing every note by hand.",
+        "Type a progression such as Am7 - [Dm7 - G7] - Cmaj7(x2), press Generate and listen to it on a piano. Download the MIDI file and drag it into your DAW, or open a MIDI file and get its chords back as text.",
+      ],
+      cta: { label: "Open Chord to MIDI", href: "https://chord-to-midi.app/" },
+      screenshots: [
+        {
+          src: "/images/apps/chord-to-midi/tool-en.png",
+          width: 1248,
+          height: 642,
+          alt: "Chord to MIDI with the progression Am7 - [Dm7 - G7] - Cmaj7(x2) - E7/G# on a chord track, the MIDI clip below it and the notes of the selected chord",
+          caption: "The chords on a track, the MIDI clip ready to download, and the notes of the selected chord.",
+        },
+      ],
+      sections: [
+        {
+          title: "Made for sketching harmony",
+          intro:
+            "For songwriters, producers and arrangers who think in chord symbols. Sketch the changes for a verse, try a reharmonization, or get a J-pop royal road progression or a K-pop ballad full of slash chords into your DAW.",
+          items: [
+            {
+              title: "Write it the way charts do",
+              text: "It understands the spellings on real charts, from Cm7-5 and CΔ7 to C7(#9) and E7/G#. If it doesn't know a chord, it tells you which one instead of guessing.",
+            },
+            {
+              title: "Hear it before you commit",
+              text: "The clip plays on a piano. Click any chord to hear it on its own and see its notes.",
+            },
+            {
+              title: "Read the chords of a MIDI file",
+              text: "Open or drop a .mid file and Chord to MIDI writes out its chords as a progression, with the tempo from the file and the names spelled the way a chart in the song's key would write them.",
+            },
+            {
+              title: "Your music stays on your device",
+              text: "The chord engine runs in your browser as WebAssembly. Your progressions and MIDI files are processed on your device and never uploaded.",
+            },
+          ],
+        },
+      ],
+      faq: [
+        {
+          question: "Is Chord to MIDI free?",
+          answer:
+            "Yes. Every feature is free to use, and you don't need an account to type, play, download or import.",
+        },
+        {
+          question: "Which DAWs can use the MIDI file?",
+          answer:
+            "Any DAW or music app that can import a standard MIDI file (.mid). The file holds the tempo, a 4/4 time signature and one track of block chords set to the General MIDI acoustic grand piano, so you can play it with any instrument.",
+        },
+        {
+          question: "Are my progressions or MIDI files uploaded?",
+          answer:
+            "No. They are processed on your device and never uploaded. Share links keep the progression after the # in the address, the part browsers never send to a server.",
+        },
+        {
+          question: "Can I use the MIDI files in my own songs?",
+          answer:
+            "Yes. The progressions you type and the MIDI files you make with Chord to MIDI are yours to use, commercial releases included.",
+        },
+        {
+          question: "Does it work on phones and tablets?",
+          answer:
+            "Yes. Typing, playback, import and download all work in mobile browsers. On iPhone and iPad, Safari saves the downloaded .mid file to the Files app.",
+        },
+      ],
+      support: "Questions, bug reports and ideas are welcome at {email}.",
+    },
+    ko: {
+      name: "Chord to MIDI",
+      status: "무료 웹 앱",
+      tagline: "코드 진행을 입력하면 1분 안에 DAW에 넣을 MIDI 클립이 됩니다.",
+      summary:
+        "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일을 열면 코드를 읽어 줍니다. 브라우저에서 무료로 씁니다.",
+      highlights: [
+        "Cm7-5, CΔ7부터 E7/G#까지 실제 코드 악보의 표기를 이해합니다",
+        "MIDI 파일을 곡의 조에 맞춘 코드 심벌로 바꿔 줍니다",
+        "브라우저 안에서 실행되어 코드 진행과 MIDI 파일을 업로드하지 않습니다",
+        "설치 없이 무료로, 컴퓨터와 휴대폰에서 씁니다",
+      ],
+      intro: [
+        "머릿속에 들리는 코드 진행을 음표 하나하나 그리지 않고 DAW로 옮기세요.",
+        "Am7 - [Dm7 - G7] - Cmaj7(x2)처럼 코드 진행을 입력하고 생성을 누르면 피아노로 들려줍니다. MIDI 파일을 내려받아 DAW로 끌어다 놓거나, 반대로 MIDI 파일을 열어 코드를 텍스트로 받아 보세요.",
+      ],
+      cta: { label: "Chord to MIDI 열기", href: "https://chord-to-midi.app/ko/" },
+      screenshots: [
+        {
+          src: "/images/apps/chord-to-midi/tool-ko.png",
+          width: 1248,
+          height: 642,
+          alt: "Chord to MIDI 화면: 코드 진행 Am7 - [Dm7 - G7] - Cmaj7(x2) - E7/G#의 코드 트랙과 MIDI 클립, 선택한 코드의 구성음",
+          caption: "코드 트랙, 내려받을 MIDI 클립, 선택한 코드의 구성음이 한 화면에 보입니다.",
+        },
+      ],
+      sections: [
+        {
+          title: "화성을 스케치하는 도구",
+          intro:
+            "코드 심벌로 생각하는 작곡가, 프로듀서, 편곡자를 위한 도구입니다. 벌스의 코드를 스케치하거나 리하모니제이션을 시도해 보고, J-pop의 왕도 진행이나 슬래시 코드가 많은 K-pop 발라드 진행을 DAW로 옮겨 보세요.",
+          items: [
+            {
+              title: "코드 악보에 쓰는 그대로",
+              text: "Cm7-5, CΔ7부터 C7(#9), E7/G#까지 실제 코드 악보의 표기를 이해합니다. 모르는 코드는 추측하지 않고 어떤 코드인지 알려 줍니다.",
+            },
+            {
+              title: "넣기 전에 먼저 듣기",
+              text: "클립이 피아노로 재생됩니다. 코드를 클릭하면 그 코드만 들리고 구성음이 표시됩니다.",
+            },
+            {
+              title: "MIDI 파일의 코드 읽기",
+              text: ".mid 파일을 열거나 끌어다 놓으면 코드를 진행으로 적어 줍니다. 템포는 파일에서 가져오고, 코드 이름은 곡의 조에 맞춰 코드 악보식으로 표기합니다.",
+            },
+            {
+              title: "음악은 기기 안에서만",
+              text: "코드 엔진은 WebAssembly로 브라우저 안에서 실행됩니다. 코드 진행과 MIDI 파일은 기기에서만 처리되며 업로드되지 않습니다.",
+            },
+          ],
+        },
+      ],
+      faq: [
+        {
+          question: "Chord to MIDI는 무료인가요?",
+          answer:
+            "네. 모든 기능을 무료로 쓸 수 있고, 코드 진행 입력, 재생, 다운로드, MIDI 가져오기에는 계정이 필요 없습니다.",
+        },
+        {
+          question: "어떤 DAW에서 MIDI 파일을 쓸 수 있나요?",
+          answer:
+            "표준 MIDI 파일(.mid)을 불러올 수 있는 DAW나 음악 앱이라면 어디서든 쓸 수 있습니다. 파일에는 템포, 4/4박자, General MIDI 어쿠스틱 그랜드 피아노로 지정한 블록 코드 트랙 하나가 들어 있어 어떤 악기로든 연주할 수 있습니다.",
+        },
+        {
+          question: "코드 진행이나 MIDI 파일이 업로드되나요?",
+          answer:
+            "아니요. 사용자의 기기에서만 처리되며 업로드되지 않습니다. 공유 링크도 코드 진행을 주소의 # 뒤에 담는데, 이 부분은 브라우저가 서버로 보내지 않습니다.",
+        },
+        {
+          question: "만든 MIDI 파일을 제 곡에 써도 되나요?",
+          answer:
+            "네. 입력한 코드 진행과 Chord to MIDI로 만든 MIDI 파일은 상업적 발매를 포함해 자유롭게 쓸 수 있습니다.",
+        },
+        {
+          question: "휴대폰이나 태블릿에서도 되나요?",
+          answer:
+            "네. 모바일 브라우저에서도 입력, 재생, 가져오기, 다운로드를 모두 할 수 있습니다. iPhone과 iPad의 Safari는 내려받은 .mid 파일을 파일 앱에 저장합니다.",
+        },
+      ],
+      support: "질문, 버그 제보, 아이디어는 {email}로 보내 주세요.",
+    },
+  },
+};
+
+const storageReview: AppInfo = {
+  slug: "storage-review",
+  fallbackIcon: HardDrive,
+  ogImage: "/images/apps/storage-review/og.png",
+  supportEmail: SUPPORT_EMAIL,
+  // Set to "/culture/storage-review/privacy.html" once mac-get-space's policy is published there
+  privacyPolicyPath: undefined,
+  schema: {
+    type: "SoftwareApplication",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "macOS 14 or later",
+  },
+  content: {
+    en: {
+      name: "Storage Review",
+      status: "Coming to the Mac App Store",
+      tagline: "Free up your Mac without touching your music.",
+      summary:
+        "A storage cleaner that knows what a producer's Mac holds. Your samples, presets, projects and plug-ins can't be selected for removal, and nothing is deleted until you approve a fixed plan.",
+      highlights: [
+        "Music Production protection is on by default",
+        "Every item says why it's a candidate and whether it comes back",
+        "Moves items to the Trash, then reports what actually changed",
+        "No network access, no analytics, no account",
+      ],
+      intro: [
+        "The disk-full warning always arrives in the middle of a session. A cleaner that guesses can hit a sample library or a project's audio folder, and that costs more than the space it frees.",
+        "Storage Review is built for a musician's Mac. It finds the caches, installers and leftovers worth removing, explains every one, and keeps your music out of reach.",
+      ],
+      screenshots: [
+        {
+          src: "/images/apps/storage-review/main.webp",
+          width: 1440,
+          height: 900,
+          alt: "Storage Review's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
+          caption:
+            "Every candidate shows why it's here and what removing it does. Before a cache is offered, every file inside is checked for music, presets and projects, and a downloaded preset pack stays protected.",
+        },
+        {
+          src: "/images/apps/storage-review/protection.webp",
+          width: 1440,
+          height: 900,
+          alt: "The Protection & exclusions screen with the Music Production profile on, listing rule groups for music production, audio plug-ins and vendor content, video originals, device backups, credentials and AI assistant data",
+          caption: "The Music Production profile is on from the first scan. Protected items never get a checkbox.",
+        },
+      ],
+      sections: [
+        {
+          title: "What stays protected",
+          intro:
+            "The Music Production profile is on by default. It protects all of this wherever it is, even inside caches, downloads, package folders and build products.",
+          items: [
+            { title: "Audio and stems", text: "WAV, AIFF, FLAC, MP3, M4A, CAF and other audio files." },
+            {
+              title: "Sample libraries and instruments",
+              text: "Kontakt, EXS, SFZ and SoundFont files, REX loops and other sample library formats.",
+            },
+            { title: "Presets, patches and MIDI", text: "Plug-in presets and banks, SysEx dumps and MIDI files." },
+            {
+              title: "DAW projects",
+              text: "Projects from Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio and Reaper.",
+            },
+            {
+              title: "Plug-ins and vendor content",
+              text: "VST, VST3, Audio Unit, AAX and CLAP plug-ins, and the content folders of sample and plug-in makers.",
+            },
+            {
+              title: "Your music folders",
+              text: "Your Music folder, ~/Library/Audio and /Library/Audio, your Splice folder, and any folder named after a DAW, a sound library or words like presets, stems, loops or sample packs.",
+            },
+          ],
+          note: "One audio file inside a cache's ZIP keeps the whole cache, and archives in your Downloads are looked inside first: a sample pack that holds audio, presets or projects stays. Protected items never get a checkbox, and a folder that holds protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are protected too. Turning a rule off is a deliberate choice, and the app asks first.",
+        },
+        {
+          title: "How a cleanup works",
+          style: "steps",
+          items: [
+            { title: "Scan", text: "Scanning only reads, and nothing is selected by default." },
+            {
+              title: "Review",
+              text: "Each candidate says why it's there, what removing it does and whether it comes back. Re-creatable items, items to review first, personal files and protected items are kept apart.",
+            },
+            {
+              title: "Approve a fixed plan",
+              text: "The plan lists exactly what will be removed, and you confirm it with Touch ID or your login password.",
+            },
+            {
+              title: "Remove and report",
+              text: "Each item is checked again right before it is removed. Items go to the Trash, and the report shows what actually changed. Moving to the Trash frees no space until the Trash is emptied, and the app says so.",
+            },
+          ],
+        },
+        {
+          title: "Free and Expert",
+          items: [
+            {
+              title: "Free",
+              text: "Clears browser and app caches, installers and updaters, development caches and the items in your Trash. Shows the Expert items with their sizes, locked.",
+            },
+            {
+              title: "Expert, a one-time in-app purchase",
+              text: "Adds more sources, such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and iCloud archive duplicates, plus permanent deletion, a deeper scan and duplicate verification.",
+            },
+          ],
+          note: "Every safety feature is in both. None of them is part of the purchase.",
+        },
+        {
+          title: "Privacy and requirements",
+          items: [
+            {
+              title: "Nothing leaves your Mac",
+              text: "Storage Review has no network access, no analytics and no account.",
+            },
+            {
+              title: "macOS 14 or later",
+              text: "On first launch it asks once for access to your home folder. Full Disk Access is optional and adds the Trash, device backups, Mail and Messages to the scan.",
+            },
+          ],
+        },
+      ],
+      faq: [
+        {
+          question: "Will it delete my sample libraries, presets or projects?",
+          answer:
+            "No. The Music Production profile protects audio, samples, presets, MIDI, DAW projects and plug-ins wherever they are, even inside caches and archives. Protected items can't be selected, and a folder that holds protected content can't be removed as a whole.",
+        },
+        {
+          question: "Does it delete anything on its own?",
+          answer:
+            "No. Scanning only reads, and nothing is selected by default. You approve a fixed plan with Touch ID or your login password, and each item is checked again right before it is removed.",
+        },
+        {
+          question: "What is the difference between Free and Expert?",
+          answer:
+            "Free clears browser and app caches, installers, development caches and your Trash, and shows Expert items with their sizes, locked. Expert, a one-time in-app purchase, adds more sources such as project environments, Xcode build caches and Final Cut Pro render files, plus permanent deletion, a deeper scan and duplicate verification. The safety features are the same in both.",
+        },
+        {
+          question: "Does it send anything about my files anywhere?",
+          answer: "No. The app has no network access, no analytics and no account.",
+        },
+        {
+          question: "What do I need to run it?",
+          answer:
+            "A Mac with macOS 14 or later. It asks once for access to your home folder, and Full Disk Access is optional.",
+        },
+        {
+          question: "Can I get it now?",
+          answer:
+            "Not yet. Storage Review is coming to the Mac App Store, and this page will link to it once it is available.",
+        },
+      ],
+      support: "Questions about Storage Review are welcome at {email}.",
+    },
+    ko: {
+      name: "Storage Review",
+      status: "Mac App Store 출시 예정",
+      tagline: "음악 파일은 건드리지 않고 Mac 용량을 비웁니다.",
+      summary:
+        "프로듀서의 Mac에 무엇이 들어 있는지 아는 저장 공간 정리 앱입니다. 샘플, 프리셋, 프로젝트, 플러그인은 삭제 대상으로 고를 수 없고, 고정된 삭제 계획을 직접 승인하기 전에는 아무것도 지워지지 않습니다.",
+      highlights: [
+        "음악 제작(Music Production) 보호 프로필이 기본으로 켜져 있습니다",
+        "항목마다 정리 후보가 된 이유와 다시 생기는지를 알려 줍니다",
+        "휴지통으로 옮긴 뒤, 실제로 바뀐 내용을 보고합니다",
+        "네트워크 접속, 분석 도구, 계정이 없습니다",
+      ],
+      intro: [
+        "용량 부족 경고는 꼭 작업 중에 뜹니다. 추측으로 지우는 정리 앱이 샘플 라이브러리나 프로젝트의 오디오 폴더를 건드리면, 확보한 용량보다 잃는 것이 훨씬 큽니다.",
+        "Storage Review는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 하나하나 이유를 설명하고, 음악 파일에는 손대지 않습니다.",
+      ],
+      screenshots: [
+        {
+          src: "/images/apps/storage-review/main.webp",
+          width: 1440,
+          height: 900,
+          alt: "Storage Review 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
+          caption:
+            "모든 후보에 여기 있는 이유와 지우면 어떻게 되는지가 표시됩니다. 캐시를 후보로 올리기 전에 안의 파일을 모두 확인해 음악, 프리셋, 프로젝트 파일이 없는지 보고, 내려받은 프리셋 팩은 보호합니다.",
+        },
+        {
+          src: "/images/apps/storage-review/protection.webp",
+          width: 1440,
+          height: 900,
+          alt: "보호 및 예외 화면: Music Production 프로필이 켜져 있고 음악 제작, 오디오 플러그인과 제조사 콘텐츠, 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터 규칙이 보입니다",
+          caption: "음악 제작 보호 프로필은 첫 검사부터 켜져 있습니다. 보호 항목에는 체크박스가 없습니다.",
+        },
+      ],
+      sections: [
+        {
+          title: "보호하는 것",
+          intro:
+            "음악 제작(Music Production) 보호 프로필은 기본으로 켜져 있습니다. 아래 항목은 캐시, 다운로드, 패키지 폴더, 빌드 결과물 안에 있어도 보호합니다.",
+          items: [
+            { title: "오디오와 스템", text: "WAV, AIFF, FLAC, MP3, M4A, CAF 등 오디오 파일." },
+            {
+              title: "샘플 라이브러리와 악기",
+              text: "Kontakt, EXS, SFZ, SoundFont 파일, REX 루프 등 샘플 라이브러리 형식.",
+            },
+            { title: "프리셋, 패치, MIDI", text: "플러그인 프리셋과 뱅크, SysEx 덤프, MIDI 파일." },
+            {
+              title: "DAW 프로젝트",
+              text: "Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio, Reaper 프로젝트.",
+            },
+            {
+              title: "플러그인과 제조사 콘텐츠",
+              text: "VST, VST3, Audio Unit, AAX, CLAP 플러그인과 샘플·플러그인 제조사의 콘텐츠 폴더.",
+            },
+            {
+              title: "음악 폴더",
+              text: "홈 폴더의 음악 폴더, ~/Library/Audio와 /Library/Audio, Splice 폴더, 그리고 DAW나 음원 라이브러리 이름, presets·stems·loops·sample packs 같은 이름이 붙은 폴더.",
+            },
+          ],
+          note: "캐시 안의 ZIP 파일에 오디오 파일이 하나만 있어도 그 캐시는 통째로 남습니다. 다운로드 폴더의 압축 파일도 안을 먼저 확인해, 오디오, 프리셋, 프로젝트가 든 샘플 팩은 그대로 둡니다. 보호 항목에는 체크박스가 없고, 보호 항목이 든 폴더는 통째로 지울 수 없습니다. 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터도 보호합니다. 규칙을 끄는 것은 따로 확인을 거치는 명시적인 선택입니다.",
+        },
+        {
+          title: "정리는 이렇게 진행됩니다",
+          style: "steps",
+          items: [
+            { title: "검사", text: "검사는 읽기만 하고, 처음에는 아무것도 선택되어 있지 않습니다." },
+            {
+              title: "검토",
+              text: "후보마다 여기 있는 이유, 지우면 어떻게 되는지, 다시 생기는지가 적혀 있습니다. 다시 만들어지는 항목, 먼저 검토할 항목, 개인 파일, 보호 항목을 나눠 보여 줍니다.",
+            },
+            {
+              title: "고정된 계획 승인",
+              text: "지울 항목이 정확히 나열된 계획을 Touch ID나 로그인 암호로 승인합니다.",
+            },
+            {
+              title: "삭제와 보고",
+              text: "지우기 직전에 항목마다 다시 확인합니다. 항목은 휴지통으로 옮기고, 실제로 바뀐 내용을 보고합니다. 휴지통을 비우기 전에는 공간이 늘지 않는다는 것도 알려 줍니다.",
+            },
+          ],
+        },
+        {
+          title: "무료와 Expert",
+          items: [
+            {
+              title: "무료",
+              text: "브라우저와 앱 캐시, 설치 파일과 업데이터, 개발 캐시, 휴지통 안의 항목을 정리합니다. Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다.",
+            },
+            {
+              title: "Expert (한 번 구매하는 앱 내 구입)",
+              text: "프로젝트 환경, Xcode 빌드 캐시, GitHub Actions 러너 잔여물, Final Cut Pro 렌더 파일, iCloud 압축 파일 중복 같은 항목과 영구 삭제, 심층 검사, 중복 검증을 더합니다.",
+            },
+          ],
+          note: "안전 기능은 두 버전에 모두 들어 있습니다. 구매해야 쓸 수 있는 안전 기능은 없습니다.",
+        },
+        {
+          title: "개인정보와 사용 환경",
+          items: [
+            {
+              title: "Mac 밖으로 나가는 정보가 없습니다",
+              text: "Storage Review는 네트워크에 접속하지 않고, 분석 도구도 계정도 없습니다.",
+            },
+            {
+              title: "macOS 14 이상",
+              text: "처음 실행할 때 홈 폴더 접근을 한 번 요청합니다. 전체 디스크 접근 권한은 선택 사항이며, 허용하면 휴지통, 기기 백업, 메일, 메시지도 검사합니다.",
+            },
+          ],
+        },
+      ],
+      faq: [
+        {
+          question: "샘플 라이브러리, 프리셋, 프로젝트가 지워지지는 않나요?",
+          answer:
+            "지워지지 않습니다. 음악 제작 보호 프로필이 오디오, 샘플, 프리셋, MIDI, DAW 프로젝트, 플러그인을 캐시나 압축 파일 안에 있어도 보호합니다. 보호 항목은 선택할 수 없고, 보호 항목이 든 폴더는 통째로 지울 수 없습니다.",
+        },
+        {
+          question: "앱이 알아서 지우는 것이 있나요?",
+          answer:
+            "없습니다. 검사는 읽기만 하고, 처음에는 아무것도 선택되어 있지 않습니다. 고정된 계획을 Touch ID나 로그인 암호로 승인해야 하고, 지우기 직전에 항목마다 다시 확인합니다.",
+        },
+        {
+          question: "무료 버전과 Expert는 무엇이 다른가요?",
+          answer:
+            "무료 버전은 브라우저와 앱 캐시, 설치 파일, 개발 캐시, 휴지통을 정리하고, Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다. 한 번 구매하는 앱 내 구입인 Expert는 프로젝트 환경, Xcode 빌드 캐시, Final Cut Pro 렌더 파일 같은 항목과 영구 삭제, 심층 검사, 중복 검증을 더합니다. 안전 기능은 두 버전이 같습니다.",
+        },
+        {
+          question: "파일에 관한 정보를 어딘가로 보내나요?",
+          answer: "아니요. 앱에는 네트워크 접속, 분석 도구, 계정이 없습니다.",
+        },
+        {
+          question: "어떤 Mac에서 쓸 수 있나요?",
+          answer:
+            "macOS 14 이상의 Mac에서 쓸 수 있습니다. 처음에 홈 폴더 접근을 한 번 요청하며, 전체 디스크 접근 권한은 선택 사항입니다.",
+        },
+        {
+          question: "지금 받을 수 있나요?",
+          answer:
+            "아직은 받을 수 없습니다. Mac App Store 출시를 준비하고 있으며, 출시되면 이 페이지에 링크를 걸어 두겠습니다.",
+        },
+      ],
+      support: "Storage Review에 관한 질문은 {email}로 보내 주세요.",
+    },
+  },
+};
+
+export const APPS: Record<AppSlug, AppInfo> = {
+  "chord-to-midi": chordToMidi,
+  "storage-review": storageReview,
+};
+
+/** The homepage's Apps section */
+export const APPS_SECTION: Record<SupportedLanguage, { title: string; intro: string; learnMore: string }> = {
+  en: {
+    title: "Apps for Musicians",
+    intro: "Made in our studio for songwriters, producers and arrangers.",
+    learnMore: "Learn more",
+  },
+  ko: {
+    title: "음악가를 위한 앱",
+    intro: "작곡가, 프로듀서, 편곡자를 위해 저희 스튜디오에서 만듭니다.",
+    learnMore: "자세히 보기",
+  },
+};
+
+/** Labels around the content of an app page */
+export const APP_PAGE_LABELS: Record<
+  SupportedLanguage,
+  {
+    breadcrumb: string;
+    home: string;
+    faq: string;
+    support: string;
+    privacyPolicy: string;
+    moreApps: string;
+    learnMore: string;
+    studioTitle: string;
+    studioText: string;
+    studioLink: string;
+  }
+> = {
+  en: {
+    breadcrumb: "Breadcrumb",
+    home: "Culture & Tech",
+    faq: "Frequently asked questions",
+    support: "Support",
+    privacyPolicy: "Privacy policy",
+    moreApps: "More apps for musicians",
+    learnMore: "Learn more",
+    studioTitle: "From the same studio",
+    studioText: "Culture & Tech also writes and produces original songs for live idols.",
+    studioLink: "Hear our live-idol works",
+  },
+  ko: {
+    breadcrumb: "현재 위치",
+    home: "컬처앤테크",
+    faq: "자주 묻는 질문",
+    support: "문의",
+    privacyPolicy: "개인정보 처리방침",
+    moreApps: "음악가를 위한 다른 앱",
+    learnMore: "자세히 보기",
+    studioTitle: "같은 스튜디오에서",
+    studioText: "컬처앤테크는 라이브아이돌 오리지널곡도 만들고 있습니다.",
+    studioLink: "라이브아이돌 작업 듣기",
+  },
+};

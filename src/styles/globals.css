@@ -60,6 +60,12 @@
   [lang="ko"], [lang="ko"] * {
     font-family: 'Noto Sans KR', 'Quicksand', system-ui, sans-serif;
   }
+
+  /* Korean wraps between words, not between the syllables of a word; a word longer than the line still wraps */
+  [lang="ko"] {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
 }
 
 @layer components {

@@ -5,7 +5,7 @@ import {
   detectUserLanguage,
   storeLanguagePreference,
 } from "@/lib/language-detection";
-import { LANGUAGE_PATHS, pageLanguageFromPath } from "@/lib/seo";
+import { languagePathsFor, pageLanguageFromPath } from "@/lib/seo";
 import { getTranslations, type Translations } from "@/lib/translations";
 
 interface LanguageContextValue {
@@ -23,7 +23,7 @@ interface LanguageProviderProps {
 
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const router = useRouter();
-  // Language the current page is pre-rendered in: "/" is English, "/ko/" is Korean
+  // Language the current page is pre-rendered in: "/" and "/apps/…" are English, "/ko/…" is Korean
   const pageLanguage = pageLanguageFromPath(router.pathname);
 
   // Language the English page shows this visitor. Always starts as "en" to prevent
@@ -57,12 +57,12 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     document.documentElement.lang = language;
   }, [language]);
 
-  // Handle manual language changes: each language has its own page
+  // Handle manual language changes: each language has its own version of the page
   const setLanguage = (newLanguage: SupportedLanguage) => {
     setPreferredLanguage(newLanguage);
     storeLanguagePreference(newLanguage);
     if (newLanguage !== pageLanguage) {
-      router.push(LANGUAGE_PATHS[newLanguage]);
+      router.push(languagePathsFor(router.pathname)[newLanguage]);
     }
 
     // Log language change for analytics (optional)

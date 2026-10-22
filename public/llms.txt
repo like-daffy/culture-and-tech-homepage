@@ -1,11 +1,13 @@
 # Culture & Tech (컬처앤테크)
 
-> Culture & Tech is a company in Seoul, South Korea, that produces original songs for live idols (credited "Produced By Sochan") and offers quality assurance and session services. This site is the primary source for its works, contract terms and contact details.
+> Culture & Tech is a music studio in Seoul, South Korea. It produces original songs for live idols (credited "Produced By Sochan"), offers quality assurance and session services, and makes apps for musicians: Chord to MIDI and Storage Review. This site is the primary source for its works, contract terms, apps and contact details.
 
 ## Pages
 
-- [Culture & Tech](https://cultureand.tech/): English homepage: services, live-idol works, demo sets, contract information, FAQ, contact
+- [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, live-idol works, demo sets, contract information, FAQ, contact
 - [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
+- [Chord to MIDI](https://cultureand.tech/apps/chord-to-midi/): the free web app that turns chord progressions into MIDI files and MIDI files back into chords (Korean: https://cultureand.tech/ko/apps/chord-to-midi/)
+- [Storage Review](https://cultureand.tech/apps/storage-review/): the Mac storage cleaner that protects music production files (Korean: https://cultureand.tech/ko/apps/storage-review/)
 
 ## Live-idol original songs
 
@@ -15,6 +17,31 @@
 - Revisions: Non-exclusive 2 times, Exclusive 3 times (small audio tweaks only); lyrics adaptation does not count
 - Scope: live (venue) performance; a digital release requires the credit "Produced By Sochan"
 - Demo sets: https://soundcloud.com/sochan_life
+
+## Apps for musicians
+
+### Chord to MIDI
+
+- What it does: type a chord progression, hear it on a piano and download a standard MIDI file for any DAW or music app that imports MIDI files; open a MIDI file to get its chords back, spelled for the song's key
+- Chord symbols: the spellings of real charts, from Cm7-5 and CΔ7 to C7(#9) and E7/G#; an unknown chord is reported by name, not guessed
+- Where: https://chord-to-midi.app/ (Korean: https://chord-to-midi.app/ko/), in the browser, on computers and phones
+- Price: every feature is free; no account is needed to type, play, download or import
+- Privacy: progressions and MIDI files are processed on the device and never uploaded; the chord engine runs in the browser as WebAssembly
+- Use: the progressions typed and the MIDI files made with it may be used in your own songs, commercial releases included
+
+### Storage Review
+
+- What it does: a macOS storage cleaner for musicians that finds caches, installers and leftovers worth removing and explains why each one is a candidate and whether it comes back
+- Music Production protection, on by default: audio and stems; sample libraries and instruments (Kontakt, EXS, SFZ, SoundFont, REX); presets, patches, SysEx and MIDI files; DAW projects (Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio, Reaper); VST, VST3, Audio Unit, AAX and CLAP plug-ins and vendor content; music folders. Protected wherever they are, even inside caches, downloads, package folders, build products and archives. Protected items can't be selected, and a folder holding protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are protected too
+- Safety: scanning only reads and nothing is selected by default; removals follow a fixed plan approved with Touch ID or the login password; each item is checked again right before removal; items go to the Trash and a report shows what changed
+- Editions: Free (browser and app caches, installers and updaters, development caches, the items in the Trash) and Expert, a one-time in-app purchase (more sources such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and iCloud archive duplicates; permanent deletion; a deeper scan; duplicate verification). The safety features are the same in both
+- Privacy: no network access, no analytics, no account
+- Requirements: macOS 14 or later
+- Status: coming to the Mac App Store
+
+### App support
+
+- Email: contact@cultureand.tech
 
 ## Contact
 

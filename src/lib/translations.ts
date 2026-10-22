@@ -9,6 +9,7 @@ export interface Translations {
   navigation: {
     home: string;
     about: string;
+    apps: string;
     services: string;
     contact: string;
     brandName: string;
@@ -56,18 +57,19 @@ const translations: Record<SupportedLanguage, Translations> = {
     navigation: {
       home: "Home",
       about: "About",
+      apps: "Apps",
       services: "Services",
       contact: "Contact",
       brandName: "Culture & Tech",
     },
     hero: {
       title: "Culture & Tech",
-      subtitle: "Innovative Solutions for Modern Business",
-      description: "Quality Assurance, Music Production, and Professional Session Services",
+      subtitle: "Music for live idols. Apps for musicians.",
+      description: "Original songs produced by Sochan, and the apps we built for our own studio: Chord to MIDI and Storage Review.",
     },
     about: {
       title: "About Us",
-      description: "We are a leading company specializing in quality assurance, music production, and professional session services. Our mission is to deliver excellence through the harmonious blend of culture and technology.",
+      description: "Culture & Tech is a music studio in Seoul. We write and produce original songs for live idols, play keyboard sessions and build QA automation. Our apps for musicians come from the same desk, and each one started with a problem we ran into while making music.",
     },
     services: {
       title: "Our Services",
@@ -101,18 +103,19 @@ const translations: Record<SupportedLanguage, Translations> = {
     navigation: {
       home: "홈",
       about: "소개",
+      apps: "앱",
       services: "서비스",
       contact: "문의",
       brandName: "컬처앤테크",
     },
     hero: {
       title: "컬처앤테크",
-      subtitle: "서브컬처 음악 제작 및 라이브아이돌 음악 제작 전문",
-      description: "라이브아이돌 오리지널곡 제작, 품질 보증 및 전문 세션 서비스",
+      subtitle: "라이브아이돌 음악 제작, 그리고 음악가를 위한 앱",
+      description: "소찬이 제작하는 라이브아이돌 오리지널곡, 그리고 작업실에서 직접 쓰려고 만든 앱 Chord to MIDI와 Storage Review.",
     },
     about: {
       title: "회사 소개",
-      description: "저희는 서브컬처 음악과 라이브아이돌을 위한 오리지널곡 제작, 품질 보증 및 전문 세션 서비스를 전문으로 하는 회사입니다. 문화와 기술의 조화로운 결합을 통해 최고의 서비스를 제공하는 것이 저희의 사명입니다.",
+      description: "컬처앤테크는 서울의 음악 스튜디오입니다. 서브컬처와 라이브아이돌을 위한 오리지널곡을 만들고, 키보드 세션과 QA 자동화 일을 합니다. 음악가를 위한 앱도 같은 책상에서 만듭니다. 모두 저희가 음악을 만들다 부딪힌 문제에서 시작했습니다.",
     },
     services: {
       title: "서비스",

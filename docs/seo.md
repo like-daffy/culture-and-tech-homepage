@@ -16,6 +16,23 @@ Released 2026-10-22 16:11 KST from `f60d4e6` (preview channel `seo` cloned to `l
 `X-Robots-Tag`; `robots.txt`, `sitemap.xml` and `llms.txt` return 200; the schema.org validator reports 0 errors
 and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passes.
 
+## App pages (branch `update/introduce-music-apps`, not released yet)
+
+| Item | Where |
+| --- | --- |
+| Pages | `/apps/chord-to-midi/` and `/apps/storage-review/`, with Korean versions under `/ko/apps/`, pre-rendered; `hreflang` en / ko / x-default per app (`appPaths` in `src/lib/seo.ts`, `public/sitemap.xml`) |
+| Titles and descriptions | `APP_METADATA` in `src/lib/seo.ts` |
+| Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Storage Review), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text |
+| Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630 |
+| Homepage | An Apps section (`#apps`) with one card per app, linking to its page; hero and About rewritten around "Music for live idols. Apps for musicians." The homepage's title, description and structured data are unchanged |
+| Crawler files | Both apps in `public/llms.txt`; the four app pages in `public/sitemap.xml` |
+
+Checked on the local export (2026-10-23): every page has its `lang`, a title of at most 60 characters, a description,
+its canonical URL, three `hreflang` links, an existing `og:image`, and one JSON-LD block that parses and whose FAQ
+equals the visible questions and answers; the homepage's JSON-LD is identical to the live build's; no page scrolls
+sideways at 390 px. After the release: `scripts/check-live.sh` checks the app pages and their images; submit
+`sitemap.xml` again in Search Console and Search Advisor and request indexing of the four app pages.
+
 ## Baseline before the change (crawler view, 2026-10-22)
 
 - `robots.txt`, `sitemap.xml`, `llms.txt`: 404
@@ -48,5 +65,9 @@ Re-measure on **2026-11-05** (14 days after the release), leaving out the last 2
 - `site:music.cafe24.com` on Naver and Google: the old pages replaced by `cultureand.tech`
 - AI citation (O/X) in ChatGPT search, Perplexity and Naver AI briefing for starter questions such as
   "라이브아이돌 오리지널곡 제작", "지하아이돌 오리곡 제작 의뢰", "컬처앤테크", "live idol original song producer Korea"
+
+App pages: measure 14 days after their own release, the same way: impressions, clicks and top queries of the four
+pages, and AI citation (O/X) for questions such as "chord progression to MIDI online", "코드 진행 MIDI 변환",
+"Mac storage cleaner for music producers", "맥 용량 정리 음악 작업" and "로직 프로 용량 부족".
 
 Top queries without a matching page are candidates for new pages.

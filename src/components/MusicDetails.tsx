@@ -167,7 +167,7 @@ export function MusicDetails() {
   } = musicDetailsContent[language];
 
   return (
-    <section id="music-details" className="py-20 bg-muted/30">
+    <section id="music-details" className="py-20">
       <div className="container">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
