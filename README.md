@@ -11,7 +11,8 @@ history) is kept as the rollback target until it is retired; see `docs/transfer-
 
 | URL | Source | Made by |
 |---|---|---|
-| `/`, `/404.html`, `/_next/…`, `/favicon.ico`, `/og-image.png` | `src/`, `public/` | `npm run build` (static export into `out/`) |
+| `/` (English), `/ko/` (Korean), `/404.html`, `/_next/…`, `/favicon.ico`, `/og-image.png` | `src/`, `public/` | `npm run build` (static export into `out/`) |
+| `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
 | `/culture/storage-review/privacy.html` (planned) | `public/culture/storage-review/` | from `mac-get-space` `docs/12-privacy-policy-draft.md` once approved |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
@@ -28,8 +29,16 @@ npm install
 npm run dev
 ```
 
-There are no API routes: the site is a static export, so language detection is stored preference, then browser
-language, then English.
+There are no API routes: the site is a static export. `/` is pre-rendered in English and adapts to the visitor
+(stored preference, then browser language, then English); `/ko/` is pre-rendered in Korean and stays Korean. The
+language switch moves between the two pages.
+
+## SEO
+
+Titles, descriptions, `hreflang` and structured data come from `src/lib/seo.ts`; the FAQ structured data reuses
+the FAQ text of `src/components/MusicDetails.tsx`. Structured data and `public/llms.txt` may only state what the
+page shows. When page content changes, update `public/llms.txt` and the `<lastmod>` dates in `public/sitemap.xml`;
+a new page also goes into the sitemap. Registration, baseline and measurement: `docs/seo.md`.
 
 ## Deploy
 

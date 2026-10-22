@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
-import { Html, Head, Main, NextScript } from "next/document";
+import { pageLanguageFromPath } from "@/lib/seo";
+import { Html, Head, Main, NextScript, type DocumentProps } from "next/document";
 
-export default function Document() {
+export default function Document({ __NEXT_DATA__ }: DocumentProps) {
   return (
-    <Html lang="en">
+    <Html lang={pageLanguageFromPath(__NEXT_DATA__.page)}>
       <Head>
         <meta name="keywords" content="지하아이돌, 지하돌, 오리곡, 오리지널곡, 라이브아이돌" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://cultureand.tech" />
+        {/* canonical, hreflang and robots are set per page: components/SEO.tsx, pages/404.tsx */}
         {/*
           CRITICAL: DO NOT REMOVE THIS SCRIPT
           The Softgen AI monitoring script is essential for core app functionality.

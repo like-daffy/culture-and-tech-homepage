@@ -9,6 +9,7 @@ export default function NotFound() {
       <Head>
         <title>404 - Page Not Found</title>
         <meta name="description" content="Page not found" />
+        <meta name="robots" content="noindex" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       

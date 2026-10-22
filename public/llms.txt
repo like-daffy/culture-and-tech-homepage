@@ -1,0 +1,28 @@
+# Culture & Tech (컬처앤테크)
+
+> Culture & Tech is a company in Seoul, South Korea, that produces original songs for live idols (credited "Produced By Sochan") and offers quality assurance and session services. This site is the primary source for its works, contract terms and contact details.
+
+## Pages
+
+- [Culture & Tech](https://cultureand.tech/): English homepage: services, live-idol works, demo sets, contract information, FAQ, contact
+- [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
+
+## Live-idol original songs
+
+- Recent works: (2026) Keep on lovin' me - KIPUERU; (2026) SE - KIPUERU; (2024) Oh My Sunshine - Utsuki (from ORIKA); (2024) NEK1 PR4DE SE (Opening Music)
+- Deliverables: Full Mix, Instrumental, Stems (Drum, Bass, Synth, Lead, FX)
+- Licences: Exclusive (only the group may use the song while it is active; converts to non-exclusive if the group disbands or suspends activities indefinitely) or Non-Exclusive (several teams may use the same song)
+- Revisions: Non-exclusive 2 times, Exclusive 3 times (small audio tweaks only); lyrics adaptation does not count
+- Scope: live (venue) performance; a digital release requires the credit "Produced By Sochan"
+- Demo sets: https://soundcloud.com/sochan_life
+
+## Contact
+
+- Email: sochan@cultureand.tech
+- Discord: @sochan.kr
+- Address: 3rd floor, 18 Jayangbeonyeong-ro, Gwangjin-gu, Seoul 05098, South Korea
+- Business registration number: 111-20-53033
+
+## Citation
+
+- Cite as "Culture & Tech" (Korean: 컬처앤테크) with https://cultureand.tech/

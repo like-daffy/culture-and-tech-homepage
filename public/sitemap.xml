@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The homepage in English (/) and Korean (/ko/); update <lastmod> when a page's content changes -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://cultureand.tech/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/"/>
+  </url>
+  <url>
+    <loc>https://cultureand.tech/ko/</loc>
+    <lastmod>2026-10-22</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/"/>
+  </url>
+</urlset>

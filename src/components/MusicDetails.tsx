@@ -2,158 +2,159 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageProvider";
 
+// Section text per language; the FAQ also feeds the homepage's structured data (components/Home.tsx)
+export const musicDetailsContent = {
+  en: {
+    title: "Live-Idol Discogs",
+    subtitle: "Produced By Sochan",
+    discography: {
+      title: "Recent Works",
+      items: [
+        {
+          title: "(2026) Keep on lovin' me - KIPUERU",
+          videoId: "2iXnfiFS91I",
+          start: 1541,
+        },
+        {
+          title: "(2026) SE - KIPUERU",
+          videoId: "2iXnfiFS91I",
+          start: 0,
+        },
+        {
+          title: "(2024) Oh My Sunshine - Utsuki (from ORIKA)",
+          videoId: "Q38vymSkv3o",
+          start: 52,
+        },
+      ],
+      additionalWork: "(2024) NEK1 PR4DE SE (Opening Music)",
+    },
+    demoPreview: {
+      title: "Demo Preview",
+    },
+    contract: {
+      title: "Contract Information",
+      payment: {
+        title: "Payment (Overseas)",
+        details: [
+          "PayPal Invoice for fast confirmation",
+          "Wise bank transfer (USD/JPY) for lower costs",
+          "Currencies: JPY / USD",
+          "Sender covers all fees (transfer/platform/FX)",
+          "Invoice-based goods and services only (No F&F)",
+        ],
+      },
+      details: {
+        title: "Contract Details",
+        items: [
+          "Deliverables: Full Mix, Instrumental, Stems (Drum, Bass, Synth, Lead, FX)",
+          "Lyrics: Adaptation allowed (language/meaning), harmony/structure changes not allowed",
+          "Local work: Vocal recording/mix/master handled by client",
+          "Scope: Live-only (venue performance). Digital release requires 'Produced By Sochan' credit",
+          "Revisions: Non-exclusive 2 times / Exclusive 3 times (small audio tweaks only)",
+          "Lyrics adaptation doesn't consume revision counts",
+          "Revisions beyond maximum are not permitted",
+        ],
+      },
+    },
+    faq: {
+      title: "FAQ",
+      items: [
+        {
+          question: "What's the difference between Exclusive and Non-Exclusive?",
+          answer: "Exclusive: Grants exclusive use during the group's active period. Other teams cannot use the song during this time. If the group disbands or suspends activities indefinitely, the license converts to non-exclusive. Non-Exclusive: Multiple teams may use the same song.",
+        },
+        {
+          question: "What counts as 'one' revision?",
+          answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Modifications to the melody, structure, or arrangement may be accommodated upon further discussion.",
+        },
+        {
+          question: "Can I cancel after payment?",
+          answer: "After payment, deliverables (Full Mix, Instrumental, Stems) are provided immediately. Due to instant service delivery, the contract cannot be canceled. Please decide carefully.",
+        },
+      ],
+    },
+    inquiry: {
+      title: "Contract Inquiry",
+      discord: "Discord ID: @sochan.kr",
+      openChat: undefined as { label: string; text: string; url: string } | undefined,
+      email: "Email: sochan@cultureand.tech",
+    },
+  },
+  ko: {
+    title: "라이브아이돌 작업 목록",
+    subtitle: "",
+    discography: {
+      title: "최근 작품",
+      items: [
+        {
+          title: "(2026) Keep on lovin' me - 키프에루",
+          videoId: "2iXnfiFS91I",
+          start: 1541,
+        },
+        {
+          title: "(2026) 키프에루 SE (오프닝 음악)",
+          videoId: "2iXnfiFS91I",
+          start: 0,
+        },
+        {
+          title: "(2024) Oh My Sunshine - 유츠키",
+          videoId: "Q38vymSkv3o",
+          start: 52,
+        },
+      ],
+      additionalWork: "(2024) NEK1 PR4DE SE (오프닝 음악)",
+    },
+    demoPreview: {
+      title: "데모 미리듣기",
+    },
+    contract: {
+      title: "계약 정보",
+      payment: undefined,
+      details: {
+        title: "계약 세부사항",
+        items: [
+          "제공물: 풀 믹스, 인스트루멘탈, 스템 (드럼, 베이스, 신스, 리드, FX)",
+          "가사: 변경 및 재작사 허용, 하모니/구조 변경 불가",
+          "로컬 작업: 보컬 녹음/믹스/마스터는 클라이언트 담당",
+          "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By Sochan' 크레딧 필수",
+          "수정: 비독점 2회 / 독점 3회 (작은 오디오 조정만)",
+          "가사 적응은 수정 횟수에 포함되지 않음",
+          "최대 수정 횟수 초과 불가",
+        ],
+      },
+    },
+    faq: {
+      title: "자주 묻는 질문",
+      items: [
+        {
+          question: "독점과 비독점의 차이점은?",
+          answer: "독점: 그룹 활동 기간 동안 독점 사용권 부여. 이 기간 동안 다른 팀은 곡을 사용할 수 없습니다. 그룹이 해체되거나 무기한 활동 중단 시 라이선스는 자동으로 비독점으로 전환됩니다. 비독점: 여러 팀이 동일한 곡을 사용할 수 있습니다.",
+        },
+        {
+          question: "'한 번'의 수정은 무엇을 의미하나요?",
+          answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 별도 협의가 필요합니다.",
+        },
+        {
+          question: "결제 후 취소할 수 있나요?",
+          answer: "결제 후 제공물(풀 믹스, 인스트루멘탈, 스템)이 즉시 제공됩니다. 즉시 서비스 제공으로 인해 계약 취소가 불가능합니다. 신중하게 결정하시기 바랍니다.",
+        },
+      ],
+    },
+    inquiry: {
+      title: "계약 문의",
+      discord: "Discord ID: @sochan.kr",
+      openChat: {
+        label: "오픈채팅",
+        text: "링크",
+        url: "https://open.kakao.com/o/sZ1fAJ3h"
+      },
+      email: "이메일: sochan@cultureand.tech",
+    },
+  },
+};
+
 export function MusicDetails() {
   const { language } = useLanguage();
-
-  const content = {
-    en: {
-      title: "Live-Idol Discogs",
-      subtitle: "Produced By Sochan",
-      discography: {
-        title: "Recent Works",
-        items: [
-          {
-            title: "(2026) Keep on lovin' me - KIPUERU",
-            videoId: "2iXnfiFS91I",
-            start: 1541,
-          },
-          {
-            title: "(2026) SE - KIPUERU",
-            videoId: "2iXnfiFS91I",
-            start: 0,
-          },
-          {
-            title: "(2024) Oh My Sunshine - Utsuki (from ORIKA)",
-            videoId: "Q38vymSkv3o",
-            start: 52,
-          },
-        ],
-        additionalWork: "(2024) NEK1 PR4DE SE (Opening Music)",
-      },
-      demoPreview: {
-        title: "Demo Preview",
-      },
-      contract: {
-        title: "Contract Information",
-        payment: {
-          title: "Payment (Overseas)",
-          details: [
-            "PayPal Invoice for fast confirmation",
-            "Wise bank transfer (USD/JPY) for lower costs",
-            "Currencies: JPY / USD",
-            "Sender covers all fees (transfer/platform/FX)",
-            "Invoice-based goods and services only (No F&F)",
-          ],
-        },
-        details: {
-          title: "Contract Details",
-          items: [
-            "Deliverables: Full Mix, Instrumental, Stems (Drum, Bass, Synth, Lead, FX)",
-            "Lyrics: Adaptation allowed (language/meaning), harmony/structure changes not allowed",
-            "Local work: Vocal recording/mix/master handled by client",
-            "Scope: Live-only (venue performance). Digital release requires 'Produced By Sochan' credit",
-            "Revisions: Non-exclusive 2 times / Exclusive 3 times (small audio tweaks only)",
-            "Lyrics adaptation doesn't consume revision counts",
-            "Revisions beyond maximum are not permitted",
-          ],
-        },
-      },
-      faq: {
-        title: "FAQ",
-        items: [
-          {
-            question: "What's the difference between Exclusive and Non-Exclusive?",
-            answer: "Exclusive: Grants exclusive use during the group's active period. Other teams cannot use the song during this time. If the group disbands or suspends activities indefinitely, the license converts to non-exclusive. Non-Exclusive: Multiple teams may use the same song.",
-          },
-          {
-            question: "What counts as 'one' revision?",
-            answer: "BPM adjustments, balance/tone tweaks, and adding FX—small edits completable within 2 hours. Modifications to the melody, structure, or arrangement may be accommodated upon further discussion.",
-          },
-          {
-            question: "Can I cancel after payment?",
-            answer: "After payment, deliverables (Full Mix, Instrumental, Stems) are provided immediately. Due to instant service delivery, the contract cannot be canceled. Please decide carefully.",
-          },
-        ],
-      },
-      inquiry: {
-        title: "Contract Inquiry",
-        discord: "Discord ID: @sochan.kr",
-        openChat: undefined as { label: string; text: string; url: string } | undefined,
-        email: "Email: sochan@cultureand.tech",
-      },
-    },
-    ko: {
-      title: "라이브아이돌 작업 목록",
-      subtitle: "",
-      discography: {
-        title: "최근 작품",
-        items: [
-          {
-            title: "(2026) Keep on lovin' me - 키프에루",
-            videoId: "2iXnfiFS91I",
-            start: 1541,
-          },
-          {
-            title: "(2026) 키프에루 SE (오프닝 음악)",
-            videoId: "2iXnfiFS91I",
-            start: 0,
-          },
-          {
-            title: "(2024) Oh My Sunshine - 유츠키",
-            videoId: "Q38vymSkv3o",
-            start: 52,
-          },
-        ],
-        additionalWork: "(2024) NEK1 PR4DE SE (오프닝 음악)",
-      },
-      demoPreview: {
-        title: "데모 미리듣기",
-      },
-      contract: {
-        title: "계약 정보",
-        payment: undefined,
-        details: {
-          title: "계약 세부사항",
-          items: [
-            "제공물: 풀 믹스, 인스트루멘탈, 스템 (드럼, 베이스, 신스, 리드, FX)",
-            "가사: 변경 및 재작사 허용, 하모니/구조 변경 불가",
-            "로컬 작업: 보컬 녹음/믹스/마스터는 클라이언트 담당",
-            "범위: 라이브 전용 (공연장 공연). 디지털 릴리스는 'Produced By Sochan' 크레딧 필수",
-            "수정: 비독점 2회 / 독점 3회 (작은 오디오 조정만)",
-            "가사 적응은 수정 횟수에 포함되지 않음",
-            "최대 수정 횟수 초과 불가",
-          ],
-        },
-      },
-      faq: {
-        title: "자주 묻는 질문",
-        items: [
-          {
-            question: "독점과 비독점의 차이점은?",
-            answer: "독점: 그룹 활동 기간 동안 독점 사용권 부여. 이 기간 동안 다른 팀은 곡을 사용할 수 없습니다. 그룹이 해체되거나 무기한 활동 중단 시 라이선스는 자동으로 비독점으로 전환됩니다. 비독점: 여러 팀이 동일한 곡을 사용할 수 있습니다.",
-          },
-          {
-            question: "'한 번'의 수정은 무엇을 의미하나요?",
-            answer: "BPM 조정, 밸런스/톤 조정, FX 추가—2시간 내에 완료 가능한 작은 편집입니다. 멜로디 변경, 절/후렴 교체, 구조 변경은 별도 협의가 필요합니다.",
-          },
-          {
-            question: "결제 후 취소할 수 있나요?",
-            answer: "결제 후 제공물(풀 믹스, 인스트루멘탈, 스템)이 즉시 제공됩니다. 즉시 서비스 제공으로 인해 계약 취소가 불가능합니다. 신중하게 결정하시기 바랍니다.",
-          },
-        ],
-      },
-      inquiry: {
-        title: "계약 문의",
-        discord: "Discord ID: @sochan.kr",
-        openChat: {
-          label: "오픈채팅",
-          text: "링크",
-          url: "https://open.kakao.com/o/sZ1fAJ3h"
-        },
-        email: "이메일: sochan@cultureand.tech",
-      },
-    },
-  };
 
   const {
     title,
@@ -163,7 +164,7 @@ export function MusicDetails() {
     contract,
     faq,
     inquiry,
-  } = content[language];
+  } = musicDetailsContent[language];
 
   return (
     <section id="music-details" className="py-20 bg-muted/30">

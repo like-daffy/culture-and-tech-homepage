@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useRouter } from "next/router";
 import {
   type SupportedLanguage,
   detectUserLanguage,
   storeLanguagePreference,
 } from "@/lib/language-detection";
+import { LANGUAGE_PATHS, pageLanguageFromPath } from "@/lib/seo";
 import { getTranslations, type Translations } from "@/lib/translations";
 
 interface LanguageContextValue {
@@ -20,33 +22,48 @@ interface LanguageProviderProps {
 }
 
 export function LanguageProvider({ children }: LanguageProviderProps) {
-  // Always initialize with "en" to prevent hydration mismatch
-  // Detection happens in useEffect after mount
-  const [language, setLanguageState] = useState<SupportedLanguage>("en");
+  const router = useRouter();
+  // Language the current page is pre-rendered in: "/" is English, "/ko/" is Korean
+  const pageLanguage = pageLanguageFromPath(router.pathname);
+
+  // Language the English page shows this visitor. Always starts as "en" to prevent
+  // hydration mismatch; detection happens in useEffect after mount
+  const [preferredLanguage, setPreferredLanguage] = useState<SupportedLanguage>("en");
   const [isLoading, setIsLoading] = useState(true);
-  const [translations, setTranslations] = useState<Translations>(getTranslations("en"));
+
+  // Only the English page adapts to the visitor; the Korean page always shows Korean
+  const language = pageLanguage === "en" ? preferredLanguage : pageLanguage;
+  const translations: Translations = getTranslations(language);
 
   // Detect and apply language after component mounts (client-side only)
   useEffect(() => {
+    if (pageLanguage !== "en") {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Stored preference, then browser settings, then English
-      const detected = detectUserLanguage();
-      if (detected !== "en") {
-        setLanguageState(detected);
-        setTranslations(getTranslations(detected));
-      }
+      setPreferredLanguage(detectUserLanguage());
     } catch (error) {
       console.error("Error during language detection:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [pageLanguage]);
 
-  // Handle manual language changes
+  // Keep <html lang> correct when the English page shows Korean
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  // Handle manual language changes: each language has its own page
   const setLanguage = (newLanguage: SupportedLanguage) => {
-    setLanguageState(newLanguage);
-    setTranslations(getTranslations(newLanguage));
+    setPreferredLanguage(newLanguage);
     storeLanguagePreference(newLanguage);
+    if (newLanguage !== pageLanguage) {
+      router.push(LANGUAGE_PATHS[newLanguage]);
+    }
 
     // Log language change for analytics (optional)
     console.log("Language changed to:", newLanguage);
