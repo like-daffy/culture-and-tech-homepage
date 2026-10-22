@@ -10,6 +10,12 @@
 | Crawler files | `public/robots.txt` (search engines and all AI crawlers allowed), `public/sitemap.xml`, `public/llms.txt` |
 | 404 page | `noindex`, no canonical |
 
+Released 2026-10-22 16:11 KST from `f60d4e6` (preview channel `seo` cloned to `live`, Next build ID
+`9ZVNZYVJcngl3EbgAYbgi`). On `cultureand.tech` after the release: `/ko/` serves 829 Korean characters with
+`lang="ko"`; both pages carry one JSON-LD block and three `hreflang` links, with no `noindex` meta tag or
+`X-Robots-Tag`; `robots.txt`, `sitemap.xml` and `llms.txt` return 200; the schema.org validator reports 0 errors
+and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passes.
+
 ## Baseline before the change (crawler view, 2026-10-22)
 
 - `robots.txt`, `sitemap.xml`, `llms.txt`: 404
