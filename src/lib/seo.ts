@@ -55,12 +55,12 @@ export const APP_METADATA: Record<AppSlug, Record<SupportedLanguage, { title: st
     en: {
       title: "Storage Review: Mac Cleaner for Musicians | Culture & Tech",
       description:
-        "Free up Mac storage without touching your music. Samples, presets, DAW projects and plug-ins stay protected, and nothing is deleted until you approve it.",
+        "A Mac storage cleaner for musicians: music files that match its default protection rules are excluded, and nothing is deleted until you approve a plan.",
     },
     ko: {
       title: "Storage Review: 음악가를 위한 Mac 용량 정리 앱 | 컬처앤테크",
       description:
-        "음악 파일은 건드리지 않고 Mac 용량을 비우세요. 샘플, 프리셋, DAW 프로젝트, 플러그인은 보호되고, 직접 승인하기 전에는 아무것도 지워지지 않습니다.",
+        "음악가를 위한 Mac 용량 정리 앱. 기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외하고, 직접 승인하기 전에는 아무것도 지우지 않습니다.",
     },
   },
 };
@@ -163,7 +163,8 @@ export function appJsonLd(app: AppInfo, language: SupportedLanguage) {
   const url = `${SITE_URL}${appPaths(app.slug)[language]}`;
   const appId = `${url}#app`;
   const { title, description } = APP_METADATA[app.slug][language];
-  const screenshot = content.screenshots[0];
+  // A screenshot with a note (a development build) is labelled on the page only, so it stays out of the JSON-LD
+  const screenshot = content.screenshots.find((shot) => !shot.note);
 
   return {
     "@context": "https://schema.org",

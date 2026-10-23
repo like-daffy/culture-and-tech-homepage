@@ -20,7 +20,7 @@ for p in "" ko/ apps/chord-to-midi/ apps/storage-review/ ko/apps/chord-to-midi/ 
   elif echo "$cc" | grep -q 'max-age=0'; then echo "ok   200 https://$host/$p (cache-control:$cc)"
   else echo "FAIL cache-control https://$host/$p:$cc"; fail=1; fi
 done
-for p in chord-to-midi/og.png chord-to-midi/icon.png storage-review/og.png storage-review/main.webp; do
+for p in chord-to-midi/og.png chord-to-midi/icon.png storage-review/og.png storage-review/og-ko.png storage-review/main.webp; do
   expect 200 "https://$host/images/apps/$p"
 done
 expect 301 "https://$host/culture/"

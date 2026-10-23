@@ -7,7 +7,7 @@
 - [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, live-idol works, demo sets, contract information, FAQ, contact
 - [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
 - [Chord to MIDI](https://cultureand.tech/apps/chord-to-midi/): the free web app that turns chord progressions into MIDI files and MIDI files back into chords (Korean: https://cultureand.tech/ko/apps/chord-to-midi/)
-- [Storage Review](https://cultureand.tech/apps/storage-review/): the Mac storage cleaner that protects music production files (Korean: https://cultureand.tech/ko/apps/storage-review/)
+- [Storage Review](https://cultureand.tech/apps/storage-review/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/storage-review/)
 
 ## Live-idol original songs
 
@@ -22,7 +22,7 @@
 
 ### Chord to MIDI
 
-- What it does: type a chord progression, hear it on a piano and download a standard MIDI file for any DAW or music app that imports MIDI files; open a MIDI file to get its chords back, spelled for the song's key
+- What it does: type a chord progression, play it on a piano and download a standard MIDI file for any DAW or music app that imports MIDI files; open a MIDI file to get its harmony as a chord progression, spelled for the song's key (a chord chart, not a note-for-note transcription)
 - Chord symbols: the spellings of real charts, from Cm7-5 and CΔ7 to C7(#9) and E7/G#; an unknown chord is reported by name, not guessed
 - Where: https://chord-to-midi.app/ (Korean: https://chord-to-midi.app/ko/), in the browser, on computers and phones
 - Price: every feature is free; no account is needed to type, play, download or import
@@ -32,10 +32,11 @@
 ### Storage Review
 
 - What it does: a macOS storage cleaner for musicians that finds caches, installers and leftovers worth removing and explains why each one is a candidate and whether it comes back
-- Music Production protection, on by default: audio and stems; sample libraries and instruments (Kontakt, EXS, SFZ, SoundFont, REX); presets, patches, SysEx and MIDI files; DAW projects (Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio, Reaper); VST, VST3, Audio Unit, AAX and CLAP plug-ins and vendor content; music folders. Protected wherever they are, even inside caches, downloads, package folders, build products and archives. Protected items can't be selected, and a folder holding protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are protected too
-- Safety: scanning only reads and nothing is selected by default; removals follow a fixed plan approved with Touch ID or the login password; each item is checked again right before removal; items go to the Trash and a report shows what changed
-- Editions: Free (browser and app caches, installers and updaters, development caches, the items in the Trash) and Expert, a one-time in-app purchase (more sources such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and iCloud archive duplicates; permanent deletion; a deeper scan; duplicate verification). The safety features are the same in both
-- Privacy: no network access, no analytics, no account
+- Protection: music production files that match the default Music Production rules are excluded from removal. The rules recognize audio and stems; sample libraries and instruments (Kontakt, EXS, SFZ, SoundFont, REX); presets, patches, SysEx and MIDI files; DAW projects (Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio, Reaper); VST, VST3, Audio Unit, AAX and CLAP plug-ins and vendor content; music folders; including inside caches, downloads, package folders and build products. Protected items get no checkbox, and a folder holding protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are covered too
+- Limits of the protection: inside a cache only ZIP-family archives are opened, so a cache holding another archive type (tar, gz, 7z, rar, dmg, pkg) is marked to review first and can still be selected by hand; formats and folder names the rules don't list aren't covered; a rule can be turned off (the app asks first)
+- Safety: scanning only reads and nothing is selected by default; removals follow a fixed plan approved with Touch ID or the login password; each item is checked again right before removal; regular cleanup moves items to the Trash and a report shows what changed; deleting items already in the Trash is permanent, and the plan marks it that way
+- Editions: Free (moves browser and app caches, installers and updaters and development caches to the Trash; can permanently delete items already in the Trash) and Expert, a one-time in-app purchase (more sources such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and duplicate files in iCloud Drive (Archive) folders; permanent deletion instead of the Trash for any item; a deeper scan; duplicate verification). The safety features are the same in both
+- Privacy: files and scan results are processed on the Mac and not uploaded to the developer's servers; no analytics, no account; Apple handles Expert purchases and restores
 - Requirements: macOS 14 or later
 - Status: coming to the Mac App Store
 

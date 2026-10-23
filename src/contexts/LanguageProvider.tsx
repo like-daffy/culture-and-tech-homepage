@@ -25,19 +25,21 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const router = useRouter();
   // Language the current page is pre-rendered in: "/" and "/apps/…" are English, "/ko/…" is Korean
   const pageLanguage = pageLanguageFromPath(router.pathname);
+  // Only the English homepage adapts to the visitor. Every other page shows the language of its address, so that
+  // its text matches its title, description and structured data
+  const adaptsToVisitor = router.pathname === "/";
 
-  // Language the English page shows this visitor. Always starts as "en" to prevent
+  // Language the English homepage shows this visitor. Always starts as "en" to prevent
   // hydration mismatch; detection happens in useEffect after mount
   const [preferredLanguage, setPreferredLanguage] = useState<SupportedLanguage>("en");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Only the English page adapts to the visitor; the Korean page always shows Korean
-  const language = pageLanguage === "en" ? preferredLanguage : pageLanguage;
+  const language = adaptsToVisitor ? preferredLanguage : pageLanguage;
   const translations: Translations = getTranslations(language);
 
   // Detect and apply language after component mounts (client-side only)
   useEffect(() => {
-    if (pageLanguage !== "en") {
+    if (!adaptsToVisitor) {
       setIsLoading(false);
       return;
     }
@@ -50,7 +52,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [pageLanguage]);
+  }, [adaptsToVisitor]);
 
   // Keep <html lang> correct when the English page shows Korean
   useEffect(() => {

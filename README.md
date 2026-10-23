@@ -31,10 +31,11 @@ npm install
 npm run dev
 ```
 
-There are no API routes: the site is a static export. Every page has an English version, pre-rendered in English and
-adapting to the visitor (stored preference, then browser language, then English), and a Korean version under `/ko/`
-that is pre-rendered in Korean and stays Korean: `/` and `/ko/`, `/apps/<app>/` and `/ko/apps/<app>/`. The language
-switch moves to the same page in the other language.
+There are no API routes: the site is a static export. Every page has an English version and a Korean version under
+`/ko/`, each pre-rendered in its language: `/` and `/ko/`, `/apps/<app>/` and `/ko/apps/<app>/`. Only the English
+homepage adapts to the visitor (stored preference, then browser language, then English); every other page, the app
+pages included, shows the language of its address, so that its text matches its title, description and structured
+data. The language switch moves to the same page in the other language.
 
 ## SEO
 
@@ -53,15 +54,21 @@ it is not public.
 
 All of their copy, in English and Korean, is in `src/lib/apps.ts`; the cards, the app pages and the structured data
 read it. Every claim must be true on the day it is published and documented in the app's own repository (the sources
-are listed at the top of that file). Images are in `public/images/apps/`. Chord to MIDI's icon, link preview image and
-screenshots come from its repository. Storage Review's screenshots are Free-edition captures of the validation tour
-on its synthetic home (`build/validation/shots-free/` in `mac-get-space`) with the "Validation mode" label painted
-over, and its link preview image is cropped from the Protection & exclusions screen.
+are listed at the top of that file). Storage Review's protection is described as what its default rules exclude from
+removal, together with the limits the page lists, never as a guarantee; the Trash and permanent deletion are named
+apart; its privacy text covers file processing only, since Apple handles the Expert purchase.
+
+Images are in `public/images/apps/`. Chord to MIDI's icon, link preview image and screenshots come from its
+repository. Storage Review's screenshots are Free-edition captures of the validation tour on its synthetic home
+(`build/validation/shots-free/` in `mac-get-space`), with the tour's own "Validation mode" label painted over. The
+page labels each of them "Development build · sample data" (`note` in `src/lib/apps.ts`), its link preview images
+`og.png` and `og-ko.png` (cropped from the Protection & exclusions screen) carry the same label in their language, and
+screenshots with a note stay out of the structured data. Replace all of them with App Store screenshots at launch.
 
 When an app changes:
 - Storage Review on the App Store: give both languages a `cta` with the App Store link and a new `status`, set
-  `schema.free` once the page says the download is free, replace the screenshots with the App Store ones, and update
-  `public/llms.txt`.
+  `schema.free` once the page says the download is free, replace the screenshots and link preview images with App
+  Store ones (without a `note`), and update `public/llms.txt`.
 - Storage Review's privacy policy published at `/culture/storage-review/privacy.html`: set `privacyPolicyPath`.
 - Chord to MIDI: mention DAW drag only once its extension is on the Chrome Web Store, and ads only once AdSense has
   approved the site.

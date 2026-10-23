@@ -7,7 +7,6 @@ import { Footer } from "@/components/Footer";
 import { AppIcon } from "@/components/AppIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useLanguage } from "@/contexts/LanguageProvider";
 import { APPS, APP_PAGE_LABELS, APP_SLUGS, type AppSection, type AppSlug } from "@/lib/apps";
 import type { SupportedLanguage } from "@/lib/language-detection";
 import { APP_METADATA, LANGUAGE_PATHS, appJsonLd, appPaths } from "@/lib/seo";
@@ -58,11 +57,10 @@ export function AppPage({ slug, language }: AppPageProps) {
   const app = APPS[slug];
   const { title, description } = APP_METADATA[slug][language];
 
-  // Like the homepage, the English page shows the visitor's language; the Korean page stays Korean
-  const { language: shown } = useLanguage();
-  const content = app.content[shown];
-  const labels = APP_PAGE_LABELS[shown];
-  const homePath = LANGUAGE_PATHS[shown];
+  // An app page always shows the language of its address, like its title, description and structured data
+  const content = app.content[language];
+  const labels = APP_PAGE_LABELS[language];
+  const homePath = LANGUAGE_PATHS[language];
   const otherApps = APP_SLUGS.filter((other) => other !== slug);
   const [supportBefore, supportAfter] = content.support.split("{email}");
   const afterSections = content.sections.length;
@@ -72,7 +70,7 @@ export function AppPage({ slug, language }: AppPageProps) {
       <SEO
         title={title}
         description={description}
-        image={app.ogImage}
+        image={app.ogImage[language]}
         path={appPaths(slug)[language]}
         language={language}
         alternates={appPaths(slug)}
@@ -137,6 +135,13 @@ export function AppPage({ slug, language }: AppPageProps) {
             <div className="container max-w-5xl space-y-12">
               {content.screenshots.map((shot, index) => (
                 <figure key={shot.src}>
+                  {shot.note && (
+                    <p className="mb-3">
+                      <span className="inline-flex items-center rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+                        {shot.note}
+                      </span>
+                    </p>
+                  )}
                   <div className="overflow-hidden rounded-xl border border-border bg-card shadow-md">
                     <Image
                       src={shot.src}
@@ -225,7 +230,7 @@ export function AppPage({ slug, language }: AppPageProps) {
             <div className="container max-w-5xl grid gap-6 md:grid-cols-2">
               {otherApps.map((other) => {
                 const otherApp = APPS[other];
-                const otherContent = otherApp.content[shown];
+                const otherContent = otherApp.content[language];
                 return (
                   <Card key={other} className="flex flex-col">
                     <CardHeader>
@@ -243,7 +248,7 @@ export function AppPage({ slug, language }: AppPageProps) {
                       </div>
                       <p className="flex-1 font-medium text-foreground">{otherContent.tagline}</p>
                       <Button asChild variant="outline" className="self-start">
-                        <Link href={appPaths(other)[shown]}>
+                        <Link href={appPaths(other)[language]}>
                           {labels.learnMore}
                           <ArrowRight />
                         </Link>

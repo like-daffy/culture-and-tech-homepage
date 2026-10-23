@@ -6,7 +6,9 @@
  * - Chord to MIDI: chord-to-midi-web (content/, site.config.json). DAW drag and ads are left out while the
  *   extension is not on the Chrome Web Store and AdSense has not approved the site.
  * - Storage Review: mac-get-space (README, docs/05-protection-defaults.md, docs/09-distribution.md,
- *   docs/plans/free-vs-expert-version.md). No price: the App Store sets it.
+ *   docs/12-privacy-policy-draft.md, docs/plans/free-vs-expert-version.md). No price: the App Store sets it.
+ *   Protection is described as what the default rules exclude from removal, with its limits, never as a guarantee.
+ *   Its screenshots come from a development build with sample data and say so on the page.
  * Not introduced here: MIDI Utility (not public) and the Thai app (not a music app).
  */
 
@@ -25,6 +27,8 @@ export interface AppImage {
   height: number;
   alt: string;
   caption?: string;
+  /** Label shown with the image, such as "Development build · sample data"; such images stay out of the JSON-LD */
+  note?: string;
 }
 
 export interface AppSection {
@@ -62,8 +66,8 @@ export interface AppInfo {
   /** Square app icon; without one, fallbackIcon is drawn on a tile */
   icon?: string;
   fallbackIcon: LucideIcon;
-  /** Link preview image, 1200 x 630 */
-  ogImage: string;
+  /** Link preview image per language, 1200 x 630 */
+  ogImage: Record<SupportedLanguage, string>;
   supportEmail: string;
   /** The app's privacy policy on this site, once it is published there */
   privacyPolicyPath?: string;
@@ -84,7 +88,7 @@ const chordToMidi: AppInfo = {
   slug: "chord-to-midi",
   icon: "/images/apps/chord-to-midi/icon.png",
   fallbackIcon: KeyboardMusic,
-  ogImage: "/images/apps/chord-to-midi/og.png",
+  ogImage: { en: "/images/apps/chord-to-midi/og.png", ko: "/images/apps/chord-to-midi/og.png" },
   supportEmail: SUPPORT_EMAIL,
   schema: {
     type: "WebApplication",
@@ -96,18 +100,18 @@ const chordToMidi: AppInfo = {
     en: {
       name: "Chord to MIDI",
       status: "Free web app",
-      tagline: "From a chord progression to a MIDI clip in your DAW, in a minute.",
+      tagline: "Hear a chord progression, then download it as a MIDI file for your DAW.",
       summary:
-        "Type a progression, hear it on a piano and download a MIDI file for your DAW. Open a MIDI file to read its chords. Free, in your browser.",
+        "Type a progression, hear it on a piano and download a MIDI file for your DAW. Open a MIDI file to read its harmony as chords. Free, in your browser.",
       highlights: [
         "Reads chord spellings from real charts, from Cm7-5 and CΔ7 to E7/G#",
-        "Turns a MIDI file back into chord symbols, spelled for the song's key",
+        "Reads a MIDI file's harmony as chord symbols, spelled for the song's key",
         "Runs in your browser: progressions and MIDI files are never uploaded",
         "Free, with nothing to install, on a computer or a phone",
       ],
       intro: [
         "You can hear the changes in your head. Chord to MIDI gets them into your DAW without drawing every note by hand.",
-        "Type a progression such as Am7 - [Dm7 - G7] - Cmaj7(x2), press Generate and listen to it on a piano. Download the MIDI file and drag it into your DAW, or open a MIDI file and get its chords back as text.",
+        "Type a progression such as Am7 - [Dm7 - G7] - Cmaj7(x2), press Generate, then Play to hear it on a piano. Download the MIDI file and drag it into your DAW, or open a MIDI file to read its harmony as a chord progression.",
       ],
       cta: { label: "Open Chord to MIDI", href: "https://chord-to-midi.app/" },
       screenshots: [
@@ -135,7 +139,7 @@ const chordToMidi: AppInfo = {
             },
             {
               title: "Read the chords of a MIDI file",
-              text: "Open or drop a .mid file and Chord to MIDI writes out its chords as a progression, with the tempo from the file and the names spelled the way a chart in the song's key would write them.",
+              text: "Open or drop a .mid file and Chord to MIDI analyzes its harmony and writes it out as a progression, with the tempo from the file and the names spelled the way a chart in the song's key would write them. It makes a chord chart, not a note-for-note transcription of the file.",
             },
             {
               title: "Your music stays on your device",
@@ -176,18 +180,18 @@ const chordToMidi: AppInfo = {
     ko: {
       name: "Chord to MIDI",
       status: "무료 웹 앱",
-      tagline: "코드 진행을 입력하면 1분 안에 DAW에 넣을 MIDI 클립이 됩니다.",
+      tagline: "코드 진행을 듣고, DAW용 MIDI 파일로 내려받으세요.",
       summary:
-        "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일을 열면 코드를 읽어 줍니다. 브라우저에서 무료로 씁니다.",
+        "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일을 열면 화성을 분석해 코드 진행으로 정리합니다. 브라우저에서 무료로 씁니다.",
       highlights: [
         "Cm7-5, CΔ7부터 E7/G#까지 실제 코드 악보의 표기를 이해합니다",
-        "MIDI 파일을 곡의 조에 맞춘 코드 심벌로 바꿔 줍니다",
+        "MIDI 파일의 화성을 분석해 곡의 조에 맞춘 코드 진행으로 정리합니다",
         "브라우저 안에서 실행되어 코드 진행과 MIDI 파일을 업로드하지 않습니다",
         "설치 없이 무료로, 컴퓨터와 휴대폰에서 씁니다",
       ],
       intro: [
         "머릿속에 들리는 코드 진행을 음표 하나하나 그리지 않고 DAW로 옮기세요.",
-        "Am7 - [Dm7 - G7] - Cmaj7(x2)처럼 코드 진행을 입력하고 생성을 누르면 피아노로 들려줍니다. MIDI 파일을 내려받아 DAW로 끌어다 놓거나, 반대로 MIDI 파일을 열어 코드를 텍스트로 받아 보세요.",
+        "Am7 - [Dm7 - G7] - Cmaj7(x2)처럼 코드 진행을 입력해 생성한 뒤 재생을 누르면 피아노로 들어 볼 수 있습니다. MIDI 파일을 내려받아 DAW로 끌어다 놓거나, 반대로 MIDI 파일을 열어 화성을 코드 진행으로 정리해 보세요.",
       ],
       cta: { label: "Chord to MIDI 열기", href: "https://chord-to-midi.app/ko/" },
       screenshots: [
@@ -215,7 +219,7 @@ const chordToMidi: AppInfo = {
             },
             {
               title: "MIDI 파일의 코드 읽기",
-              text: ".mid 파일을 열거나 끌어다 놓으면 코드를 진행으로 적어 줍니다. 템포는 파일에서 가져오고, 코드 이름은 곡의 조에 맞춰 코드 악보식으로 표기합니다.",
+              text: ".mid 파일을 열거나 끌어다 놓으면 화성을 분석해 코드 진행으로 적어 줍니다. 템포는 파일에서 가져오고, 코드 이름은 곡의 조에 맞춰 코드 악보식으로 표기합니다. 음을 하나하나 옮겨 적는 기능이 아니라 코드 악보를 만드는 기능입니다.",
             },
             {
               title: "음악은 기기 안에서만",
@@ -259,7 +263,8 @@ const chordToMidi: AppInfo = {
 const storageReview: AppInfo = {
   slug: "storage-review",
   fallbackIcon: HardDrive,
-  ogImage: "/images/apps/storage-review/og.png",
+  // Cropped from the development build's Protection & exclusions screen, with the label burned in per language
+  ogImage: { en: "/images/apps/storage-review/og.png", ko: "/images/apps/storage-review/og-ko.png" },
   supportEmail: SUPPORT_EMAIL,
   // Set to "/culture/storage-review/privacy.html" once mac-get-space's policy is published there
   privacyPolicyPath: undefined,
@@ -272,18 +277,18 @@ const storageReview: AppInfo = {
     en: {
       name: "Storage Review",
       status: "Coming to the Mac App Store",
-      tagline: "Free up your Mac without touching your music.",
+      tagline: "Free up your Mac, with your music protected by default.",
       summary:
-        "A storage cleaner that knows what a producer's Mac holds. Your samples, presets, projects and plug-ins can't be selected for removal, and nothing is deleted until you approve a fixed plan.",
+        "A storage cleaner that knows what a producer's Mac holds. Music production files that match its default protection rules are excluded from removal, and nothing is deleted until you approve a fixed plan.",
       highlights: [
-        "Music Production protection is on by default",
+        "Music Production protection rules are on by default",
         "Every item says why it's a candidate and whether it comes back",
-        "Moves items to the Trash, then reports what actually changed",
-        "No network access, no analytics, no account",
+        "Moves items to the Trash by default, then reports what actually changed",
+        "Files and scan results are processed on your Mac, not uploaded",
       ],
       intro: [
         "The disk-full warning always arrives in the middle of a session. A cleaner that guesses can hit a sample library or a project's audio folder, and that costs more than the space it frees.",
-        "Storage Review is built for a musician's Mac. It finds the caches, installers and leftovers worth removing, explains every one, and keeps your music out of reach.",
+        "Storage Review is built for a musician's Mac. It finds the caches, installers and leftovers worth removing, explains every one, and excludes the music production files its protection rules recognize.",
       ],
       screenshots: [
         {
@@ -292,23 +297,25 @@ const storageReview: AppInfo = {
           height: 900,
           alt: "Storage Review's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
           caption:
-            "Every candidate shows why it's here and what removing it does. Before a cache is offered, every file inside is checked for music, presets and projects, and a downloaded preset pack stays protected.",
+            "Each candidate shows why it's here and what removing it does. Every item inside the selected cache was inspected, and none is music, a preset or a project. The downloaded preset pack is marked Protected.",
+          note: "Development build · sample data",
         },
         {
           src: "/images/apps/storage-review/protection.webp",
           width: 1440,
           height: 900,
           alt: "The Protection & exclusions screen with the Music Production profile on, listing rule groups for music production, audio plug-ins and vendor content, video originals, device backups, credentials and AI assistant data",
-          caption: "The Music Production profile is on from the first scan. Protected items never get a checkbox.",
+          caption: "The Music Production rules are on from the first scan. Protected items never get a checkbox.",
+          note: "Development build · sample data",
         },
       ],
       sections: [
         {
-          title: "What stays protected",
+          title: "What the protection rules cover",
           intro:
-            "The Music Production profile is on by default. It protects all of this wherever it is, even inside caches, downloads, package folders and build products.",
+            "Music production files that match the default protection rules are excluded from removal. The rules recognize these formats and folders wherever the scan finds them, including inside caches, downloads, package folders and build products.",
           items: [
-            { title: "Audio and stems", text: "WAV, AIFF, FLAC, MP3, M4A, CAF and other audio files." },
+            { title: "Audio and stems", text: "WAV, AIFF, FLAC, MP3, M4A, CAF and the other audio formats the rules list." },
             {
               title: "Sample libraries and instruments",
               text: "Kontakt, EXS, SFZ and SoundFont files, REX loops and other sample library formats.",
@@ -327,7 +334,26 @@ const storageReview: AppInfo = {
               text: "Your Music folder, ~/Library/Audio and /Library/Audio, your Splice folder, and any folder named after a DAW, a sound library or words like presets, stems, loops or sample packs.",
             },
           ],
-          note: "One audio file inside a cache's ZIP keeps the whole cache, and archives in your Downloads are looked inside first: a sample pack that holds audio, presets or projects stays. Protected items never get a checkbox, and a folder that holds protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are protected too. Turning a rule off is a deliberate choice, and the app asks first.",
+          note: "Protected items never get a checkbox, and a folder that holds protected content can't be removed as a whole. One audio file inside a ZIP in a cache keeps the whole cache. ZIP and tar archives in your Downloads are listed before they are offered: a sample pack that holds audio, presets or projects stays, and an archive that can't be read is kept as not inspected. Video originals, device backups, credentials and AI assistant data are covered too.",
+        },
+        {
+          title: "Where the rules stop",
+          intro:
+            "The rules are a strong default, not a guarantee. Check each item's reason before you approve a plan.",
+          items: [
+            {
+              title: "Archives it can't open",
+              text: "Inside a cache, ZIP-family archives are opened and checked. Other types, such as tar, gz, 7z, rar, dmg and pkg, aren't opened, so a cache that holds one is marked to review first: it is never recommended, but you can still select it yourself.",
+            },
+            {
+              title: "Files the rules don't recognize",
+              text: "Formats and folder names the rules don't list aren't protected by them. Add any folder you always want kept with Always Keep.",
+            },
+            {
+              title: "Rules you turn off",
+              text: "You can turn a rule off in Protection & exclusions. The app asks first, and the files that rule covered can then be selected.",
+            },
+          ],
         },
         {
           title: "How a cleanup works",
@@ -340,11 +366,11 @@ const storageReview: AppInfo = {
             },
             {
               title: "Approve a fixed plan",
-              text: "The plan lists exactly what will be removed, and you confirm it with Touch ID or your login password.",
+              text: "The plan lists exactly what will be removed and how, and you confirm it with Touch ID or your login password.",
             },
             {
               title: "Remove and report",
-              text: "Each item is checked again right before it is removed. Items go to the Trash, and the report shows what actually changed. Moving to the Trash frees no space until the Trash is emptied, and the app says so.",
+              text: "Each item is checked again right before it is removed. Regular cleanup moves items to the Trash, and the report shows what actually changed; moving to the Trash frees no space until the Trash is emptied, and the app says so. Deleting items that are already in the Trash is permanent: the plan marks them for permanent deletion before you confirm it.",
             },
           ],
         },
@@ -353,11 +379,11 @@ const storageReview: AppInfo = {
           items: [
             {
               title: "Free",
-              text: "Clears browser and app caches, installers and updaters, development caches and the items in your Trash. Shows the Expert items with their sizes, locked.",
+              text: "Moves browser and app caches, installers and updaters and development caches to the Trash, and can permanently delete the items already in your Trash. Shows the Expert items with their sizes, locked.",
             },
             {
               title: "Expert, a one-time in-app purchase",
-              text: "Adds more sources, such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and iCloud archive duplicates, plus permanent deletion, a deeper scan and duplicate verification.",
+              text: "Adds more sources, such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and duplicate files in iCloud Drive (Archive) folders, plus permanent deletion instead of the Trash for any item, a deeper scan and duplicate verification.",
             },
           ],
           note: "Every safety feature is in both. None of them is part of the purchase.",
@@ -366,8 +392,8 @@ const storageReview: AppInfo = {
           title: "Privacy and requirements",
           items: [
             {
-              title: "Nothing leaves your Mac",
-              text: "Storage Review has no network access, no analytics and no account.",
+              title: "Your files are processed on your Mac",
+              text: "Files and scan results are processed on your Mac and are not uploaded to our servers. The app has no analytics and no account. Apple handles Expert purchases and restores.",
             },
             {
               title: "macOS 14 or later",
@@ -380,7 +406,7 @@ const storageReview: AppInfo = {
         {
           question: "Will it delete my sample libraries, presets or projects?",
           answer:
-            "No. The Music Production profile protects audio, samples, presets, MIDI, DAW projects and plug-ins wherever they are, even inside caches and archives. Protected items can't be selected, and a folder that holds protected content can't be removed as a whole.",
+            "Music production files that match the default protection rules are excluded from removal: audio, samples, presets, MIDI, DAW projects and plug-ins get no checkbox, and a folder that holds them can't be removed as a whole. The rules have limits. A cache that holds an archive type the app can't open is marked to review first and can still be selected by hand, and a rule you turn off stops protecting its files. Check each item's reason before you approve a plan.",
         },
         {
           question: "Does it delete anything on its own?",
@@ -388,13 +414,19 @@ const storageReview: AppInfo = {
             "No. Scanning only reads, and nothing is selected by default. You approve a fixed plan with Touch ID or your login password, and each item is checked again right before it is removed.",
         },
         {
+          question: "Does everything go to the Trash?",
+          answer:
+            "Regular cleanup moves items to the Trash by default. Deleting items that are already in the Trash is permanent, and the plan marks them that way before you confirm it. With Expert you can also choose permanent deletion instead of the Trash.",
+        },
+        {
           question: "What is the difference between Free and Expert?",
           answer:
-            "Free clears browser and app caches, installers, development caches and your Trash, and shows Expert items with their sizes, locked. Expert, a one-time in-app purchase, adds more sources such as project environments, Xcode build caches and Final Cut Pro render files, plus permanent deletion, a deeper scan and duplicate verification. The safety features are the same in both.",
+            "Free moves browser and app caches, installers and development caches to the Trash and can permanently delete items already in your Trash; it shows Expert items with their sizes, locked. Expert, a one-time in-app purchase, adds more sources such as project environments, Xcode build caches and Final Cut Pro render files, plus permanent deletion instead of the Trash, a deeper scan and duplicate verification. The safety features are the same in both.",
         },
         {
           question: "Does it send anything about my files anywhere?",
-          answer: "No. The app has no network access, no analytics and no account.",
+          answer:
+            "No. Files and scan results are processed on your Mac and are not uploaded to our servers. The app has no analytics and no account, and Apple handles Expert purchases and restores.",
         },
         {
           question: "What do I need to run it?",
@@ -412,18 +444,18 @@ const storageReview: AppInfo = {
     ko: {
       name: "Storage Review",
       status: "Mac App Store 출시 예정",
-      tagline: "음악 파일은 건드리지 않고 Mac 용량을 비웁니다.",
+      tagline: "음악 작업 파일은 기본으로 보호하면서 Mac 용량을 비웁니다.",
       summary:
-        "프로듀서의 Mac에 무엇이 들어 있는지 아는 저장 공간 정리 앱입니다. 샘플, 프리셋, 프로젝트, 플러그인은 삭제 대상으로 고를 수 없고, 고정된 삭제 계획을 직접 승인하기 전에는 아무것도 지워지지 않습니다.",
+        "프로듀서의 Mac에 무엇이 들어 있는지 아는 저장 공간 정리 앱입니다. 기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외하고, 고정된 삭제 계획을 직접 승인하기 전에는 아무것도 지우지 않습니다.",
       highlights: [
-        "음악 제작(Music Production) 보호 프로필이 기본으로 켜져 있습니다",
+        "음악 제작(Music Production) 보호 규칙이 기본으로 켜져 있습니다",
         "항목마다 정리 후보가 된 이유와 다시 생기는지를 알려 줍니다",
-        "휴지통으로 옮긴 뒤, 실제로 바뀐 내용을 보고합니다",
-        "네트워크 접속, 분석 도구, 계정이 없습니다",
+        "기본으로 휴지통으로 옮기고, 실제로 바뀐 내용을 보고합니다",
+        "파일과 검사 결과는 Mac에서 처리하며 업로드하지 않습니다",
       ],
       intro: [
         "용량 부족 경고는 꼭 작업 중에 뜹니다. 추측으로 지우는 정리 앱이 샘플 라이브러리나 프로젝트의 오디오 폴더를 건드리면, 확보한 용량보다 잃는 것이 훨씬 큽니다.",
-        "Storage Review는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 하나하나 이유를 설명하고, 음악 파일에는 손대지 않습니다.",
+        "Storage Review는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 하나하나 이유를 설명하고, 보호 규칙이 알아보는 음악 작업 파일은 삭제 대상에서 제외합니다.",
       ],
       screenshots: [
         {
@@ -432,23 +464,25 @@ const storageReview: AppInfo = {
           height: 900,
           alt: "Storage Review 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
           caption:
-            "모든 후보에 여기 있는 이유와 지우면 어떻게 되는지가 표시됩니다. 캐시를 후보로 올리기 전에 안의 파일을 모두 확인해 음악, 프리셋, 프로젝트 파일이 없는지 보고, 내려받은 프리셋 팩은 보호합니다.",
+            "후보마다 여기 있는 이유와 지우면 어떻게 되는지가 표시됩니다. 선택한 캐시는 안의 항목을 모두 검사해 음악, 프리셋, 프로젝트 파일이 없음을 확인했습니다. 내려받은 프리셋 팩은 보호 항목으로 표시됩니다.",
+          note: "개발 중인 화면 · 예시 데이터",
         },
         {
           src: "/images/apps/storage-review/protection.webp",
           width: 1440,
           height: 900,
           alt: "보호 및 예외 화면: Music Production 프로필이 켜져 있고 음악 제작, 오디오 플러그인과 제조사 콘텐츠, 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터 규칙이 보입니다",
-          caption: "음악 제작 보호 프로필은 첫 검사부터 켜져 있습니다. 보호 항목에는 체크박스가 없습니다.",
+          caption: "음악 제작 보호 규칙은 첫 검사부터 켜져 있습니다. 보호 항목에는 체크박스가 없습니다.",
+          note: "개발 중인 화면 · 예시 데이터",
         },
       ],
       sections: [
         {
-          title: "보호하는 것",
+          title: "보호 규칙이 지키는 것",
           intro:
-            "음악 제작(Music Production) 보호 프로필은 기본으로 켜져 있습니다. 아래 항목은 캐시, 다운로드, 패키지 폴더, 빌드 결과물 안에 있어도 보호합니다.",
+            "기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외합니다. 규칙은 아래 형식과 폴더를 검사 중 어디에서 찾든 알아보며, 캐시, 다운로드, 패키지 폴더, 빌드 결과물 안도 마찬가지입니다.",
           items: [
-            { title: "오디오와 스템", text: "WAV, AIFF, FLAC, MP3, M4A, CAF 등 오디오 파일." },
+            { title: "오디오와 스템", text: "WAV, AIFF, FLAC, MP3, M4A, CAF 등 규칙에 등록된 오디오 형식." },
             {
               title: "샘플 라이브러리와 악기",
               text: "Kontakt, EXS, SFZ, SoundFont 파일, REX 루프 등 샘플 라이브러리 형식.",
@@ -467,7 +501,25 @@ const storageReview: AppInfo = {
               text: "홈 폴더의 음악 폴더, ~/Library/Audio와 /Library/Audio, Splice 폴더, 그리고 DAW나 음원 라이브러리 이름, presets·stems·loops·sample packs 같은 이름이 붙은 폴더.",
             },
           ],
-          note: "캐시 안의 ZIP 파일에 오디오 파일이 하나만 있어도 그 캐시는 통째로 남습니다. 다운로드 폴더의 압축 파일도 안을 먼저 확인해, 오디오, 프리셋, 프로젝트가 든 샘플 팩은 그대로 둡니다. 보호 항목에는 체크박스가 없고, 보호 항목이 든 폴더는 통째로 지울 수 없습니다. 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터도 보호합니다. 규칙을 끄는 것은 따로 확인을 거치는 명시적인 선택입니다.",
+          note: "보호 항목에는 체크박스가 없고, 보호 항목이 든 폴더는 통째로 지울 수 없습니다. 캐시 안의 ZIP 파일에 오디오 파일이 하나만 있어도 그 캐시는 통째로 남습니다. 다운로드 폴더의 ZIP과 tar 압축 파일은 후보로 올리기 전에 안의 목록을 확인해, 오디오, 프리셋, 프로젝트가 든 샘플 팩은 그대로 두고 읽을 수 없는 압축 파일은 검사하지 않은 항목으로 남깁니다. 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터도 규칙에 포함됩니다.",
+        },
+        {
+          title: "보호 규칙의 한계",
+          intro: "보호 규칙은 강한 기본값이지만 모든 경우를 보장하지는 않습니다. 계획을 승인하기 전에 항목마다 이유를 확인하세요.",
+          items: [
+            {
+              title: "열어 보지 못하는 압축 파일",
+              text: "캐시 안의 ZIP 계열 압축 파일은 열어서 검사합니다. tar, gz, 7z, rar, dmg, pkg 같은 다른 형식은 열지 않으므로, 이런 파일이 든 캐시는 먼저 검토할 항목으로 표시됩니다. 추천되지는 않지만 직접 선택할 수는 있습니다.",
+            },
+            {
+              title: "규칙이 모르는 파일",
+              text: "규칙에 없는 형식이나 폴더 이름은 보호되지 않습니다. 항상 남겨야 하는 폴더는 항상 유지(Always Keep)에 추가하세요.",
+            },
+            {
+              title: "직접 끈 규칙",
+              text: "보호 및 예외(Protection & exclusions)에서 규칙을 끌 수 있습니다. 앱이 먼저 확인을 요청하며, 끈 뒤에는 그 규칙이 지키던 파일도 선택할 수 있게 됩니다.",
+            },
+          ],
         },
         {
           title: "정리는 이렇게 진행됩니다",
@@ -480,11 +532,11 @@ const storageReview: AppInfo = {
             },
             {
               title: "고정된 계획 승인",
-              text: "지울 항목이 정확히 나열된 계획을 Touch ID나 로그인 암호로 승인합니다.",
+              text: "무엇을 어떻게 지울지 정확히 나열된 계획을 Touch ID나 로그인 암호로 승인합니다.",
             },
             {
               title: "삭제와 보고",
-              text: "지우기 직전에 항목마다 다시 확인합니다. 항목은 휴지통으로 옮기고, 실제로 바뀐 내용을 보고합니다. 휴지통을 비우기 전에는 공간이 늘지 않는다는 것도 알려 줍니다.",
+              text: "지우기 직전에 항목마다 다시 확인합니다. 일반 정리는 항목을 휴지통으로 옮기고, 실제로 바뀐 내용을 보고합니다. 휴지통을 비우기 전에는 공간이 늘지 않는다는 것도 알려 줍니다. 이미 휴지통에 있는 항목을 지우는 것은 영구 삭제이며, 승인하기 전에 계획에 영구 삭제로 표시됩니다.",
             },
           ],
         },
@@ -493,11 +545,11 @@ const storageReview: AppInfo = {
           items: [
             {
               title: "무료",
-              text: "브라우저와 앱 캐시, 설치 파일과 업데이터, 개발 캐시, 휴지통 안의 항목을 정리합니다. Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다.",
+              text: "브라우저와 앱 캐시, 설치 파일과 업데이터, 개발 캐시를 휴지통으로 옮기고, 이미 휴지통에 있는 항목은 영구 삭제할 수 있습니다. Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다.",
             },
             {
               title: "Expert (한 번 구매하는 앱 내 구입)",
-              text: "프로젝트 환경, Xcode 빌드 캐시, GitHub Actions 러너 잔여물, Final Cut Pro 렌더 파일, iCloud 압축 파일 중복 같은 항목과 영구 삭제, 심층 검사, 중복 검증을 더합니다.",
+              text: "프로젝트 환경, Xcode 빌드 캐시, GitHub Actions 러너 잔여물, Final Cut Pro 렌더 파일, iCloud 보관 폴더의 중복 파일 같은 항목을 더하고, 휴지통을 거치지 않는 영구 삭제, 심층 검사, 중복 검증을 엽니다.",
             },
           ],
           note: "안전 기능은 두 버전에 모두 들어 있습니다. 구매해야 쓸 수 있는 안전 기능은 없습니다.",
@@ -506,8 +558,8 @@ const storageReview: AppInfo = {
           title: "개인정보와 사용 환경",
           items: [
             {
-              title: "Mac 밖으로 나가는 정보가 없습니다",
-              text: "Storage Review는 네트워크에 접속하지 않고, 분석 도구도 계정도 없습니다.",
+              title: "파일은 Mac에서 처리합니다",
+              text: "파일과 검사 결과는 Mac에서 처리하며 개발자 서버로 업로드하지 않습니다. 분석 도구도 계정도 없습니다. Expert 구매와 복원은 Apple이 처리합니다.",
             },
             {
               title: "macOS 14 이상",
@@ -520,7 +572,7 @@ const storageReview: AppInfo = {
         {
           question: "샘플 라이브러리, 프리셋, 프로젝트가 지워지지는 않나요?",
           answer:
-            "지워지지 않습니다. 음악 제작 보호 프로필이 오디오, 샘플, 프리셋, MIDI, DAW 프로젝트, 플러그인을 캐시나 압축 파일 안에 있어도 보호합니다. 보호 항목은 선택할 수 없고, 보호 항목이 든 폴더는 통째로 지울 수 없습니다.",
+            "기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외합니다. 오디오, 샘플, 프리셋, MIDI, DAW 프로젝트, 플러그인에는 체크박스가 없고, 이런 파일이 든 폴더는 통째로 지울 수 없습니다. 다만 한계가 있습니다. 열어 보지 못하는 형식의 압축 파일이 든 캐시는 먼저 검토할 항목으로 표시되어 직접 선택할 수 있고, 끈 규칙은 더 이상 파일을 보호하지 않습니다. 계획을 승인하기 전에 항목마다 이유를 확인하세요.",
         },
         {
           question: "앱이 알아서 지우는 것이 있나요?",
@@ -528,13 +580,19 @@ const storageReview: AppInfo = {
             "없습니다. 검사는 읽기만 하고, 처음에는 아무것도 선택되어 있지 않습니다. 고정된 계획을 Touch ID나 로그인 암호로 승인해야 하고, 지우기 직전에 항목마다 다시 확인합니다.",
         },
         {
+          question: "모든 항목이 휴지통으로 가나요?",
+          answer:
+            "일반 정리는 기본적으로 휴지통으로 이동합니다. 이미 휴지통에 있는 항목을 지우는 것은 영구 삭제이며, 승인하기 전에 계획에 영구 삭제로 표시됩니다. Expert에서는 휴지통 대신 영구 삭제를 고를 수도 있습니다.",
+        },
+        {
           question: "무료 버전과 Expert는 무엇이 다른가요?",
           answer:
-            "무료 버전은 브라우저와 앱 캐시, 설치 파일, 개발 캐시, 휴지통을 정리하고, Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다. 한 번 구매하는 앱 내 구입인 Expert는 프로젝트 환경, Xcode 빌드 캐시, Final Cut Pro 렌더 파일 같은 항목과 영구 삭제, 심층 검사, 중복 검증을 더합니다. 안전 기능은 두 버전이 같습니다.",
+            "무료 버전은 브라우저와 앱 캐시, 설치 파일, 개발 캐시를 휴지통으로 옮기고 이미 휴지통에 있는 항목은 영구 삭제할 수 있으며, Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다. 한 번 구매하는 앱 내 구입인 Expert는 프로젝트 환경, Xcode 빌드 캐시, Final Cut Pro 렌더 파일 같은 항목과 휴지통을 거치지 않는 영구 삭제, 심층 검사, 중복 검증을 더합니다. 안전 기능은 두 버전이 같습니다.",
         },
         {
           question: "파일에 관한 정보를 어딘가로 보내나요?",
-          answer: "아니요. 앱에는 네트워크 접속, 분석 도구, 계정이 없습니다.",
+          answer:
+            "아니요. 파일과 검사 결과는 Mac에서 처리하며 개발자 서버로 업로드하지 않습니다. 분석 도구도 계정도 없고, Expert 구매와 복원은 Apple이 처리합니다.",
         },
         {
           question: "어떤 Mac에서 쓸 수 있나요?",
