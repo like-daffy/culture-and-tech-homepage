@@ -74,7 +74,7 @@ export const musicDetailsContent = {
       ],
     },
     inquiry: {
-      title: "Contract Inquiry",
+      title: "Live-Idol Original Song Inquiries",
       discord: "Discord ID: @sochan.kr",
       openChat: undefined as { label: string; text: string; url: string } | undefined,
       email: "Email: sochan@cultureand.tech",
@@ -141,7 +141,7 @@ export const musicDetailsContent = {
       ],
     },
     inquiry: {
-      title: "계약 문의",
+      title: "라이브아이돌 오리지널 곡 제작 문의",
       discord: "Discord ID: @sochan.kr",
       openChat: {
         label: "오픈채팅",

@@ -20,11 +20,11 @@ and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passe
 
 | Item | Where |
 | --- | --- |
-| Pages | `/apps/chord-to-midi/` and `/apps/storage-review/`, with Korean versions under `/ko/apps/`, pre-rendered; `hreflang` en / ko / x-default per app (`appPaths` in `src/lib/seo.ts`, `public/sitemap.xml`) |
+| Pages | `/apps/chord-to-midi/` and `/apps/mac-get-space/`, with Korean versions under `/ko/apps/`, pre-rendered; `hreflang` en / ko / x-default per app (`appPaths` in `src/lib/seo.ts`, `public/sitemap.xml`) |
 | Titles and descriptions | `APP_METADATA` in `src/lib/seo.ts` |
-| Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Storage Review), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text; screenshots labelled as a development build are left out |
+| Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Mac Get Space), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text; screenshots labelled as a development build are left out |
 | Language | App pages show the language of their address, so their text, title, description and structured data agree; only the English homepage adapts to the visitor |
-| Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630; Storage Review also has `og-ko.png` for its Korean page, both labelled as a development build |
+| Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630; Mac Get Space also has `og-ko.png` for its Korean page, both labelled as a development build |
 | Homepage | An Apps section (`#apps`) with one card per app, linking to its page; hero and About rewritten around "Music for live idols. Apps for musicians." The homepage's title, description and structured data are unchanged |
 | Crawler files | Both apps in `public/llms.txt`; the four app pages in `public/sitemap.xml` |
 

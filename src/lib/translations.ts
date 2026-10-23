@@ -26,10 +26,6 @@ export interface Translations {
   services: {
     title: string;
     subtitle: string;
-    qa: {
-      title: string;
-      description: string;
-    };
     music: {
       title: string;
       description: string;
@@ -65,19 +61,15 @@ const translations: Record<SupportedLanguage, Translations> = {
     hero: {
       title: "Culture & Tech",
       subtitle: "Music for live idols. Apps for musicians.",
-      description: "Original songs produced by Sochan, and the apps we built for our own studio: Chord to MIDI and Storage Review.",
+      description: "Original songs in live-idol genres such as denpa, ōdō and kakkoii, and Chord to MIDI, an app for musicians.",
     },
     about: {
       title: "About Us",
-      description: "Culture & Tech is a music studio in Seoul. We write and produce original songs for live idols, play keyboard sessions and build QA automation. Our apps for musicians come from the same desk, and each one started with a problem we ran into while making music.",
+      description: "Culture & Tech is a music studio in Seoul. We write and produce original songs for live idols and play keyboard sessions. Our apps for musicians come from the same desk, and each one started with a problem we ran into while making music.",
     },
     services: {
       title: "Our Services",
       subtitle: "Comprehensive solutions tailored to your needs",
-      qa: {
-        title: "Quality Assurance",
-        description: "Rigorous testing and quality control to ensure your products meet the highest standards.",
-      },
       music: {
         title: "Music Production",
         description: "Professional music production services with state-of-the-art equipment and experienced producers.",
@@ -111,19 +103,15 @@ const translations: Record<SupportedLanguage, Translations> = {
     hero: {
       title: "컬처앤테크",
       subtitle: "라이브아이돌 음악 제작, 그리고 음악가를 위한 앱",
-      description: "소찬이 제작하는 라이브아이돌 오리지널곡, 그리고 작업실에서 직접 쓰려고 만든 앱 Chord to MIDI와 Storage Review.",
+      description: "전파, 왕도, 각고이 외 라이브아이돌 장르의 오리지널곡 제작, 음악인을 위한 앱 Chord to MIDI",
     },
     about: {
       title: "회사 소개",
-      description: "컬처앤테크는 서울의 음악 스튜디오입니다. 서브컬처와 라이브아이돌을 위한 오리지널곡을 만들고, 키보드 세션과 QA 자동화 일을 합니다. 음악가를 위한 앱도 같은 책상에서 만듭니다. 모두 저희가 음악을 만들다 부딪힌 문제에서 시작했습니다.",
+      description: "컬처앤테크는 서울의 음악 스튜디오입니다. 서브컬처와 라이브아이돌을 위한 오리지널곡을 만들고, 키보드 세션을 연주합니다. 음악가를 위한 앱도 같은 책상에서 만듭니다. 모두 저희가 음악을 만들다 부딪힌 문제에서 시작했습니다.",
     },
     services: {
       title: "서비스",
       subtitle: "고객의 니즈에 맞춘 종합 솔루션",
-      qa: {
-        title: "품질 보증",
-        description: "제품이 최고 수준을 충족하도록 엄격한 테스트 및 품질 관리를 제공합니다.",
-      },
       music: {
         title: "음악 제작",
         description: "최첨단 장비와 경험 많은 프로듀서와 함께하는 전문 음악 제작 서비스입니다.",

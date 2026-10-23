@@ -1,13 +1,13 @@
 # Culture & Tech (컬처앤테크)
 
-> Culture & Tech is a music studio in Seoul, South Korea. It produces original songs for live idols (credited "Produced By Sochan"), offers quality assurance and session services, and makes apps for musicians: Chord to MIDI and Storage Review. This site is the primary source for its works, contract terms, apps and contact details.
+> Culture & Tech is a music studio in Seoul, South Korea. It produces original songs for live idols (credited "Produced By Sochan"), plays keyboard sessions, and makes apps for musicians: Chord to MIDI and Mac Get Space. This site is the primary source for its works, contract terms, apps and contact details.
 
 ## Pages
 
 - [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, live-idol works, demo sets, contract information, FAQ, contact
 - [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
 - [Chord to MIDI](https://cultureand.tech/apps/chord-to-midi/): the free web app that turns chord progressions into MIDI files and MIDI files back into chords (Korean: https://cultureand.tech/ko/apps/chord-to-midi/)
-- [Storage Review](https://cultureand.tech/apps/storage-review/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/storage-review/)
+- [Mac Get Space](https://cultureand.tech/apps/mac-get-space/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/mac-get-space/)
 
 ## Live-idol original songs
 
@@ -29,7 +29,7 @@
 - Privacy: progressions and MIDI files are processed on the device and never uploaded; the chord engine runs in the browser as WebAssembly
 - Use: the progressions typed and the MIDI files made with it may be used in your own songs, commercial releases included
 
-### Storage Review
+### Mac Get Space
 
 - What it does: a macOS storage cleaner for musicians that finds caches, installers and leftovers worth removing and explains why each one is a candidate and whether it comes back
 - Protection: music production files that match the default Music Production rules are excluded from removal. The rules recognize audio and stems; sample libraries and instruments (Kontakt, EXS, SFZ, SoundFont, REX); presets, patches, SysEx and MIDI files; DAW projects (Logic Pro, GarageBand, Cubase, Ableton Live, Pro Tools, FL Studio, Studio One, Bitwig Studio, Reaper); VST, VST3, Audio Unit, AAX and CLAP plug-ins and vendor content; music folders; including inside caches, downloads, package folders and build products. Protected items get no checkbox, and a folder holding protected content can't be removed as a whole. Video originals, device backups, credentials and AI assistant data are covered too

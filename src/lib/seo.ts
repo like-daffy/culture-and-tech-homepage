@@ -27,9 +27,9 @@ export const OG_LOCALES: Record<SupportedLanguage, string> = {
 
 export const HOME_METADATA: Record<SupportedLanguage, { title: string; description: string }> = {
   en: {
-    title: "Live-Idol Music Production & QA in Seoul | Culture & Tech",
+    title: "Live-Idol Music Production in Seoul | Culture & Tech",
     description:
-      "Original songs for live idols, produced by Sochan: full mix, instrumental and stems, exclusive or non-exclusive. Plus QA and session services in Seoul.",
+      "Original songs for live idols, produced by Sochan: full mix, instrumental and stems, exclusive or non-exclusive. Plus keyboard sessions and apps for musicians.",
   },
   ko: {
     title: "라이브아이돌 오리지널곡(오리곡) 제작 | 컬처앤테크",
@@ -51,14 +51,14 @@ export const APP_METADATA: Record<AppSlug, Record<SupportedLanguage, { title: st
         "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일의 코드도 읽어 줍니다. 브라우저에서 무료로 쓰는 음악 도구입니다.",
     },
   },
-  "storage-review": {
+  "mac-get-space": {
     en: {
-      title: "Storage Review: Mac Cleaner for Musicians | Culture & Tech",
+      title: "Mac Get Space: Mac Cleaner for Musicians | Culture & Tech",
       description:
         "A Mac storage cleaner for musicians: music files that match its default protection rules are excluded, and nothing is deleted until you approve a plan.",
     },
     ko: {
-      title: "Storage Review: 음악가를 위한 Mac 용량 정리 앱 | 컬처앤테크",
+      title: "Mac Get Space: 음악가를 위한 Mac 용량 정리 앱 | 컬처앤테크",
       description:
         "음악가를 위한 Mac 용량 정리 앱. 기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외하고, 직접 승인하기 전에는 아무것도 지우지 않습니다.",
     },
@@ -74,8 +74,8 @@ export function pageLanguageFromPath(pathname: string): SupportedLanguage {
 
 /**
  * The language versions of the page at a route: the English version is at the route without "/ko",
- * the Korean version under "/ko". "/apps/storage-review" gives "/apps/storage-review/" and
- * "/ko/apps/storage-review/"; "/" and "/ko" give the two homepages.
+ * the Korean version under "/ko". "/apps/mac-get-space" gives "/apps/mac-get-space/" and
+ * "/ko/apps/mac-get-space/"; "/" and "/ko" give the two homepages.
  */
 export function languagePathsFor(pathname: string): Record<SupportedLanguage, string> {
   const english = pageLanguageFromPath(pathname) === "ko" ? pathname.slice("/ko".length) || "/" : pathname;

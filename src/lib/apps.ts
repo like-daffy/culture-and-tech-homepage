@@ -5,7 +5,7 @@
  * they are published, and only what the app's own repository documents:
  * - Chord to MIDI: chord-to-midi-web (content/, site.config.json). DAW drag and ads are left out while the
  *   extension is not on the Chrome Web Store and AdSense has not approved the site.
- * - Storage Review: mac-get-space (README, docs/05-protection-defaults.md, docs/09-distribution.md,
+ * - Mac Get Space, called Storage Review until its rename: mac-get-space (README, docs/05-protection-defaults.md, docs/09-distribution.md,
  *   docs/12-privacy-policy-draft.md, docs/plans/free-vs-expert-version.md). No price: the App Store sets it.
  *   Protection is described as what the default rules exclude from removal, with its limits, never as a guarantee.
  *   Its screenshots come from a development build with sample data and say so on the page.
@@ -16,10 +16,10 @@ import type { LucideIcon } from "lucide-react";
 import { HardDrive, KeyboardMusic } from "lucide-react";
 import type { SupportedLanguage } from "./language-detection";
 
-export type AppSlug = "chord-to-midi" | "storage-review";
+export type AppSlug = "chord-to-midi" | "mac-get-space";
 
 /** Order of the apps on the homepage and under "More apps" */
-export const APP_SLUGS: AppSlug[] = ["chord-to-midi", "storage-review"];
+export const APP_SLUGS: AppSlug[] = ["chord-to-midi", "mac-get-space"];
 
 export interface AppImage {
   src: string;
@@ -100,14 +100,14 @@ const chordToMidi: AppInfo = {
     en: {
       name: "Chord to MIDI",
       status: "Free web app",
-      tagline: "Hear a chord progression, then download it as a MIDI file for your DAW.",
+      tagline: "Hear a chord progression, then drag it straight into your DAW.",
       summary:
-        "Type a progression, hear it on a piano and download a MIDI file for your DAW. Open a MIDI file to read its harmony as chords. Free, in your browser.",
+        "Type a progression, hear it on a piano and drag and drop it straight into your DAW. Import a MIDI file and it analyzes the harmony into a chord progression. Free to use in your browser.",
       highlights: [
         "Reads chord spellings from real charts, from Cm7-5 and CΔ7 to E7/G#",
         "Reads a MIDI file's harmony as chord symbols, spelled for the song's key",
         "Runs in your browser: progressions and MIDI files are never uploaded",
-        "Free, with nothing to install, on a computer or a phone",
+        "Free, with nothing to install, right in your web browser",
       ],
       intro: [
         "You can hear the changes in your head. Chord to MIDI gets them into your DAW without drawing every note by hand.",
@@ -180,14 +180,14 @@ const chordToMidi: AppInfo = {
     ko: {
       name: "Chord to MIDI",
       status: "무료 웹 앱",
-      tagline: "코드 진행을 듣고, DAW용 MIDI 파일로 내려받으세요.",
+      tagline: "코드 진행을 듣고 DAW에 끌어서 바로 사용하세요.",
       summary:
-        "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일을 열면 화성을 분석해 코드 진행으로 정리합니다. 브라우저에서 무료로 씁니다.",
+        "코드 진행을 입력해 피아노로 들어 보고 DAW에 Drag-and-drop으로 바로 사용하세요. 역으로 MIDI 파일을 가져오면 화성을 분석해 코드 진행으로 정리합니다. 브라우저에서 무료로 사용이 가능합니다.",
       highlights: [
         "Cm7-5, CΔ7부터 E7/G#까지 실제 코드 악보의 표기를 이해합니다",
         "MIDI 파일의 화성을 분석해 곡의 조에 맞춘 코드 진행으로 정리합니다",
         "브라우저 안에서 실행되어 코드 진행과 MIDI 파일을 업로드하지 않습니다",
-        "설치 없이 무료로, 컴퓨터와 휴대폰에서 씁니다",
+        "설치 없이 무료로, 웹브라우저에서 직접 사용이 가능합니다",
       ],
       intro: [
         "머릿속에 들리는 코드 진행을 음표 하나하나 그리지 않고 DAW로 옮기세요.",
@@ -260,11 +260,11 @@ const chordToMidi: AppInfo = {
   },
 };
 
-const storageReview: AppInfo = {
-  slug: "storage-review",
+const macGetSpace: AppInfo = {
+  slug: "mac-get-space",
   fallbackIcon: HardDrive,
   // Cropped from the development build's Protection & exclusions screen, with the label burned in per language
-  ogImage: { en: "/images/apps/storage-review/og.png", ko: "/images/apps/storage-review/og-ko.png" },
+  ogImage: { en: "/images/apps/mac-get-space/og.png", ko: "/images/apps/mac-get-space/og-ko.png" },
   supportEmail: SUPPORT_EMAIL,
   // Set to "/culture/storage-review/privacy.html" once mac-get-space's policy is published there
   privacyPolicyPath: undefined,
@@ -275,9 +275,9 @@ const storageReview: AppInfo = {
   },
   content: {
     en: {
-      name: "Storage Review",
+      name: "Mac Get Space",
       status: "Coming to the Mac App Store",
-      tagline: "Free up your Mac, with your music protected by default.",
+      tagline: "Free up your Mac, with your DAW projects, virtual instruments and plug-ins protected by default.",
       summary:
         "A storage cleaner that knows what a producer's Mac holds. Music production files that match its default protection rules are excluded from removal, and nothing is deleted until you approve a fixed plan.",
       highlights: [
@@ -287,21 +287,21 @@ const storageReview: AppInfo = {
         "Files and scan results are processed on your Mac, not uploaded",
       ],
       intro: [
-        "The disk-full warning always arrives in the middle of a session. A cleaner that guesses can hit a sample library or a project's audio folder, and that costs more than the space it frees.",
-        "Storage Review is built for a musician's Mac. It finds the caches, installers and leftovers worth removing, explains every one, and excludes the music production files its protection rules recognize.",
+        "If you make music, you know the feeling: the virtual instrument libraries you've installed keep filling up your disk.",
+        "Mac Get Space is built for a musician's Mac. It finds the caches, installers and leftovers you can remove, explains why each one is safe to delete, and excludes the music production files its protection rules recognize.",
       ],
       screenshots: [
         {
-          src: "/images/apps/storage-review/main.webp",
+          src: "/images/apps/mac-get-space/main.webp",
           width: 1440,
           height: 900,
-          alt: "Storage Review's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
+          alt: "Mac Get Space's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
           caption:
             "Each candidate shows why it's here and what removing it does. Every item inside the selected cache was inspected, and none is music, a preset or a project. The downloaded preset pack is marked Protected.",
           note: "Development build · sample data",
         },
         {
-          src: "/images/apps/storage-review/protection.webp",
+          src: "/images/apps/mac-get-space/protection.webp",
           width: 1440,
           height: 900,
           alt: "The Protection & exclusions screen with the Music Production profile on, listing rule groups for music production, audio plug-ins and vendor content, video originals, device backups, credentials and AI assistant data",
@@ -382,7 +382,7 @@ const storageReview: AppInfo = {
               text: "Moves browser and app caches, installers and updaters and development caches to the Trash, and can permanently delete the items already in your Trash. Shows the Expert items with their sizes, locked.",
             },
             {
-              title: "Expert, a one-time in-app purchase",
+              title: "Expert (in-app purchase)",
               text: "Adds more sources, such as project environments, Xcode build caches, GitHub Actions runner leftovers, Final Cut Pro render files and duplicate files in iCloud Drive (Archive) folders, plus permanent deletion instead of the Trash for any item, a deeper scan and duplicate verification.",
             },
           ],
@@ -436,15 +436,15 @@ const storageReview: AppInfo = {
         {
           question: "Can I get it now?",
           answer:
-            "Not yet. Storage Review is coming to the Mac App Store, and this page will link to it once it is available.",
+            "Not yet: it is being prepared for release. We are preparing its Mac App Store listing first, and this page will link to it once it is available.",
         },
       ],
-      support: "Questions about Storage Review are welcome at {email}.",
+      support: "Questions about Mac Get Space are welcome at {email}.",
     },
     ko: {
-      name: "Storage Review",
+      name: "Mac Get Space",
       status: "Mac App Store 출시 예정",
-      tagline: "음악 작업 파일은 기본으로 보호하면서 Mac 용량을 비웁니다.",
+      tagline: "DAW, 가상 악기 및 플러그인들은 기본으로 보호하면서 Mac 용량을 비웁니다.",
       summary:
         "프로듀서의 Mac에 무엇이 들어 있는지 아는 저장 공간 정리 앱입니다. 기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외하고, 고정된 삭제 계획을 직접 승인하기 전에는 아무것도 지우지 않습니다.",
       highlights: [
@@ -454,21 +454,21 @@ const storageReview: AppInfo = {
         "파일과 검사 결과는 Mac에서 처리하며 업로드하지 않습니다",
       ],
       intro: [
-        "용량 부족 경고는 꼭 작업 중에 뜹니다. 추측으로 지우는 정리 앱이 샘플 라이브러리나 프로젝트의 오디오 폴더를 건드리면, 확보한 용량보다 잃는 것이 훨씬 큽니다.",
-        "Storage Review는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 하나하나 이유를 설명하고, 보호 규칙이 알아보는 음악 작업 파일은 삭제 대상에서 제외합니다.",
+        "음악을 하시다 보면 설치한 가상악기 라이브러리 등으로 인해 용량이 부족한 걸 느끼실 때가 많으실 겁니다.",
+        "Mac Get Space는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 삭제해도 되는 이유를 설명하고, 보호 규칙이 알아보는 음악 작업 파일은 삭제 대상에서 제외합니다.",
       ],
       screenshots: [
         {
-          src: "/images/apps/storage-review/main.webp",
+          src: "/images/apps/mac-get-space/main.webp",
           width: 1440,
           height: 900,
-          alt: "Storage Review 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
+          alt: "Mac Get Space 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
           caption:
             "후보마다 여기 있는 이유와 지우면 어떻게 되는지가 표시됩니다. 선택한 캐시는 안의 항목을 모두 검사해 음악, 프리셋, 프로젝트 파일이 없음을 확인했습니다. 내려받은 프리셋 팩은 보호 항목으로 표시됩니다.",
           note: "개발 중인 화면 · 예시 데이터",
         },
         {
-          src: "/images/apps/storage-review/protection.webp",
+          src: "/images/apps/mac-get-space/protection.webp",
           width: 1440,
           height: 900,
           alt: "보호 및 예외 화면: Music Production 프로필이 켜져 있고 음악 제작, 오디오 플러그인과 제조사 콘텐츠, 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터 규칙이 보입니다",
@@ -548,7 +548,7 @@ const storageReview: AppInfo = {
               text: "브라우저와 앱 캐시, 설치 파일과 업데이터, 개발 캐시를 휴지통으로 옮기고, 이미 휴지통에 있는 항목은 영구 삭제할 수 있습니다. Expert 항목은 크기와 함께 잠긴 채로 보여 줍니다.",
             },
             {
-              title: "Expert (한 번 구매하는 앱 내 구입)",
+              title: "Expert (인앱 결제)",
               text: "프로젝트 환경, Xcode 빌드 캐시, GitHub Actions 러너 잔여물, Final Cut Pro 렌더 파일, iCloud 보관 폴더의 중복 파일 같은 항목을 더하고, 휴지통을 거치지 않는 영구 삭제, 심층 검사, 중복 검증을 엽니다.",
             },
           ],
@@ -602,17 +602,17 @@ const storageReview: AppInfo = {
         {
           question: "지금 받을 수 있나요?",
           answer:
-            "아직은 받을 수 없습니다. Mac App Store 출시를 준비하고 있으며, 출시되면 이 페이지에 링크를 걸어 두겠습니다.",
+            "현재는 출시 준비중입니다. 우선 Mac App Store 등록을 준비하고 있으며, 출시되면 이 페이지에 링크를 걸어 두겠습니다.",
         },
       ],
-      support: "Storage Review에 관한 질문은 {email}로 보내 주세요.",
+      support: "Mac Get Space에 관한 질문은 {email}로 보내 주세요.",
     },
   },
 };
 
 export const APPS: Record<AppSlug, AppInfo> = {
   "chord-to-midi": chordToMidi,
-  "storage-review": storageReview,
+  "mac-get-space": macGetSpace,
 };
 
 /** The homepage's Apps section */
