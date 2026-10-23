@@ -1,10 +1,10 @@
 # Culture & Tech (컬처앤테크)
 
-> Culture & Tech is a music studio in Seoul, South Korea. It produces original songs for live idols (credited "Produced By Sochan"), plays keyboard sessions, and makes apps for musicians: Chord to MIDI and Mac Get Space. This site is the primary source for its works, contract terms, apps and contact details.
+> Culture & Tech is a music studio in Seoul, South Korea. It produces original songs for doujin music and Live-idols (credited "Produced By Sochan"), plays keyboard sessions, and makes apps for musicians: Chord to MIDI and Mac Get Space. This site is the primary source for its works, contract terms, apps and contact details.
 
 ## Pages
 
-- [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, live-idol works, demo sets, contract information, FAQ, contact
+- [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, Live-idol works, demo sets, contract information, FAQ, contact
 - [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
 - [Chord to MIDI](https://cultureand.tech/apps/chord-to-midi/): the free web app that turns chord progressions into MIDI files and MIDI files back into chords (Korean: https://cultureand.tech/ko/apps/chord-to-midi/)
 - [Mac Get Space](https://cultureand.tech/apps/mac-get-space/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/mac-get-space/)

@@ -654,8 +654,8 @@ export const APP_PAGE_LABELS: Record<
     moreApps: "More apps for musicians",
     learnMore: "Learn more",
     studioTitle: "From the same studio",
-    studioText: "Culture & Tech also writes and produces original songs for live idols.",
-    studioLink: "Hear our live-idol works",
+    studioText: "Culture & Tech also writes and produces original songs for Live-idols.",
+    studioLink: "Hear our Live-idol works",
   },
   ko: {
     breadcrumb: "현재 위치",

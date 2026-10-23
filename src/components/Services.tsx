@@ -12,8 +12,8 @@ export function Services() {
       services: [
         {
           icon: Music,
-          title: "Live-Idol Music Production",
-          description: "Professional music production services for live idol performances by Sochan, the live-idol music producer.",
+          title: "Live-idol Music Production",
+          description: "Professional music production services for Live-idol performances by Sochan, the Live-idol music producer.",
           features: [
             "Exclusive & Non-Exclusive licenses",
             "Full Mix, Instrumental & Stems delivery",

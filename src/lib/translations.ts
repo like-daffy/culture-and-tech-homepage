@@ -60,12 +60,12 @@ const translations: Record<SupportedLanguage, Translations> = {
     },
     hero: {
       title: "Culture & Tech",
-      subtitle: "Music for live idols. Apps for musicians.",
-      description: "Original songs in live-idol genres such as denpa, ōdō and kakkoii, and Chord to MIDI, an app for musicians.",
+      subtitle: "Music for Live-idols. Apps for musicians.",
+      description: "Original songs in Live-idol genres such as Denpa, Seishun ōdō and Kakkoi, and Chord to MIDI, an app for musicians.",
     },
     about: {
       title: "About Us",
-      description: "Culture & Tech is a music studio in Seoul. We write and produce original songs for live idols and play keyboard sessions. Our apps for musicians come from the same desk, and each one started with a problem we ran into while making music.",
+      description: "Culture & Tech started from one value: the happiness of doujin music lovers around the world. We produce original songs for doujin music and Live-idols, and make apps for musicians.",
     },
     services: {
       title: "Our Services",
@@ -107,7 +107,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     },
     about: {
       title: "회사 소개",
-      description: "컬처앤테크는 서울의 음악 스튜디오입니다. 서브컬처와 라이브아이돌을 위한 오리지널곡을 만들고, 키보드 세션을 연주합니다. 음악가를 위한 앱도 같은 책상에서 만듭니다. 모두 저희가 음악을 만들다 부딪힌 문제에서 시작했습니다.",
+      description: "컬처앤테크는 전세계 동인음악 애호가들의 행복을 위한 가치로부터 출발했습니다. 동인음악과 라이브아이돌을 위한 오리지널곡을 제작하고, 음악가를 위한 앱을 제작합니다.",
     },
     services: {
       title: "서비스",

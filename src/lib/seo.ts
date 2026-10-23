@@ -27,9 +27,9 @@ export const OG_LOCALES: Record<SupportedLanguage, string> = {
 
 export const HOME_METADATA: Record<SupportedLanguage, { title: string; description: string }> = {
   en: {
-    title: "Live-Idol Music Production in Seoul | Culture & Tech",
+    title: "Live-idol Music Production in Seoul | Culture & Tech",
     description:
-      "Original songs for live idols, produced by Sochan: full mix, instrumental and stems, exclusive or non-exclusive. Plus keyboard sessions and apps for musicians.",
+      "Original songs for Live-idols, produced by Sochan: full mix, instrumental and stems, exclusive or non-exclusive. Plus keyboard sessions and apps for musicians.",
   },
   ko: {
     title: "라이브아이돌 오리지널곡(오리곡) 제작 | 컬처앤테크",

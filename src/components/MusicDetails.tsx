@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageProvider";
 // Section text per language; the FAQ also feeds the homepage's structured data (components/Home.tsx)
 export const musicDetailsContent = {
   en: {
-    title: "Live-Idol Discogs",
+    title: "Live-idol Discogs",
     subtitle: "Produced By Sochan",
     discography: {
       title: "Recent Works",
@@ -74,7 +74,7 @@ export const musicDetailsContent = {
       ],
     },
     inquiry: {
-      title: "Live-Idol Original Song Inquiries",
+      title: "Live-idol Original Song Inquiries",
       discord: "Discord ID: @sochan.kr",
       openChat: undefined as { label: string; text: string; url: string } | undefined,
       email: "Email: sochan@cultureand.tech",
