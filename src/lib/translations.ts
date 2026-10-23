@@ -65,7 +65,7 @@ const translations: Record<SupportedLanguage, Translations> = {
     },
     about: {
       title: "About Us",
-      description: "Culture & Tech started from one value: the happiness of doujin music lovers around the world. We produce original songs for doujin music and Live-idols, and make apps for musicians.",
+      description: "Culture & Tech started from one value: the happiness of Subculture music lovers around the world. We produce original songs for Subculture music and Live-idols, and make apps for musicians.",
     },
     services: {
       title: "Our Services",

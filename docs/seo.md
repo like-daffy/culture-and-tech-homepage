@@ -25,7 +25,7 @@ and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passe
 | Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Mac Get Space), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text; screenshots labelled as a development build are left out |
 | Language | App pages show the language of their address, so their text, title, description and structured data agree; only the English homepage adapts to the visitor |
 | Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630; Mac Get Space also has `og-ko.png` for its Korean page, both labelled as a development build |
-| Homepage | An Apps section (`#apps`) with one card per app, linking to its page; hero and About rewritten around "Music for Live-idols. Apps for musicians." (the About names doujin music and Live-idols; "Live-idol" is spelled as a proper noun throughout the English text). The homepage's title and description no longer mention QA since the QA card was removed; its FAQ structured data is unchanged |
+| Homepage | An Apps section (`#apps`) with one card per app, linking to its page; hero and About rewritten around "Music for Live-idols. Apps for musicians." (the About names Subculture music and Live-idols; "Live-idol" is spelled as a proper noun throughout the English text). The homepage's title and description no longer mention QA since the QA card was removed; its FAQ structured data is unchanged |
 | Crawler files | Both apps in `public/llms.txt`; the four app pages in `public/sitemap.xml` |
 
 Checked on the local export (2026-10-23): every page has its `lang`, a title of at most 60 characters, a description,
