@@ -5,7 +5,8 @@
     "predeploy": [
       "npm run build",
       "bash scripts/add-compat-assets.sh out",
-      "bash scripts/sync-thai-legal.sh --check out/culture/thai-learn"
+      "bash scripts/sync-thai-legal.sh --check out/culture/thai-learn",
+      "bash scripts/sync-mac-get-space-legal.sh --check out/culture/mac-get-space"
     ],
     "cleanUrls": false,
     "redirects": [

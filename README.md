@@ -69,8 +69,8 @@ When an app changes:
 - Mac Get Space on the App Store: give both languages a `cta` with the App Store link and a new `status`, set
   `schema.free` once the page says the download is free, replace the screenshots and link preview images with App
   Store ones (without a `note`), and update `public/llms.txt`.
-- Mac Get Space's privacy policy published at `/culture/storage-review/privacy.html` (the path proposed in
-  `mac-get-space`; it may change with the rename): set `privacyPolicyPath`.
+- Mac Get Space's privacy policy changes: see "Updating Mac Get Space's privacy page" below. Its app pages link to
+  it through `privacyPolicyPath` (published 2026-10-23).
 - Chord to MIDI: mention DAW drag only once its extension is on the Chrome Web Store, and ads only once AdSense has
   approved the site.
 - A new app: an entry in `APPS` and `APP_SLUGS` (`src/lib/apps.ts`) and in `APP_METADATA` (`src/lib/seo.ts`), page
@@ -82,7 +82,7 @@ When an app changes:
 Releases are manual, from a clean, committed `main`, with the pinned CLI and an explicit project.
 Needs `firebase login` with the account that owns `cultureand-tech-web` (sochan@cultureand.tech).
 Channel deploys first run `npm run build`, add the Cafe24 compatibility assets and check
-`out/culture/thai-learn/` (`predeploy` in `firebase.json`).
+`out/culture/thai-learn/` and `out/culture/mac-get-space/` (`predeploy` in `firebase.json`).
 
 ```bash
 fb() { npx --yes firebase-tools@15.32.1 "$@"; }
@@ -106,6 +106,17 @@ Rollback of content: Firebase console → Hosting → release history → roll b
    review `build/legal-preview/thai/`, set both `publicationReview` flags, then `npm run legal:release`.
 2. Here: `scripts/sync-thai-legal.sh` (refuses drafts, pending markers, scripts and foreign `<link>`s), commit
    ("Thai legal: …"), deploy.
+
+Never edit the copied HTML by hand.
+
+## Updating Mac Get Space's privacy page
+
+1. In `mac-get-space`: edit `docs/12-privacy-policy-draft.md`, review the draft from
+   `scripts/build-privacy-page.py` (`build/legal-preview/mac-get-space/`), record the owner's approvals in docs/12,
+   commit, then run `scripts/build-privacy-page.py --release`. Until the release day the page has no effective date
+   (`--release --without-effective-date`, the owner's choice on 2026-10-23).
+2. Here: `scripts/sync-mac-get-space-legal.sh` (refuses drafts, placeholders, scripts, foreign `<link>`s and
+   uncommitted sources), commit ("Mac Get Space legal: …"), deploy.
 
 Never edit the copied HTML by hand.
 

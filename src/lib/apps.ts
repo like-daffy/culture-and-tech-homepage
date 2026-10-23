@@ -266,8 +266,8 @@ const macGetSpace: AppInfo = {
   // Cropped from the development build's Protection & exclusions screen, with the label burned in per language
   ogImage: { en: "/images/apps/mac-get-space/og.png", ko: "/images/apps/mac-get-space/og-ko.png" },
   supportEmail: SUPPORT_EMAIL,
-  // Set to "/culture/storage-review/privacy.html" once mac-get-space's policy is published there
-  privacyPolicyPath: undefined,
+  // Published from mac-get-space's docs/12 by scripts/sync-mac-get-space-legal.sh
+  privacyPolicyPath: "/culture/mac-get-space/privacy.html",
   schema: {
     type: "SoftwareApplication",
     applicationCategory: "UtilitiesApplication",
