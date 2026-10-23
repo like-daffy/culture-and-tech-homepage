@@ -54,7 +54,7 @@ Next: submit `sitemap.xml` again in Search Console and Search Advisor and reques
 | --- | --- | --- | --- |
 | Google Search Console | Domain `cultureand.tech` | TXT record at Porkbun (Host blank) | Submit `sitemap.xml`; inspect `/` and `/ko/` and request indexing |
 | Bing Webmaster Tools | Imported from Search Console | Import | Check the sitemap is listed |
-| Naver Search Advisor | `https://cultureand.tech` | HTML tag (`naver-site-verification`, added in `src/pages/_document.tsx`) | Submit `sitemap.xml`; request collection of `/ko/` |
+| Naver Search Advisor | `https://cultureand.tech` | HTML tag (`naver-site-verification` in `src/pages/_document.tsx`, on every page; live since 2026-10-23) | Submit `sitemap.xml`; request collection of `/ko/` and the four app pages |
 
 ## Old address music.cafe24.com
 
