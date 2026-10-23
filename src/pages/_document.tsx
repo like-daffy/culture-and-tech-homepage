@@ -7,6 +7,8 @@ export default function Document({ __NEXT_DATA__ }: DocumentProps) {
     <Html lang={pageLanguageFromPath(__NEXT_DATA__.page)}>
       <Head>
         <meta name="keywords" content="지하아이돌, 지하돌, 오리곡, 오리지널곡, 라이브아이돌" />
+        {/* Naver Search Advisor's ownership check for https://cultureand.tech (docs/seo.md, Registration); keep it */}
+        <meta name="naver-site-verification" content="1cb906c075f395477e7f5193106f23d39cda8fd6" />
         {/* canonical, hreflang and robots are set per page: components/SEO.tsx, pages/404.tsx */}
         {/*
           CRITICAL: DO NOT REMOVE THIS SCRIPT
