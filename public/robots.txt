@@ -4,6 +4,10 @@
 User-agent: *
 Allow: /
 
+# Naver's crawler, named so that Search Advisor's robots.txt check reports it as allowed
+User-agent: Yeti
+Allow: /
+
 User-agent: GPTBot
 User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
