@@ -16,7 +16,7 @@ Released 2026-10-22 16:11 KST from `f60d4e6` (preview channel `seo` cloned to `l
 `X-Robots-Tag`; `robots.txt`, `sitemap.xml` and `llms.txt` return 200; the schema.org validator reports 0 errors
 and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passes.
 
-## App pages (branch `update/introduce-music-apps`, not released yet)
+## App pages (released 2026-10-23)
 
 | Item | Where |
 | --- | --- |
@@ -30,9 +30,15 @@ and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passe
 
 Checked on the local export (2026-10-23): every page has its `lang`, a title of at most 60 characters, a description,
 its canonical URL, three `hreflang` links, an existing `og:image`, and one JSON-LD block that parses and whose FAQ
-equals the visible questions and answers; the homepage's JSON-LD is identical to the live build's; no page scrolls
-sideways at 390 px. After the release: `scripts/check-live.sh` checks the app pages and their images; submit
-`sitemap.xml` again in Search Console and Search Advisor and request indexing of the four app pages.
+equals the visible questions and answers; the homepage's FAQ structured data is unchanged from the previous release;
+no page scrolls sideways at 390 px.
+
+Released 2026-10-23 14:09 KST from `3e6f1b3` (preview channel `apps` cloned to `live`, Next build ID
+`J2ulh-hEG6B8cGWwAMsWz`), from the branch `update/introduce-music-apps` before its merge; PR #1 merges it into
+`main`. After the release, `scripts/check-live.sh … 1.1` passes on the preview channel, on
+`cultureand-tech-web.web.app` and on `cultureand.tech`: the six pages answer 200 with `max-age=0`, the five app
+images and the Thai legal pages answer 200, and every page serves its `lang`, its title and one JSON-LD block.
+Next: submit `sitemap.xml` again in Search Console and Search Advisor and request indexing of the four app pages.
 
 ## Baseline before the change (crawler view, 2026-10-22)
 
