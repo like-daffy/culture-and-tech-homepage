@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageProvider";
 // Section text per language; the FAQ also feeds the homepage's structured data (components/Home.tsx)
 export const musicDetailsContent = {
   en: {
-    title: "Live-Idol Discogs",
+    title: "Live-idol Discogs",
     subtitle: "Produced By Sochan",
     discography: {
       title: "Recent Works",
@@ -74,7 +74,7 @@ export const musicDetailsContent = {
       ],
     },
     inquiry: {
-      title: "Contract Inquiry",
+      title: "Live-idol Original Song Inquiries",
       discord: "Discord ID: @sochan.kr",
       openChat: undefined as { label: string; text: string; url: string } | undefined,
       email: "Email: sochan@cultureand.tech",
@@ -141,7 +141,7 @@ export const musicDetailsContent = {
       ],
     },
     inquiry: {
-      title: "계약 문의",
+      title: "라이브아이돌 오리지널 곡 제작 문의",
       discord: "Discord ID: @sochan.kr",
       openChat: {
         label: "오픈채팅",
@@ -167,7 +167,7 @@ export function MusicDetails() {
   } = musicDetailsContent[language];
 
   return (
-    <section id="music-details" className="py-20 bg-muted/30">
+    <section id="music-details" className="py-20">
       <div className="container">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">

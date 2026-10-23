@@ -11,7 +11,18 @@ code() { curl -s -o /dev/null -m 20 -w '%{http_code}' "$1"; }
 expect() { local got; got=$(code "$2"); if [ "$got" = "$1" ]; then echo "ok   $1 $2"; else echo "FAIL $got (want $1) $2"; fail=1; fi; }
 for p in index terms privacy privacy-consent; do expect 200 "https://$host/culture/thai-learn/$p.html"; done
 expect 200 "https://$host/culture/thai-learn/styles.css"
-expect 200 "https://$host/"
+# Every page in both languages: 200, and no stale browser cache (firebase.json headers; the default is max-age=3600)
+for p in "" ko/ apps/chord-to-midi/ apps/mac-get-space/ ko/apps/chord-to-midi/ ko/apps/mac-get-space/; do
+  headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
+  status=$(echo "$headers" | awk 'NR==1{print $2}')
+  cc=$(echo "$headers" | awk 'tolower($1)=="cache-control:"{ $1=""; print }')
+  if [ "$status" != 200 ]; then echo "FAIL $status (want 200) https://$host/$p"; fail=1
+  elif echo "$cc" | grep -q 'max-age=0'; then echo "ok   200 https://$host/$p (cache-control:$cc)"
+  else echo "FAIL cache-control https://$host/$p:$cc"; fail=1; fi
+done
+for p in chord-to-midi/og.png chord-to-midi/icon.png mac-get-space/og.png mac-get-space/og-ko.png mac-get-space/main.webp; do
+  expect 200 "https://$host/images/apps/$p"
+done
 expect 301 "https://$host/culture/"
 expect 404 "https://$host/culture/no-such-page-$(date +%s).html"
 for p in index terms privacy privacy-consent; do

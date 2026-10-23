@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The homepage in English (/) and Korean (/ko/); update <lastmod> when a page's content changes -->
+<!-- Every page in English and Korean; update <lastmod> when a page's content changes -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://cultureand.tech/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-23</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/"/>
   </url>
   <url>
     <loc>https://cultureand.tech/ko/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-23</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/"/>
+  </url>
+  <url>
+    <loc>https://cultureand.tech/apps/chord-to-midi/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/apps/chord-to-midi/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/apps/chord-to-midi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/apps/chord-to-midi/"/>
+  </url>
+  <url>
+    <loc>https://cultureand.tech/ko/apps/chord-to-midi/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/apps/chord-to-midi/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/apps/chord-to-midi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/apps/chord-to-midi/"/>
+  </url>
+  <url>
+    <loc>https://cultureand.tech/apps/mac-get-space/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/apps/mac-get-space/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/apps/mac-get-space/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/apps/mac-get-space/"/>
+  </url>
+  <url>
+    <loc>https://cultureand.tech/ko/apps/mac-get-space/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cultureand.tech/apps/mac-get-space/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://cultureand.tech/ko/apps/mac-get-space/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cultureand.tech/apps/mac-get-space/"/>
   </url>
 </urlset>

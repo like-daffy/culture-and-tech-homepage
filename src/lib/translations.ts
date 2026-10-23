@@ -9,6 +9,7 @@ export interface Translations {
   navigation: {
     home: string;
     about: string;
+    apps: string;
     services: string;
     contact: string;
     brandName: string;
@@ -25,10 +26,6 @@ export interface Translations {
   services: {
     title: string;
     subtitle: string;
-    qa: {
-      title: string;
-      description: string;
-    };
     music: {
       title: string;
       description: string;
@@ -56,26 +53,23 @@ const translations: Record<SupportedLanguage, Translations> = {
     navigation: {
       home: "Home",
       about: "About",
+      apps: "Apps",
       services: "Services",
       contact: "Contact",
       brandName: "Culture & Tech",
     },
     hero: {
       title: "Culture & Tech",
-      subtitle: "Innovative Solutions for Modern Business",
-      description: "Quality Assurance, Music Production, and Professional Session Services",
+      subtitle: "Music for Live-idols. Apps for musicians.",
+      description: "Original songs in Live-idol genres such as Denpa, Seishun ōdō and Kakkoi, and Chord to MIDI, an app for musicians.",
     },
     about: {
       title: "About Us",
-      description: "We are a leading company specializing in quality assurance, music production, and professional session services. Our mission is to deliver excellence through the harmonious blend of culture and technology.",
+      description: "Culture & Tech started from one value: the happiness of Subculture music lovers around the world. We produce original songs for Subculture music and Live-idols, and make apps for musicians.",
     },
     services: {
       title: "Our Services",
       subtitle: "Comprehensive solutions tailored to your needs",
-      qa: {
-        title: "Quality Assurance",
-        description: "Rigorous testing and quality control to ensure your products meet the highest standards.",
-      },
       music: {
         title: "Music Production",
         description: "Professional music production services with state-of-the-art equipment and experienced producers.",
@@ -101,26 +95,23 @@ const translations: Record<SupportedLanguage, Translations> = {
     navigation: {
       home: "홈",
       about: "소개",
+      apps: "앱",
       services: "서비스",
       contact: "문의",
       brandName: "컬처앤테크",
     },
     hero: {
       title: "컬처앤테크",
-      subtitle: "서브컬처 음악 제작 및 라이브아이돌 음악 제작 전문",
-      description: "라이브아이돌 오리지널곡 제작, 품질 보증 및 전문 세션 서비스",
+      subtitle: "라이브아이돌 음악 제작, 그리고 음악가를 위한 앱",
+      description: "전파, 왕도, 각고이 외 라이브아이돌 장르의 오리지널곡 제작, 음악인을 위한 앱 Chord to MIDI",
     },
     about: {
       title: "회사 소개",
-      description: "저희는 서브컬처 음악과 라이브아이돌을 위한 오리지널곡 제작, 품질 보증 및 전문 세션 서비스를 전문으로 하는 회사입니다. 문화와 기술의 조화로운 결합을 통해 최고의 서비스를 제공하는 것이 저희의 사명입니다.",
+      description: "컬처앤테크는 전세계 동인음악 애호가들의 행복을 위한 가치로부터 출발했습니다. 동인음악과 라이브아이돌을 위한 오리지널곡을 제작하고, 음악가를 위한 앱을 제작합니다.",
     },
     services: {
       title: "서비스",
       subtitle: "고객의 니즈에 맞춘 종합 솔루션",
-      qa: {
-        title: "품질 보증",
-        description: "제품이 최고 수준을 충족하도록 엄격한 테스트 및 품질 관리를 제공합니다.",
-      },
       music: {
         title: "음악 제작",
         description: "최첨단 장비와 경험 많은 프로듀서와 함께하는 전문 음악 제작 서비스입니다.",

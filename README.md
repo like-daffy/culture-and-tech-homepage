@@ -12,10 +12,10 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 
 | URL | Source | Made by |
 |---|---|---|
-| `/` (English), `/ko/` (Korean), `/404.html`, `/_next/…`, `/favicon.ico`, `/og-image.png` | `src/`, `public/` | `npm run build` (static export into `out/`) |
+| `/` (English), `/ko/` (Korean), the app pages `/apps/<app>/` and `/ko/apps/<app>/`, `/404.html`, `/_next/…`, `/favicon.ico`, `/og-image.png`, `/images/apps/…` | `src/`, `public/` | `npm run build` (static export into `out/`) |
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
-| `/culture/storage-review/privacy.html` (planned) | `public/culture/storage-review/` | from `mac-get-space` `docs/12-privacy-policy-draft.md` once approved |
+| `/culture/storage-review/privacy.html` (planned) | `public/culture/storage-review/` | from `mac-get-space` `docs/12-privacy-policy-draft.md` once approved; then set `privacyPolicyPath` in `src/lib/apps.ts` so that the Mac Get Space page links it |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
 | `https://music.cafe24.com/…` (old address, not Firebase) | `cafe24/www/` | Uploaded by hand to the Cafe24 web root: 301 to `cultureand.tech`, checked by `scripts/check-music-cafe24.sh`; see `cafe24/README.md` |
@@ -31,16 +31,51 @@ npm install
 npm run dev
 ```
 
-There are no API routes: the site is a static export. `/` is pre-rendered in English and adapts to the visitor
-(stored preference, then browser language, then English); `/ko/` is pre-rendered in Korean and stays Korean. The
-language switch moves between the two pages.
+There are no API routes: the site is a static export. Every page has an English version and a Korean version under
+`/ko/`, each pre-rendered in its language: `/` and `/ko/`, `/apps/<app>/` and `/ko/apps/<app>/`. Only the English
+homepage adapts to the visitor (stored preference, then browser language, then English); every other page, the app
+pages included, shows the language of its address, so that its text matches its title, description and structured
+data. The language switch moves to the same page in the other language.
 
 ## SEO
 
-Titles, descriptions, `hreflang` and structured data come from `src/lib/seo.ts`; the FAQ structured data reuses
-the FAQ text of `src/components/MusicDetails.tsx`. Structured data and `public/llms.txt` may only state what the
-page shows. When page content changes, update `public/llms.txt` and the `<lastmod>` dates in `public/sitemap.xml`;
-a new page also goes into the sitemap. Registration, baseline and measurement: `docs/seo.md`.
+Titles, descriptions, `hreflang` and structured data come from `src/lib/seo.ts`; the homepage's FAQ structured
+data reuses the FAQ text of `src/components/MusicDetails.tsx`, and each app page's reuses that app's FAQ in
+`src/lib/apps.ts`. Structured data and `public/llms.txt` may only state what the page shows. When page content
+changes, update `public/llms.txt` and the `<lastmod>` dates in `public/sitemap.xml`; a new page also goes into the
+sitemap. Registration, baseline and measurement: `docs/seo.md`.
+
+## Apps for musicians
+
+The homepage's Apps section and the app pages introduce only apps for making music; that is the section's concept.
+Today they are Chord to MIDI (`chord-to-midi-web`, live at https://chord-to-midi.app/) and Mac Get Space
+(`mac-get-space`, coming to the Mac App Store; the app was called Storage Review until its rename). The Thai app is not introduced, and MIDI Utility is not named while
+it is not public.
+
+All of their copy, in English and Korean, is in `src/lib/apps.ts`; the cards, the app pages and the structured data
+read it. Every claim must be true on the day it is published and documented in the app's own repository (the sources
+are listed at the top of that file). Mac Get Space's protection is described as what its default rules exclude from
+removal, together with the limits the page lists, never as a guarantee; the Trash and permanent deletion are named
+apart; its privacy text covers file processing only, since Apple handles the Expert purchase.
+
+Images are in `public/images/apps/`. Chord to MIDI's icon, link preview image and screenshots come from its
+repository. Mac Get Space's screenshots are Free-edition captures of the validation tour on its synthetic home
+(`build/validation/shots-free/` in `mac-get-space`), with the tour's own "Validation mode" label painted over. The
+page labels each of them "Development build · sample data" (`note` in `src/lib/apps.ts`), its link preview images
+`og.png` and `og-ko.png` (cropped from the Protection & exclusions screen) carry the same label in their language, and
+screenshots with a note stay out of the structured data. Replace all of them with App Store screenshots at launch.
+
+When an app changes:
+- Mac Get Space on the App Store: give both languages a `cta` with the App Store link and a new `status`, set
+  `schema.free` once the page says the download is free, replace the screenshots and link preview images with App
+  Store ones (without a `note`), and update `public/llms.txt`.
+- Mac Get Space's privacy policy published at `/culture/storage-review/privacy.html` (the path proposed in
+  `mac-get-space`; it may change with the rename): set `privacyPolicyPath`.
+- Chord to MIDI: mention DAW drag only once its extension is on the Chrome Web Store, and ads only once AdSense has
+  approved the site.
+- A new app: an entry in `APPS` and `APP_SLUGS` (`src/lib/apps.ts`) and in `APP_METADATA` (`src/lib/seo.ts`), page
+  files under `src/pages/apps/` and `src/pages/ko/apps/`, then the sitemap, `public/llms.txt` and
+  `scripts/check-live.sh`.
 
 ## Deploy
 
