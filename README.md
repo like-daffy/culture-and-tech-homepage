@@ -118,6 +118,15 @@ Never edit the copied HTML by hand.
 2. Here: `scripts/sync-mac-get-space-legal.sh` (refuses drafts, placeholders, scripts, foreign `<link>`s and
    uncommitted sources), commit ("Mac Get Space legal: …"), deploy.
 
+## Updating English-Thai Learn's privacy and support pages
+
+1. In `thai-word-learn-app`: edit `docs/legal/privacy-policy-draft.md` or `docs/legal/support-page-draft.md`, review
+   the drafts from `scripts/build-legal-pages.py` (`build/legal-preview/english-thai-learn/index.html`), record the
+   owner's approvals in the drafts, commit, then run `scripts/build-legal-pages.py --release`. Until the app's release
+   day the policy has no effective date (`--release --without-effective-date`, as for Mac Get Space).
+2. Here: `scripts/sync-english-thai-learn-legal.sh` (refuses drafts, placeholders, scripts, foreign `<link>`s and
+   uncommitted sources), commit ("English-Thai Learn legal: …"), deploy.
+
 Never edit the copied HTML by hand.
 
 ## Rules

@@ -1,0 +1,67 @@
+/* Styles for https://cultureand.tech/culture/english-thai-learn/ (privacy.html and support.html), rendered by
+   scripts/build-legal-pages.py. The layout follows the Mac Get Space legal page (mac-get-space/scripts/lib/legal-page.css);
+   the colours are English-Thai Learn's neutrals and its six pastel-rainbow dots (.superdesign/design-system.md).
+   System fonts only: the pages must not load fonts, scripts or anything else from other hosts (policy section 6). */
+:root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #17191e; background: #f2f3f5; line-height: 1.8; }
+* { box-sizing: border-box; }
+body { margin: 0; overflow-wrap: anywhere; }
+:lang(ko) { word-break: keep-all; }
+a { color: #1f5f8b; text-underline-offset: .2em; }
+a:focus-visible { outline: 3px solid #9ec1cf; outline-offset: 4px; border-radius: 3px; }
+.site-header, main, .site-footer { width: min(880px, calc(100% - 40px)); margin-inline: auto; }
+.site-header { padding: 26px 0 18px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.brand { font-weight: 750; display: inline-flex; align-items: center; gap: 10px; }
+.dots { display: inline-flex; gap: 5px; }
+.dots i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.dots i:nth-child(1) { background: #cc99c9; }
+.dots i:nth-child(2) { background: #9ec1cf; }
+.dots i:nth-child(3) { background: #9ee09e; }
+.dots i:nth-child(4) { background: #fdfd97; }
+.dots i:nth-child(5) { background: #feb144; }
+.dots i:nth-child(6) { background: #ff6663; }
+.site-header nav { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; }
+main { padding: 44px 48px; background: #fff; border: 1px solid #dfe2e7; border-radius: 20px; }
+article + article { margin-top: 64px; padding-top: 44px; border-top: 1px solid #dfe2e7; }
+.document-header { padding-bottom: 28px; margin-bottom: 30px; border-bottom: 3px solid #17191e; }
+h1 { font-size: clamp(26px, 5vw, 36px); line-height: 1.35; letter-spacing: -.03em; margin: 0 0 14px; }
+h2 { font-size: 20px; line-height: 1.5; letter-spacing: -.02em; margin: 0 0 14px; }
+p { margin: 0 0 14px; }
+section { margin: 30px 0 0; }
+.date, .muted { color: #5f6673; font-size: 14px; }
+.lead { color: #262a31; font-size: 17px; }
+ul, ol { padding-left: 24px; margin: 12px 0; }
+li + li { margin-top: 12px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+.table-wrap { margin: 18px 0; }
+table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 14px; }
+th, td { padding: 14px 12px; border: 1px solid #dfe2e7; text-align: left; vertical-align: top; }
+th { background: #f2f3f5; font-weight: 650; }
+.site-footer { padding: 26px 0 40px; font-size: 13px; color: #5f6673; }
+.draft { background: #fff3dc; border: 1px solid #e9c77c; border-radius: 10px; padding: 15px 18px; margin-bottom: 30px; font-size: 14px; color: #674516; }
+.draft ul { margin: 8px 0 0; padding-left: 20px; }
+.draft li + li { margin-top: 6px; }
+.pending { color: #8e4200; background: #fff1dd; font-weight: 650; }
+.approval { display: inline-block; margin-left: 10px; padding: 1px 10px; border-radius: 999px; background: #e6f6ec; color: #1f8a4c; font-size: 12px; font-weight: 650; letter-spacing: 0; line-height: 1.8; vertical-align: middle; }
+.approval.changed { background: #fff1dd; color: #8e4200; }
+.skip-link { position: absolute; top: -80px; left: 16px; padding: 8px 16px; background: white; z-index: 2; }
+.skip-link:focus { top: 8px; }
+@media (max-width: 600px) {
+  .site-header, main, .site-footer { width: min(100% - 28px, 880px); }
+  .site-header { padding-top: 18px; gap: 8px; }
+  .site-header nav { gap: 14px; font-size: 13px; }
+  main { padding: 26px 20px; border-radius: 14px; }
+  .lead { font-size: 16px; }
+  table, tbody, tr, th, td { display: block; width: 100%; }
+  thead { display: none; }
+  tr { margin-bottom: 16px; border: 1px solid #dfe2e7; border-radius: 8px; overflow: hidden; }
+  td, th { border: 0; border-top: 1px solid #e6e8ec; padding: 12px; }
+  tr > :first-child { border-top: 0; }
+  td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; font-weight: 700; color: #5f6673; margin-bottom: 4px; }
+}
+@media print {
+  :root { background: white; color: black; }
+  .site-header, .site-footer, .skip-link { display: none; }
+  main { width: 100%; border: 0; padding: 0; }
+  h2 { break-after: avoid; }
+  tr { break-inside: avoid; }
+}

@@ -13,6 +13,8 @@ for p in index terms privacy privacy-consent; do expect 200 "https://$host/cultu
 expect 200 "https://$host/culture/thai-learn/styles.css"
 expect 200 "https://$host/culture/mac-get-space/privacy.html"
 expect 200 "https://$host/culture/mac-get-space/styles.css"
+for p in privacy support; do expect 200 "https://$host/culture/english-thai-learn/$p.html"; done
+expect 200 "https://$host/culture/english-thai-learn/styles.css"
 # Every page in both languages: 200, and no stale browser cache (firebase.json headers; the default is max-age=3600)
 for p in "" ko/ apps/chord-to-midi/ apps/mac-get-space/ ko/apps/chord-to-midi/ ko/apps/mac-get-space/; do
   headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
@@ -39,6 +41,14 @@ if echo "$body" | grep -qi '<script'; then echo "FAIL script tag in mac-get-spac
 if echo "$body" | grep -q 'class="draft"'; then echo "FAIL draft banner in mac-get-space/privacy.html"; fail=1; fi
 if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in mac-get-space/privacy.html"; fail=1; fi
 if echo "$body" | grep -q '<link rel="canonical" href="https://cultureand.tech/culture/mac-get-space/privacy.html">'; then echo "ok   mac-get-space/privacy.html canonical"; else echo "FAIL mac-get-space/privacy.html canonical"; fail=1; fi
+# English-Thai Learn's privacy and support pages (sync-english-thai-learn-legal.sh): the release pages only, at their canonical addresses
+for p in privacy support; do
+  body=$(curl -s -m 20 "https://$host/culture/english-thai-learn/$p.html")
+  if echo "$body" | grep -qi '<script'; then echo "FAIL script tag in english-thai-learn/$p.html"; fail=1; fi
+  if echo "$body" | grep -q 'class="draft"'; then echo "FAIL draft banner in english-thai-learn/$p.html"; fail=1; fi
+  if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in english-thai-learn/$p.html"; fail=1; fi
+  if echo "$body" | grep -q "<link rel=\"canonical\" href=\"https://cultureand.tech/culture/english-thai-learn/$p.html\">"; then echo "ok   english-thai-learn/$p.html canonical"; else echo "FAIL english-thai-learn/$p.html canonical"; fail=1; fi
+done
 if [ -n "$version" ]; then
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/privacy.html")
   if echo "$body" | grep -q "버전 $version"; then echo "ok   privacy.html shows 버전 $version"; else echo "FAIL privacy.html does not show 버전 $version"; fail=1; fi
@@ -47,6 +57,7 @@ fi
 if [ "$host" = "cultureand.tech" ]; then
   expect 301 "http://$host/culture/thai-learn/privacy.html"
   expect 301 "http://$host/culture/mac-get-space/privacy.html"
+  expect 301 "http://$host/culture/english-thai-learn/privacy.html"
   expect 301 "https://www.$host/"
 fi
 exit $fail
