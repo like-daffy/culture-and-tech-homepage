@@ -1,5 +1,5 @@
 /* Styles for https://cultureand.tech/culture/mac-get-space/privacy.html, rendered by scripts/build-privacy-page.py.
-   The layout follows the Thai app's legal/styles.css; colours are Mac Get Space's (.superdesign/design-system.md).
+   The layout follows the Thai app's legal/styles.css; colours are Clean Space's (.superdesign/design-system.md).
    System fonts only: the page must not load fonts, scripts or anything else from other hosts (policy section 7). */
 :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #18324d; background: #f3f8ff; line-height: 1.8; }
 * { box-sizing: border-box; }
