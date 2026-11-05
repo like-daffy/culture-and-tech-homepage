@@ -40,7 +40,7 @@ Released 2026-10-23 14:09 KST from `3e6f1b3` (preview channel `apps` cloned to `
 images and the Thai legal pages answer 200, and every page serves its `lang`, its title and one JSON-LD block.
 Next: submit `sitemap.xml` again in Search Console and Search Advisor and request indexing of the four app pages.
 
-## Rename to Clean Space (prepared 2026-11-05, not deployed)
+## Rename to Clean Space (released 2026-11-05)
 
 Apple rejected the name Mac Get Space (Guideline 5.2.5); the app is now Clean Space, App Store subtitle "For Music
 Production". Every address stays: `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` and
@@ -52,9 +52,15 @@ Production". Every address stays: `/apps/mac-get-space/`, `/ko/apps/mac-get-spac
   owner's icon, so `image` is `/images/apps/mac-get-space/icon.png`.
 - Crawler files: `public/llms.txt` names Clean Space; every `<lastmod>` in `public/sitemap.xml` is 2026-11-05, since
   every page shows the app's name (the homepages' Apps cards, the Chord to MIDI pages' "More apps" card).
-- Privacy page: the release build from mac-get-space `2632d3e` differs from the live page only by the name.
+- Privacy page: the release build from mac-get-space `2632d3e` differs from the page it replaced only by the name.
 
-After the release: request recrawling of the two Clean Space pages and the two homepages in Search Console and Search
+Released 2026-11-05 17:02 KST from `37eb1fa` (preview channel `clean-space` cloned to `live`, Next build ID
+`E6Ebs2A_cID6LryUGSkR0`). `scripts/check-live.sh … 1.1` passed on the preview (37 checks), on
+`cultureand-tech-web.web.app` (37) and on `cultureand.tech` (41), including its new check that every page and the
+privacy page name Clean Space and never Mac Get Space; the live privacy page and its `styles.css` are byte-identical
+to the release files. The Firebase CLI's sign-in had expired; the owner signed in again before the deploy.
+
+Next: request recrawling of the two Clean Space pages and the two homepages in Search Console and Search
 Advisor, so that results show the new name; until then they may still show Mac Get Space. Add "Clean Space Mac" and
 "Clean Space For Music Production" to the app pages' measurement queries.
 
