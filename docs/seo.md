@@ -43,8 +43,8 @@ Next: submit `sitemap.xml` again in Search Console and Search Advisor and reques
 ## Rename to Clean Space (released 2026-11-05)
 
 Apple rejected the name Mac Get Space (Guideline 5.2.5); the app is now Clean Space, App Store subtitle "For Music
-Production". Every address stays: `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` and
-`/culture/mac-get-space/privacy.html` (the installed app links to it), so there is no redirect and no new sitemap URL.
+Production". This release kept every address (`/apps/mac-get-space/`, `/ko/apps/mac-get-space/` and
+`/culture/mac-get-space/privacy.html`); they moved later the same day (next section).
 
 - Titles: "Clean Space: Mac Cleaner for Musicians | Culture & Tech" and "Clean Space: 음악가를 위한 Mac 용량 정리 앱 |
   컬처앤테크"; the descriptions did not name the app and are unchanged.
@@ -63,6 +63,26 @@ to the release files. The Firebase CLI's sign-in had expired; the owner signed i
 Next: request recrawling of the two Clean Space pages and the two homepages in Search Console and Search
 Advisor, so that results show the new name; until then they may still show Mac Get Space. Add "Clean Space Mac" and
 "Clean Space For Music Production" to the app pages' measurement queries.
+
+## Clean Space addresses (released 2026-11-05)
+
+At the owner's request, so that nothing an App Store reviewer opens carries the rejected name, Clean Space's
+addresses moved to `/apps/clean-space/`, `/ko/apps/clean-space/`, `/images/apps/clean-space/` and
+`/culture/clean-space/privacy.html`; canonical URLs, `hreflang`, structured data, `public/sitemap.xml` and
+`public/llms.txt` follow. `firebase.json` 301s every old address: `/apps/mac-get-space` and `/ko/apps/mac-get-space`
+with or without the slash, `/culture/mac-get-space/<file>` and `/images/apps/mac-get-space/<file>`. The privacy
+page's text is unchanged; only its canonical link moved (mac-get-space `3ecd039`). The icon became the owner's
+updated artwork.
+
+Released 2026-11-05 19:11 KST from `ce0c31f` (preview channel `clean-space` cloned to `live` by the owner, Next
+build ID `0P-P1nu873jPrHK68jkF0`). `scripts/check-live.sh … 1.1` passed on the preview (43 checks), on
+`cultureand-tech-web.web.app` (43) and on `cultureand.tech` (47), including a 301 to the right new address for each
+old one. The live privacy page and its `styles.css` are byte-identical to the committed files, and no page,
+`sitemap.xml` or `llms.txt` contains the old slug or name.
+
+Next: submit `sitemap.xml` again in Search Console and Search Advisor and request indexing of `/apps/clean-space/`
+and `/ko/apps/clean-space/`; the 301s carry the old pages over. The app's own privacy link and the URLs in App Store
+Connect move separately; until they do, the 301 keeps the old privacy address working.
 
 ## Baseline before the change (crawler view, 2026-10-22)
 
