@@ -22,9 +22,9 @@ and 0 warnings for both pages; `scripts/check-live.sh cultureand.tech 1.1` passe
 | --- | --- |
 | Pages | `/apps/chord-to-midi/` and `/apps/mac-get-space/`, with Korean versions under `/ko/apps/`, pre-rendered; `hreflang` en / ko / x-default per app (`appPaths` in `src/lib/seo.ts`, `public/sitemap.xml`) |
 | Titles and descriptions | `APP_METADATA` in `src/lib/seo.ts` |
-| Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Mac Get Space), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text; screenshots labelled as a development build are left out |
+| Structured data | Organization, WebSite, the app (WebApplication for Chord to MIDI, SoftwareApplication for Clean Space), FAQPage and BreadcrumbList per page (`appJsonLd`); the FAQ is the visible FAQ text; screenshots labelled as a development build are left out |
 | Language | App pages show the language of their address, so their text, title, description and structured data agree; only the English homepage adapts to the visitor |
-| Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630; Mac Get Space also has `og-ko.png` for its Korean page, both labelled as a development build |
+| Link preview images | `public/images/apps/<app>/og.png`, 1200 × 630; Clean Space also has `og-ko.png` for its Korean page, both labelled as a development build |
 | Homepage | An Apps section (`#apps`) with one card per app, linking to its page; hero and About rewritten around "Music for Live-idols. Apps for musicians." (the About names Subculture music and Live-idols; "Live-idol" is spelled as a proper noun throughout the English text). The homepage's title and description no longer mention QA since the QA card was removed; its FAQ structured data is unchanged |
 | Crawler files | Both apps in `public/llms.txt`; the four app pages in `public/sitemap.xml` |
 
@@ -39,6 +39,24 @@ Released 2026-10-23 14:09 KST from `3e6f1b3` (preview channel `apps` cloned to `
 `cultureand-tech-web.web.app` and on `cultureand.tech`: the six pages answer 200 with `max-age=0`, the five app
 images and the Thai legal pages answer 200, and every page serves its `lang`, its title and one JSON-LD block.
 Next: submit `sitemap.xml` again in Search Console and Search Advisor and request indexing of the four app pages.
+
+## Rename to Clean Space (prepared 2026-11-05, not deployed)
+
+Apple rejected the name Mac Get Space (Guideline 5.2.5); the app is now Clean Space, App Store subtitle "For Music
+Production". Every address stays: `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` and
+`/culture/mac-get-space/privacy.html` (the installed app links to it), so there is no redirect and no new sitemap URL.
+
+- Titles: "Clean Space: Mac Cleaner for Musicians | Culture & Tech" and "Clean Space: 음악가를 위한 Mac 용량 정리 앱 |
+  컬처앤테크"; the descriptions did not name the app and are unchanged.
+- Structured data: the SoftwareApplication, the breadcrumb and the FAQ page name Clean Space; the page now shows the
+  owner's icon, so `image` is `/images/apps/mac-get-space/icon.png`.
+- Crawler files: `public/llms.txt` names Clean Space; every `<lastmod>` in `public/sitemap.xml` is 2026-11-05, since
+  every page shows the app's name (the homepages' Apps cards, the Chord to MIDI pages' "More apps" card).
+- Privacy page: the release build from mac-get-space `2632d3e` differs from the live page only by the name.
+
+After the release: request recrawling of the two Clean Space pages and the two homepages in Search Console and Search
+Advisor, so that results show the new name; until then they may still show Mac Get Space. Add "Clean Space Mac" and
+"Clean Space For Music Production" to the app pages' measurement queries.
 
 ## Baseline before the change (crawler view, 2026-10-22)
 

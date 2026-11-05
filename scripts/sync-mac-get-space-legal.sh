@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Copies Mac Get Space's released privacy page into public/culture/mac-get-space/, which is served at
+# Copies Clean Space's released privacy page into public/culture/mac-get-space/, which is served at
 # https://cultureand.tech/culture/mac-get-space/. Refuses drafts and anything but plain HTML + styles.css.
+# The app was called Mac Get Space until 2026-11-05; its repository, this address and this script keep that name.
 #
 # Usage: scripts/sync-mac-get-space-legal.sh [path/to/mac-get-space]
 #        scripts/sync-mac-get-space-legal.sh --check <dir>   validate only (firebase predeploy runs it on out/)

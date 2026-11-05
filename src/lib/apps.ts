@@ -5,8 +5,10 @@
  * they are published, and only what the app's own repository documents:
  * - Chord to MIDI: chord-to-midi-web (content/, site.config.json). DAW drag and ads are left out while the
  *   extension is not on the Chrome Web Store and AdSense has not approved the site.
- * - Mac Get Space, called Storage Review until its rename: mac-get-space (README, docs/05-protection-defaults.md, docs/09-distribution.md,
- *   docs/12-privacy-policy-draft.md, docs/plans/free-vs-expert-version.md). No price: the App Store sets it.
+ * - Clean Space, App Store subtitle "For Music Production": mac-get-space (AGENTS.md, README, docs/05-protection-defaults.md,
+ *   docs/09-distribution.md, docs/12-privacy-policy-draft.md, docs/plans/free-vs-expert-version.md). No price: the App
+ *   Store sets it. It was called Mac Get Space until Apple's Guideline 5.2.5 rejection (renamed 2026-11-05), and Storage
+ *   Review before that; its slug, page addresses, image folder and privacy page address keep "mac-get-space".
  *   Protection is described as what the default rules exclude from removal, with its limits, never as a guarantee.
  *   Its screenshots come from a development build with sample data and say so on the page.
  * Not introduced here: MIDI Utility (not public) and the Thai app (not a music app).
@@ -42,6 +44,8 @@ export interface AppSection {
 
 export interface AppContent {
   name: string;
+  /** The app's official subtitle, shown under its name on its page; left out where it has no reviewed translation */
+  subtitle?: string;
   /** Availability, shown as a badge */
   status: string;
   tagline: string;
@@ -260,10 +264,14 @@ const chordToMidi: AppInfo = {
   },
 };
 
-const macGetSpace: AppInfo = {
+// Clean Space. Its slug, page addresses and image folder keep the app's earlier name, Mac Get Space.
+const cleanSpace: AppInfo = {
   slug: "mac-get-space",
+  // The owner's artwork as the app's generated icon set has it (AppIcon.appiconset/icon_128x128@2x.png), unchanged
+  icon: "/images/apps/mac-get-space/icon.png",
   fallbackIcon: HardDrive,
-  // Cropped from the development build's Protection & exclusions screen, with the label burned in per language
+  // Cropped from the Protection & exclusions screen of the 2026-10-23 development build, which shows no app name,
+  // with the label burned in per language
   ogImage: { en: "/images/apps/mac-get-space/og.png", ko: "/images/apps/mac-get-space/og-ko.png" },
   supportEmail: SUPPORT_EMAIL,
   // Published from mac-get-space's docs/12 by scripts/sync-mac-get-space-legal.sh
@@ -275,7 +283,9 @@ const macGetSpace: AppInfo = {
   },
   content: {
     en: {
-      name: "Mac Get Space",
+      name: "Clean Space",
+      // The App Store subtitle, approved in English only
+      subtitle: "For Music Production",
       status: "Coming to the Mac App Store",
       tagline: "Free up your Mac, with your DAW projects, virtual instruments and plug-ins protected by default.",
       summary:
@@ -288,14 +298,15 @@ const macGetSpace: AppInfo = {
       ],
       intro: [
         "If you make music, you know the feeling: the virtual instrument libraries you've installed keep filling up your disk.",
-        "Mac Get Space is built for a musician's Mac. It finds the caches, installers and leftovers you can remove, explains why each one is safe to delete, and excludes the music production files its protection rules recognize.",
+        "Clean Space is built for a musician's Mac. It finds the caches, installers and leftovers you can remove, explains why each one is safe to delete, and excludes the music production files its protection rules recognize.",
       ],
+      // The Clean Space validation tour on its synthetic home (mac-get-space build/validation/cs-tour-en, 2026-11-05)
       screenshots: [
         {
           src: "/images/apps/mac-get-space/main.webp",
           width: 1440,
           height: 900,
-          alt: "Mac Get Space's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
+          alt: "Clean Space's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
           caption:
             "Each candidate shows why it's here and what removing it does. Every item inside the selected cache was inspected, and none is music, a preset or a project. The downloaded preset pack is marked Protected.",
           note: "Development build · sample data",
@@ -439,10 +450,11 @@ const macGetSpace: AppInfo = {
             "Not yet: it is being prepared for release. We are preparing its Mac App Store listing first, and this page will link to it once it is available.",
         },
       ],
-      support: "Questions about Mac Get Space are welcome at {email}.",
+      support: "Questions about Clean Space are welcome at {email}.",
     },
     ko: {
-      name: "Mac Get Space",
+      name: "Clean Space",
+      // No subtitle: the App Store subtitle has no reviewed Korean translation
       status: "Mac App Store 출시 예정",
       tagline: "DAW, 가상 악기 및 플러그인들은 기본으로 보호하면서 Mac 용량을 비웁니다.",
       summary:
@@ -455,14 +467,14 @@ const macGetSpace: AppInfo = {
       ],
       intro: [
         "음악을 하시다 보면 설치한 가상악기 라이브러리 등으로 인해 용량이 부족한 걸 느끼실 때가 많으실 겁니다.",
-        "Mac Get Space는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 삭제해도 되는 이유를 설명하고, 보호 규칙이 알아보는 음악 작업 파일은 삭제 대상에서 제외합니다.",
+        "Clean Space는 음악가의 Mac을 위해 만들었습니다. 지워도 되는 캐시, 설치 파일, 남은 파일을 찾아 삭제해도 되는 이유를 설명하고, 보호 규칙이 알아보는 음악 작업 파일은 삭제 대상에서 제외합니다.",
       ],
       screenshots: [
         {
           src: "/images/apps/mac-get-space/main.webp",
           width: 1440,
           height: 900,
-          alt: "Mac Get Space 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
+          alt: "Clean Space 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
           caption:
             "후보마다 여기 있는 이유와 지우면 어떻게 되는지가 표시됩니다. 선택한 캐시는 안의 항목을 모두 검사해 음악, 프리셋, 프로젝트 파일이 없음을 확인했습니다. 내려받은 프리셋 팩은 보호 항목으로 표시됩니다.",
           note: "개발 중인 화면 · 예시 데이터",
@@ -605,14 +617,14 @@ const macGetSpace: AppInfo = {
             "현재는 출시 준비중입니다. 우선 Mac App Store 등록을 준비하고 있으며, 출시되면 이 페이지에 링크를 걸어 두겠습니다.",
         },
       ],
-      support: "Mac Get Space에 관한 질문은 {email}로 보내 주세요.",
+      support: "Clean Space에 관한 질문은 {email}로 보내 주세요.",
     },
   },
 };
 
 export const APPS: Record<AppSlug, AppInfo> = {
   "chord-to-midi": chordToMidi,
-  "mac-get-space": macGetSpace,
+  "mac-get-space": cleanSpace,
 };
 
 /** The homepage's Apps section */

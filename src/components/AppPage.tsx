@@ -105,6 +105,11 @@ export function AppPage({ slug, language }: AppPageProps) {
                     {content.status}
                   </span>
                   <h1 className="mt-3 text-4xl md:text-5xl font-bold text-primary">{content.name}</h1>
+                  {content.subtitle && (
+                    <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                      {content.subtitle}
+                    </p>
+                  )}
                   <p className="mt-3 text-xl md:text-2xl font-medium text-foreground/90 text-balance">
                     {content.tagline}
                   </p>

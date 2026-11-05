@@ -51,14 +51,15 @@ export const APP_METADATA: Record<AppSlug, Record<SupportedLanguage, { title: st
         "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일의 코드도 읽어 줍니다. 브라우저에서 무료로 쓰는 음악 도구입니다.",
     },
   },
+  // Clean Space; its slug keeps the earlier name
   "mac-get-space": {
     en: {
-      title: "Mac Get Space: Mac Cleaner for Musicians | Culture & Tech",
+      title: "Clean Space: Mac Cleaner for Musicians | Culture & Tech",
       description:
         "A Mac storage cleaner for musicians: music files that match its default protection rules are excluded, and nothing is deleted until you approve a plan.",
     },
     ko: {
-      title: "Mac Get Space: 음악가를 위한 Mac 용량 정리 앱 | 컬처앤테크",
+      title: "Clean Space: 음악가를 위한 Mac 용량 정리 앱 | 컬처앤테크",
       description:
         "음악가를 위한 Mac 용량 정리 앱. 기본 보호 규칙에 해당하는 음악 작업 파일은 삭제 대상에서 제외하고, 직접 승인하기 전에는 아무것도 지우지 않습니다.",
     },

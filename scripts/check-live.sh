@@ -24,8 +24,15 @@ for p in "" ko/ apps/chord-to-midi/ apps/mac-get-space/ ko/apps/chord-to-midi/ k
   elif echo "$cc" | grep -q 'max-age=0'; then echo "ok   200 https://$host/$p (cache-control:$cc)"
   else echo "FAIL cache-control https://$host/$p:$cc"; fail=1; fi
 done
-for p in chord-to-midi/og.png chord-to-midi/icon.png mac-get-space/og.png mac-get-space/og-ko.png mac-get-space/main.webp; do
+for p in chord-to-midi/og.png chord-to-midi/icon.png mac-get-space/og.png mac-get-space/og-ko.png mac-get-space/main.webp \
+         mac-get-space/protection.webp mac-get-space/icon.png; do
   expect 200 "https://$host/images/apps/$p"
+done
+# Every page calls the app in the mac-get-space folder Clean Space (renamed from Mac Get Space on 2026-11-05)
+for p in "" ko/ apps/chord-to-midi/ apps/mac-get-space/ ko/apps/chord-to-midi/ ko/apps/mac-get-space/; do
+  body=$(curl -s -m 20 "https://$host/$p")
+  if echo "$body" | grep -q 'Clean Space' && ! echo "$body" | grep -q 'Mac Get Space'; then echo "ok   https://$host/$p names Clean Space"
+  else echo "FAIL https://$host/$p does not name the app Clean Space only"; fail=1; fi
 done
 expect 301 "https://$host/culture/"
 expect 404 "https://$host/culture/no-such-page-$(date +%s).html"
@@ -35,8 +42,10 @@ for p in index terms privacy privacy-consent; do
   if echo "$body" | grep -qE 'class="pending"|확인 필요'; then echo "FAIL pending marker in $p.html"; fail=1; fi
   if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in $p.html"; fail=1; fi
 done
-# Mac Get Space's privacy page (sync-mac-get-space-legal.sh): the release page only, at its canonical address
+# Clean Space's privacy page (sync-mac-get-space-legal.sh): the release page only, at its canonical address, which
+# keeps the app's earlier name
 body=$(curl -s -m 20 "https://$host/culture/mac-get-space/privacy.html")
+if echo "$body" | grep -q '<span class="brand">Clean Space</span>' && ! echo "$body" | grep -q 'Mac Get Space'; then echo "ok   mac-get-space/privacy.html names Clean Space"; else echo "FAIL mac-get-space/privacy.html does not name the app Clean Space only"; fail=1; fi
 if echo "$body" | grep -qi '<script'; then echo "FAIL script tag in mac-get-space/privacy.html"; fail=1; fi
 if echo "$body" | grep -q 'class="draft"'; then echo "FAIL draft banner in mac-get-space/privacy.html"; fail=1; fi
 if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in mac-get-space/privacy.html"; fail=1; fi
