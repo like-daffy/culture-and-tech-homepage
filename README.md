@@ -15,13 +15,16 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/` (English), `/ko/` (Korean), the app pages `/apps/<app>/` and `/ko/apps/<app>/`, `/404.html`, `/_next/…`, `/favicon.ico`, `/og-image.png`, `/images/apps/…` | `src/`, `public/` | `npm run build` (static export into `out/`) |
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
-| `/culture/mac-get-space/privacy.html`, `styles.css` (Clean Space's privacy policy; the address keeps the app's earlier name) | `public/culture/mac-get-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
+| `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
+| `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
 | `https://music.cafe24.com/…` (old address, not Firebase) | `cafe24/www/` | Uploaded by hand to the Cafe24 web root: 301 to `cultureand.tech`, checked by `scripts/check-music-cafe24.sh`; see `cafe24/README.md` |
 
 The `/culture/...` legal URLs are registered in the Toss console and App Store Connect. They must keep returning
-200 at exactly these paths, so `cleanUrls` stays `false` and `trailingSlash` is unset in `firebase.json`.
+200 at exactly these paths, so `cleanUrls` stays `false` and `trailingSlash` is unset in `firebase.json`. The one
+exception is Clean Space's old address `/culture/mac-get-space/privacy.html`: since 2026-11-05 a permanent 301 to
+`/culture/clean-space/privacy.html`. Keep that redirect while any build or App Store Connect links to the old address.
 The generated HTML is committed so that the published text of every policy version stays in git history.
 
 ## Develop
@@ -50,9 +53,11 @@ sitemap. Registration, baseline and measurement: `docs/seo.md`.
 The homepage's Apps section and the app pages introduce only apps for making music; that is the section's concept.
 Today they are Chord to MIDI (`chord-to-midi-web`, live at https://chord-to-midi.app/) and Clean Space
 (`mac-get-space`, coming to the Mac App Store; App Store subtitle "For Music Production"). Clean Space was called Mac
-Get Space until Apple's Guideline 5.2.5 rejection (renamed 2026-11-05), and Storage Review before that. Its slug, page
-addresses (`/apps/mac-get-space/`), image folder and privacy page address keep that name, since the installed app and
-search engines already use them. The Thai app is not introduced, and MIDI Utility is not named while it is not public.
+Get Space until Apple's Guideline 5.2.5 rejection (renamed 2026-11-05), and Storage Review before that. The same day
+its pages, images and privacy page moved to `clean-space` addresses (`/apps/clean-space/`,
+`/culture/clean-space/privacy.html`), so that no address a reviewer opens carries the rejected name; `firebase.json`
+301s the old `mac-get-space` ones. Its repository keeps the name `mac-get-space`. The Thai app is not introduced, and
+MIDI Utility is not named while it is not public.
 
 All of their copy, in English and Korean, is in `src/lib/apps.ts`; the cards, the app pages and the structured data
 read it. Every claim must be true on the day it is published and documented in the app's own repository (the sources
@@ -62,9 +67,10 @@ removal, together with the limits the page lists, never as a guarantee; the Tras
 apart; its privacy text covers file processing only, since Apple handles the Expert purchase.
 
 Images are in `public/images/apps/`. Chord to MIDI's icon, link preview image and screenshots come from its
-repository. Clean Space's icon is the owner's artwork as the app's generated icon set has it
-(`App/MacGetSpace/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png`, 256 px), copied unchanged; never redraw
-it. Its screenshots are Expert-preview captures of the Clean Space validation tour on its synthetic home
+repository. Clean Space's icon is the owner's updated artwork (`assets/new-app-icon-1024-updated.png` in
+`mac-get-space`, 1312 × 1199), padded to a square with its own white background and framed by the app's
+`scripts/make-app-icon.swift`, run with a scratch folder as its root so that the app's icon set is not touched: the
+256 px image (`icon_128x128@2x.png`). Never redraw it. Its screenshots are Expert-preview captures of the Clean Space validation tour on its synthetic home
 (`build/validation/cs-tour-en/` in `mac-get-space`, 2026-11-05, recorded in its docs/10), with the tour's own
 "Validation mode — fixture home" label left in place. The page labels each of them "Development build · sample data"
 (`note` in `src/lib/apps.ts`), its link preview images `og.png` and `og-ko.png` (cropped from the Protection &
@@ -89,7 +95,8 @@ When an app changes:
 Releases are manual, from a clean, committed `main`, with the pinned CLI and an explicit project.
 Needs `firebase login` with the account that owns `cultureand-tech-web` (sochan@cultureand.tech).
 Channel deploys first run `npm run build`, add the Cafe24 compatibility assets and check
-`out/culture/thai-learn/` and `out/culture/mac-get-space/` (`predeploy` in `firebase.json`).
+`out/culture/thai-learn/`, `out/culture/clean-space/` and `out/culture/english-thai-learn/` (`predeploy` in
+`firebase.json`).
 
 ```bash
 fb() { npx --yes firebase-tools@15.32.1 "$@"; }
@@ -123,8 +130,9 @@ Never edit the copied HTML by hand.
    commit, then run `scripts/build-privacy-page.py --release`. Until the release day the page has no effective date
    (`--release --without-effective-date`, the owner's choice on 2026-10-23).
 2. Here: `scripts/sync-mac-get-space-legal.sh` (refuses drafts, placeholders, scripts, foreign `<link>`s and
-   uncommitted sources), commit ("Clean Space legal: …"), deploy. The page keeps its address
-   `/culture/mac-get-space/privacy.html`, which the installed app links to.
+   uncommitted sources), commit ("Clean Space legal: …"), deploy. The page is at
+   `/culture/clean-space/privacy.html`; its address until 2026-11-05, `/culture/mac-get-space/privacy.html`, is a 301
+   to it. The script and the app's build folders (`build/legal-upload/mac-get-space/`) keep the repository's name.
 
 ## Updating English-Thai Learn's privacy and support pages
 

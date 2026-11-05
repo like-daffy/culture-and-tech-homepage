@@ -51,8 +51,7 @@ export const APP_METADATA: Record<AppSlug, Record<SupportedLanguage, { title: st
         "코드 진행을 입력해 피아노로 들어 보고 DAW용 MIDI 파일로 내려받으세요. MIDI 파일의 코드도 읽어 줍니다. 브라우저에서 무료로 쓰는 음악 도구입니다.",
     },
   },
-  // Clean Space; its slug keeps the earlier name
-  "mac-get-space": {
+  "clean-space": {
     en: {
       title: "Clean Space: Mac Cleaner for Musicians | Culture & Tech",
       description:
@@ -75,8 +74,8 @@ export function pageLanguageFromPath(pathname: string): SupportedLanguage {
 
 /**
  * The language versions of the page at a route: the English version is at the route without "/ko",
- * the Korean version under "/ko". "/apps/mac-get-space" gives "/apps/mac-get-space/" and
- * "/ko/apps/mac-get-space/"; "/" and "/ko" give the two homepages.
+ * the Korean version under "/ko". "/apps/clean-space" gives "/apps/clean-space/" and
+ * "/ko/apps/clean-space/"; "/" and "/ko" give the two homepages.
  */
 export function languagePathsFor(pathname: string): Record<SupportedLanguage, string> {
   const english = pageLanguageFromPath(pathname) === "ko" ? pathname.slice("/ko".length) || "/" : pathname;

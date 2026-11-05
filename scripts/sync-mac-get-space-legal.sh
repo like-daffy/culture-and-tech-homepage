@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Copies Clean Space's released privacy page into public/culture/mac-get-space/, which is served at
-# https://cultureand.tech/culture/mac-get-space/. Refuses drafts and anything but plain HTML + styles.css.
-# The app was called Mac Get Space until 2026-11-05; its repository, this address and this script keep that name.
+# Copies Clean Space's released privacy page into public/culture/clean-space/, which is served at
+# https://cultureand.tech/culture/clean-space/. Refuses drafts and anything but plain HTML + styles.css.
+# Until 2026-11-05 the app was Mac Get Space and the page was at /culture/mac-get-space/privacy.html, now a 301 in
+# firebase.json; the app's repository, its build folder and this script keep the old name.
 #
 # Usage: scripts/sync-mac-get-space-legal.sh [path/to/mac-get-space]
 #        scripts/sync-mac-get-space-legal.sh --check <dir>   validate only (firebase predeploy runs it on out/)
@@ -13,7 +14,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pages=(privacy.html)
-canonical="https://cultureand.tech/culture/mac-get-space/privacy.html"
+canonical="https://cultureand.tech/culture/clean-space/privacy.html"
 
 fail() { echo "sync-mac-get-space-legal: $*" >&2; exit 1; }
 
@@ -55,11 +56,11 @@ if [ -n "$(git -C "$app" status --porcelain -- "${sources[@]}")" ]; then
 fi
 validate "$src"
 
-dest="$root/public/culture/mac-get-space"
+dest="$root/public/culture/clean-space"
 mkdir -p "$dest"
 find "$dest" -maxdepth 1 -type f \( -name '*.html' -o -name 'styles.css' \) -delete
 for f in "${pages[@]}" styles.css; do cp "$src/$f" "$dest/$f"; done
 echo "Copied ${#pages[@]} page + styles.css from $src ($(git -C "$app" log -1 --format='%h %s' -- "${sources[@]}"))"
 grep -o 'class="date">[^<]*' "$dest/privacy.html" | sed 's/class="date">/privacy.html: /' \
   || echo "privacy.html: no effective date (published before the release day)"
-git -C "$root" status --short -- public/culture/mac-get-space
+git -C "$root" status --short -- public/culture/clean-space

@@ -7,7 +7,7 @@
 - [Culture & Tech](https://cultureand.tech/): English homepage: services, apps for musicians, Live-idol works, demo sets, contract information, FAQ, contact
 - [컬처앤테크](https://cultureand.tech/ko/): Korean homepage with the same sections (라이브아이돌 오리지널곡 제작)
 - [Chord to MIDI](https://cultureand.tech/apps/chord-to-midi/): the free web app that turns chord progressions into MIDI files and MIDI files back into chords (Korean: https://cultureand.tech/ko/apps/chord-to-midi/)
-- [Clean Space](https://cultureand.tech/apps/mac-get-space/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/mac-get-space/)
+- [Clean Space](https://cultureand.tech/apps/clean-space/): the Mac storage cleaner whose default rules exclude music production files from removal (Korean: https://cultureand.tech/ko/apps/clean-space/)
 
 ## Live-idol original songs
 

@@ -8,7 +8,8 @@
  * - Clean Space, App Store subtitle "For Music Production": mac-get-space (AGENTS.md, README, docs/05-protection-defaults.md,
  *   docs/09-distribution.md, docs/12-privacy-policy-draft.md, docs/plans/free-vs-expert-version.md). No price: the App
  *   Store sets it. It was called Mac Get Space until Apple's Guideline 5.2.5 rejection (renamed 2026-11-05), and Storage
- *   Review before that; its slug, page addresses, image folder and privacy page address keep "mac-get-space".
+ *   Review before that. Its pages, images and privacy page moved to clean-space addresses the same day (firebase.json
+ *   301s the old mac-get-space ones); its repository keeps the name mac-get-space.
  *   Protection is described as what the default rules exclude from removal, with its limits, never as a guarantee.
  *   Its screenshots come from a development build with sample data and say so on the page.
  * Not introduced here: MIDI Utility (not public) and the Thai app (not a music app).
@@ -18,10 +19,10 @@ import type { LucideIcon } from "lucide-react";
 import { HardDrive, KeyboardMusic } from "lucide-react";
 import type { SupportedLanguage } from "./language-detection";
 
-export type AppSlug = "chord-to-midi" | "mac-get-space";
+export type AppSlug = "chord-to-midi" | "clean-space";
 
 /** Order of the apps on the homepage and under "More apps" */
-export const APP_SLUGS: AppSlug[] = ["chord-to-midi", "mac-get-space"];
+export const APP_SLUGS: AppSlug[] = ["chord-to-midi", "clean-space"];
 
 export interface AppImage {
   src: string;
@@ -264,18 +265,19 @@ const chordToMidi: AppInfo = {
   },
 };
 
-// Clean Space. Its slug, page addresses and image folder keep the app's earlier name, Mac Get Space.
+// Clean Space; its addresses were mac-get-space until 2026-11-05 (firebase.json redirects them)
 const cleanSpace: AppInfo = {
-  slug: "mac-get-space",
-  // The owner's artwork as the app's generated icon set has it (AppIcon.appiconset/icon_128x128@2x.png), unchanged
-  icon: "/images/apps/mac-get-space/icon.png",
+  slug: "clean-space",
+  // The owner's updated artwork (mac-get-space assets/new-app-icon-1024-updated.png), padded to a square with its own
+  // white background and framed by the app's scripts/make-app-icon.swift: its 128 pt @2x image (256 px)
+  icon: "/images/apps/clean-space/icon.png",
   fallbackIcon: HardDrive,
   // Cropped from the Protection & exclusions screen of the 2026-10-23 development build, which shows no app name,
   // with the label burned in per language
-  ogImage: { en: "/images/apps/mac-get-space/og.png", ko: "/images/apps/mac-get-space/og-ko.png" },
+  ogImage: { en: "/images/apps/clean-space/og.png", ko: "/images/apps/clean-space/og-ko.png" },
   supportEmail: SUPPORT_EMAIL,
   // Published from mac-get-space's docs/12 by scripts/sync-mac-get-space-legal.sh
-  privacyPolicyPath: "/culture/mac-get-space/privacy.html",
+  privacyPolicyPath: "/culture/clean-space/privacy.html",
   schema: {
     type: "SoftwareApplication",
     applicationCategory: "UtilitiesApplication",
@@ -303,7 +305,7 @@ const cleanSpace: AppInfo = {
       // The Clean Space validation tour on its synthetic home (mac-get-space build/validation/cs-tour-en, 2026-11-05)
       screenshots: [
         {
-          src: "/images/apps/mac-get-space/main.webp",
+          src: "/images/apps/clean-space/main.webp",
           width: 1440,
           height: 900,
           alt: "Clean Space's main window: cleanup candidates grouped by source with their class, size and status, and an inspector explaining why the selected cache is there and what removing it does",
@@ -312,7 +314,7 @@ const cleanSpace: AppInfo = {
           note: "Development build · sample data",
         },
         {
-          src: "/images/apps/mac-get-space/protection.webp",
+          src: "/images/apps/clean-space/protection.webp",
           width: 1440,
           height: 900,
           alt: "The Protection & exclusions screen with the Music Production profile on, listing rule groups for music production, audio plug-ins and vendor content, video originals, device backups, credentials and AI assistant data",
@@ -471,7 +473,7 @@ const cleanSpace: AppInfo = {
       ],
       screenshots: [
         {
-          src: "/images/apps/mac-get-space/main.webp",
+          src: "/images/apps/clean-space/main.webp",
           width: 1440,
           height: 900,
           alt: "Clean Space 메인 창: 출처별로 묶인 정리 후보와 각 항목의 분류, 크기, 상태, 그리고 선택한 캐시가 왜 후보인지와 지우면 어떻게 되는지 설명하는 인스펙터",
@@ -480,7 +482,7 @@ const cleanSpace: AppInfo = {
           note: "개발 중인 화면 · 예시 데이터",
         },
         {
-          src: "/images/apps/mac-get-space/protection.webp",
+          src: "/images/apps/clean-space/protection.webp",
           width: 1440,
           height: 900,
           alt: "보호 및 예외 화면: Music Production 프로필이 켜져 있고 음악 제작, 오디오 플러그인과 제조사 콘텐츠, 영상 원본, 기기 백업, 인증 정보, AI 어시스턴트 데이터 규칙이 보입니다",
@@ -624,7 +626,7 @@ const cleanSpace: AppInfo = {
 
 export const APPS: Record<AppSlug, AppInfo> = {
   "chord-to-midi": chordToMidi,
-  "mac-get-space": cleanSpace,
+  "clean-space": cleanSpace,
 };
 
 /** The homepage's Apps section */
