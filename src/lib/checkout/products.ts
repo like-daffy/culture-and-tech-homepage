@@ -93,8 +93,10 @@ const chordToMidi: OpenProduct = {
   footerPages: ["terms", "refund", "privacy", "business"],
   storageKey: "cultureandtech.checkout.chord-to-midi",
   paypalDescription:
-    "Digital service, no shipping: no banner ads on Chord to MIDI for the buyer's account. One-time payment.",
+    "Digital service, no shipping: no banner ads on Chord to MIDI for the buyer's account for 364 days from payment. One-time payment; it doesn't renew.",
   alreadyOwnedCode: APP_ERROR.alreadyAdFree,
+  // Remove Ads — 364 days (chord-to-midi-web's REMOVE_ADS_OFFER), stated in the copy's fixed words.
+  passDays: 364,
   copy: CHORD_TO_MIDI_COPY,
 };
 

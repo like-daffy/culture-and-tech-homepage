@@ -8,6 +8,7 @@ import {
   type CreateOrderResponse,
   type Currency,
   type Lang,
+  type OfferVersions,
   type OpenCheckoutResponse,
 } from "@/lib/checkout/contract";
 import { CHECKOUT_COPY, fill, formatPrice } from "@/lib/checkout/copy";
@@ -308,6 +309,18 @@ function Checkout({
         )}
         <p className="text-sm text-muted-foreground">{productCopy.priceTerms}</p>
         <p className="text-sm text-muted-foreground">{productCopy.period}</p>
+        {productCopy.renewal && <p className="text-sm text-muted-foreground">{productCopy.renewal}</p>}
+        {productCopy.periodTerms && (
+          <p className="text-sm text-muted-foreground">
+            {richText(productCopy.periodTerms.text, {
+              terms: (
+                <NewTabLink href={`${productUrl(product, lang, "terms")}#${productCopy.periodTerms.anchor}`}>
+                  {productCopy.periodTerms.link}
+                </NewTabLink>
+              ),
+            })}
+          </p>
+        )}
         <ul className="list-disc space-y-1 pl-5 text-sm">
           {productCopy.includes.map((line) => (
             <li key={line}>{line}</li>
@@ -326,6 +339,7 @@ function Checkout({
             lang={lang}
             option={option}
             credential={credential}
+            versions={offerVersions(checkout)}
             orderName={checkout.orderName}
             receiptEmail={checkout.receiptEmail}
           />
@@ -374,9 +388,20 @@ function orderRefusal(product: OpenProduct, lang: Lang, info: CallableErrorInfo)
       return copy.unavailable;
     case APP_ERROR.salesClosed:
       return productCopy.salesClosed;
+    case APP_ERROR.offerChanged:
+      return copy.offerChanged;
     default:
       return info.message;
   }
+}
+
+/** The versions the server gave with the checkout, to send back with the order: those it gave, and nothing else. */
+function offerVersions({ productVersion, termsVersion, refundPolicyVersion }: OpenCheckoutResponse): OfferVersions {
+  return {
+    ...(productVersion !== undefined && { productVersion }),
+    ...(termsVersion !== undefined && { termsVersion }),
+    ...(refundPolicyVersion !== undefined && { refundPolicyVersion }),
+  };
 }
 
 function Payment({
@@ -384,6 +409,7 @@ function Payment({
   lang,
   option,
   credential,
+  versions,
   orderName,
   receiptEmail,
 }: {
@@ -391,6 +417,8 @@ function Payment({
   lang: Lang;
   option: CheckoutOption;
   credential: CheckoutCredential;
+  /** What the server gave with the checkout, sent back with the order. */
+  versions: OfferVersions;
   orderName: string;
   receiptEmail: string;
 }) {
@@ -450,6 +478,7 @@ function Payment({
     setStep({ kind: "preparing" });
     createCheckoutOrder(product, {
       ...credential,
+      ...versions,
       termsAccepted: true,
       ageConfirmed: true,
       currency: option.currency,

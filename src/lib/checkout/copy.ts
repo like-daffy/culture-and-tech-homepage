@@ -31,6 +31,8 @@ const en = {
   retry: "Try again",
   priceChanged: "The price on this page is out of date. Reload the page and check the price before paying.",
   termChanged: "The term on this page is out of date. Reload the page and check it before paying.",
+  offerChanged:
+    "The offer or the terms changed since this page was opened. Reload it and review them before paying. Nothing was charged.",
   windowClosed: "The payment window was closed. Nothing was charged; you can pay again.",
   loading: "Loading…",
   opening: "Opening the checkout…",
@@ -102,6 +104,8 @@ const ko: CheckoutCopy = {
   retry: "다시 시도",
   priceChanged: "이 페이지의 가격이 최신이 아닙니다. 페이지를 새로 고쳐 가격을 확인한 뒤 결제해 주세요.",
   termChanged: "이 페이지의 이용 기간이 최신이 아닙니다. 페이지를 새로 고쳐 확인한 뒤 결제해 주세요.",
+  offerChanged:
+    "이 페이지를 연 뒤 상품이나 약관이 바뀌었습니다. 페이지를 새로 고쳐 내용을 다시 확인한 뒤 결제해 주세요. 청구된 금액은 없습니다.",
   windowClosed: "결제창을 닫았습니다. 청구된 금액은 없으며 다시 결제할 수 있습니다.",
   loading: "불러오는 중…",
   opening: "결제 페이지를 여는 중…",

@@ -103,7 +103,7 @@ its wording (`product-copy.ts`), the tab's storage key for its session, and whet
 
 | Product | Pages | Backend | Here |
 | --- | --- | --- | --- |
-| Chord to MIDI: Remove Ads | `/checkout/chord-to-midi/` | Firebase project `chord-to-midi` | Open |
+| Chord to MIDI: Remove Ads, 364 days | `/checkout/chord-to-midi/` | Firebase project `chord-to-midi` | Open |
 | DJ Duplicate Guard: Expert, a 364-day pass | `/checkout/dj-duplicate-guard/` | Firebase project `dj-duplicate-guard` (from its M4a) | Closed |
 
 - **The way through.** A buyer signs in on the product's site and continues to its checkout. The product's backend
@@ -132,9 +132,13 @@ its wording (`product-copy.ts`), the tab's storage key for its session, and whet
 
 ### Chord to MIDI
 
-Chord to MIDI (https://chord-to-midi.app) sells one product, Remove Ads. The product, its price, terms and refund
-policy, and the buyers' accounts are Chord to MIDI's, unchanged (`chord-to-midi-web`: `site.config.json`, `content/`,
-`functions/src/checkout.ts`).
+Chord to MIDI (https://chord-to-midi.app) sells one product, Remove Ads — 364 days: one payment that removes the ads
+for 364 days from its approval, with no renewal. The product, its price, terms and refund policy, and the buyers'
+accounts are Chord to MIDI's, unchanged (`chord-to-midi-web`: `site.config.json`, `content/`,
+`functions/src/checkout.ts`). Its server says when its sales are open (before its launch, only on Toss's test keys;
+otherwise the page says so), gives the period, which the page states in fixed words and checks (`passDays`), and the
+versions of the offer and of the terms and refund policy, which the order sends back (`OfferVersions`; a page opened
+before they changed is told to reload).
 
 - **Settings.** The build needs the public web app settings of the `chord-to-midi` project, the same values as
   `chord-to-midi-web`'s `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID` and

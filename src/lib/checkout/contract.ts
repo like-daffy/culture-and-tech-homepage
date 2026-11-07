@@ -28,6 +28,8 @@ export const APP_ERROR = {
   alreadyAdFree: "ALREADY_AD_FREE",
   /** The product's server has its sales switch off, whatever a page shows. */
   salesClosed: "SALES_CLOSED",
+  /** The offer or the policies the page showed aren't the server's current ones (OfferVersions): reload the page. */
+  offerChanged: "OFFER_CHANGED",
   currencyUnavailable: "CURRENCY_UNAVAILABLE",
   amountMismatch: "AMOUNT_MISMATCH",
   notOrderOwner: "NOT_ORDER_OWNER",
@@ -70,7 +72,18 @@ export interface CheckoutOption {
   test: boolean;
 }
 
-export interface OpenCheckoutResponse {
+/**
+ * The versions of the offer and of the terms and refund policy that a product's server gives with the checkout and
+ * takes back with its order: the page sends exactly what it was given, and the server takes only its current ones
+ * (OFFER_CHANGED otherwise). Chord to MIDI's server gives them; a server that gives none gets none back.
+ */
+export interface OfferVersions {
+  productVersion?: string;
+  termsVersion?: string;
+  refundPolicyVersion?: string;
+}
+
+export interface OpenCheckoutResponse extends OfferVersions {
   /** The product's own id on its orders (`remove_ads`, `expert_pass_364d`). */
   product: string;
   lang: Lang;
@@ -85,7 +98,7 @@ export interface OpenCheckoutResponse {
   expiresAt: string;
 }
 
-export interface CreateCheckoutOrderRequest extends CheckoutCredential {
+export interface CreateCheckoutOrderRequest extends CheckoutCredential, OfferVersions {
   termsAccepted: true;
   ageConfirmed: true;
   currency: Currency;
