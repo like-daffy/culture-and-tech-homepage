@@ -45,6 +45,25 @@ moved /ko/apps/mac-get-space/ /ko/apps/clean-space/
 moved /ko/apps/mac-get-space /ko/apps/clean-space/
 moved /culture/mac-get-space/privacy.html /culture/clean-space/privacy.html
 moved /images/apps/mac-get-space/og.png /images/apps/clean-space/og.png
+# Chord to MIDI's checkout (README, "Chord to MIDI's checkout"): every page in both languages is 200, never cached
+# stale, never framed, out of search results, and loads nothing from other hosts but what the payment needs.
+for p in checkout/chord-to-midi/ checkout/chord-to-midi/success/ checkout/chord-to-midi/fail/ \
+         ko/checkout/chord-to-midi/ ko/checkout/chord-to-midi/success/ ko/checkout/chord-to-midi/fail/; do
+  headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
+  status=$(echo "$headers" | awk 'NR==1{print $2}')
+  header() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
+  if [ "$status" != 200 ]; then echo "FAIL $status (want 200) https://$host/$p"; fail=1; continue; fi
+  if header cache-control: | grep -q 'max-age=0' && [ "$(header x-frame-options:)" = DENY ] \
+     && header content-security-policy: | grep -q "frame-ancestors 'none'" \
+     && [ "$(header referrer-policy:)" = strict-origin ]; then
+    echo "ok   200 https://$host/$p (no cache, no framing, referrer origin only, also on this site)"
+  else echo "FAIL headers of https://$host/$p"; fail=1; fi
+  body=$(curl -s -m 20 "https://$host/$p")
+  if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL https://$host/$p loads another host"; fail=1; fi
+  if ! echo "$body" | grep -q '<meta name="robots" content="noindex"'; then echo "FAIL https://$host/$p has no noindex"; fail=1; fi
+done
+moved /checkout/chord-to-midi /checkout/chord-to-midi/
+moved /ko/checkout/chord-to-midi /ko/checkout/chord-to-midi/
 for p in index terms privacy privacy-consent; do
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/$p.html")
   if echo "$body" | grep -qi '<script'; then echo "FAIL script tag in $p.html"; fail=1; fi

@@ -3,6 +3,7 @@
     "public": "out",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "predeploy": [
+      "node scripts/check-checkout-config.mjs",
       "npm run build",
       "bash scripts/add-compat-assets.sh out",
       "bash scripts/sync-thai-legal.sh --check out/culture/thai-learn",
@@ -36,6 +37,18 @@
       ] },
       { "source": "/ko/apps/**", "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ] },
+      { "source": "/checkout/**", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Referrer-Policy", "value": "strict-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" }
+      ] },
+      { "source": "/ko/checkout/**", "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Referrer-Policy", "value": "strict-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'" }
       ] },
       { "source": "**/*.html", "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
