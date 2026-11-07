@@ -66,6 +66,25 @@ for p in privacy support; do
   if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in english-thai-learn/$p.html"; fail=1; fi
   if echo "$body" | grep -q "<link rel=\"canonical\" href=\"https://cultureand.tech/culture/english-thai-learn/$p.html\">"; then echo "ok   english-thai-learn/$p.html canonical"; else echo "FAIL english-thai-learn/$p.html canonical"; fail=1; fi
 done
+# Clean Space's direct-sale pages (docs/clean-space-direct-sale.md): every page in both languages is 200, never stored,
+# never framed, out of search results, sends no referrer beyond the origin, and loads no font, monitoring script or embed.
+for p in checkout/clean-space/ checkout/clean-space/success/ checkout/clean-space/fail/ apps/clean-space/account/ \
+         apps/clean-space/auth/callback/ apps/clean-space/activate/; do
+  for l in "" ko/; do
+    url="https://$host/$l$p"
+    headers=$(curl -s -o /dev/null -D - -m 20 "$url" | tr -d '\r')
+    status=$(echo "$headers" | awk 'NR==1{print $2}')
+    hval() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
+    if [ "$status" != 200 ]; then echo "FAIL $status (want 200) $url"; fail=1; continue; fi
+    if [ "$(hval cache-control:)" = no-store ] && [ "$(hval x-frame-options:)" = DENY ] && [ "$(hval referrer-policy:)" = strict-origin ] \
+       && hval content-security-policy: | grep -q "frame-ancestors 'none'" && hval x-robots-tag: | grep -q noindex; then
+      echo "ok   200 $url (no-store, no framing, origin-only referrer, noindex)"
+    else echo "FAIL headers of $url"; fail=1; fi
+    body=$(curl -s -m 20 "$url")
+    if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL $url loads another host"; fail=1; fi
+    if ! echo "$body" | grep -q '<meta name="robots" content="noindex, nofollow"'; then echo "FAIL $url has no noindex"; fail=1; fi
+  done
+done
 if [ -n "$version" ]; then
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/privacy.html")
   if echo "$body" | grep -q "버전 $version"; then echo "ok   privacy.html shows 버전 $version"; else echo "FAIL privacy.html does not show 버전 $version"; fail=1; fi

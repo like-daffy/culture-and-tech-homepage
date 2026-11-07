@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+/* Quicksand and Noto Sans KR come from Google Fonts by a <link> in src/pages/_document.tsx, on every page but the sensitive ones. */
 
 @tailwind base;
 @tailwind components;

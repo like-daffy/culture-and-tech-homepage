@@ -16,6 +16,7 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
 | `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
+| `/checkout/clean-space/` (`success/`, `fail/`), `/apps/clean-space/account/`, `/apps/clean-space/auth/callback/`, `/apps/clean-space/activate/`, each also under `/ko/` | `src/pages/`, `src/components/clean-space/`, `src/lib/clean-space/` | `npm run build`; Clean Space's direct sale, not released (see below) |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
@@ -90,6 +91,19 @@ When an app changes:
   files under `src/pages/apps/` and `src/pages/ko/apps/`, then the sitemap, `public/llms.txt` and
   `scripts/check-live.sh`.
 
+## Clean Space's direct sale (not released)
+
+Pages for the website download of Clean Space and its one paid option, the 364 days Unlock: checkout (Toss Payments),
+account, sign-in callback and activation, in English and Korean (mac-get-space `docs/plans/364-days-option.md`). They
+call the Clean Space licensing service in its own Firebase project through a pinned copy of its contract
+(`src/lib/clean-space/contract.generated.ts`); this site's project stays Hosting only. Until the build is configured
+they say accounts and purchases aren't available, and the checkout takes orders only with
+`NEXT_PUBLIC_CLEAN_SPACE_SALES_ENABLED=1`, `NEXT_PUBLIC_CLEAN_SPACE_POLICIES_PUBLISHED=1` and the service's sale gate
+open. They load no fonts, monitoring script or embeds, are out of search results and have their own headers in
+`firebase.json`. Settings, routes, checks, the Korean text that needs review and what is still unverified:
+`docs/clean-space-direct-sale.md`. Predeploy runs `scripts/check-clean-space-contract.mjs` and
+`scripts/check-clean-space-config.mjs --deploy`; `npm test` runs their unit tests.
+
 ## Deploy
 
 Releases are manual, from a clean, committed `main`, with the pinned CLI and an explicit project.
@@ -100,7 +114,7 @@ Channel deploys first run `npm run build`, add the Cafe24 compatibility assets a
 
 ```bash
 fb() { npx --yes firebase-tools@15.32.1 "$@"; }
-npm ci && npm run lint && node_modules/.bin/tsc --noEmit --incremental false
+npm ci && npm run lint && node_modules/.bin/tsc --noEmit --incremental false && npm test
 
 # Preview: a temporary *.web.app URL, no effect on the live site
 fb hosting:channel:deploy cafe24-migration --expires 7d --no-authorized-domains --project cultureand-tech-web

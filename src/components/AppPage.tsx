@@ -184,6 +184,18 @@ export function AppPage({ slug, language }: AppPageProps) {
                     {section.note}
                   </p>
                 )}
+                {section.links && section.links.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    {section.links.map((link) => (
+                      <Button key={link.href} asChild size="lg">
+                        <Link href={link.href}>
+                          {link.label}
+                          <ArrowRight />
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
             </section>
           ))}

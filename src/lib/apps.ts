@@ -18,6 +18,8 @@
 import type { LucideIcon } from "lucide-react";
 import { HardDrive, KeyboardMusic } from "lucide-react";
 import type { SupportedLanguage } from "./language-detection";
+import { CLEAN_SPACE } from "./clean-space/config";
+import { withWebsiteChannel } from "./clean-space/channel-copy";
 
 export type AppSlug = "chord-to-midi" | "clean-space";
 
@@ -41,6 +43,8 @@ export interface AppSection {
   style?: "cards" | "steps";
   items: { title: string; text: string }[];
   note?: string;
+  /** Buttons under the section (pages of this site only) */
+  links?: { label: string; href: string }[];
 }
 
 export interface AppContent {
@@ -626,7 +630,9 @@ const cleanSpace: AppInfo = {
 
 export const APPS: Record<AppSlug, AppInfo> = {
   "chord-to-midi": chordToMidi,
-  "clean-space": cleanSpace,
+  // Once the website download is released (NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1, off by default), the page tells
+  // it apart from the App Store app and says which one the 364 days Unlock is for (src/lib/clean-space/channel-copy.ts)
+  "clean-space": CLEAN_SPACE.websiteRelease ? withWebsiteChannel(cleanSpace) : cleanSpace,
 };
 
 /** The homepage's Apps section */
