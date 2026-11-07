@@ -46,6 +46,11 @@ const nextConfig = {
     ],
   },
   allowedDevOrigins: ["*.daytona.work", "*.softgen.dev"],
+  // DJ Duplicate Guard's checkout switch, written into the pages whether it is set or not: a build that keeps the
+  // checkout closed then leaves its offer out of the bundle (src/lib/checkout/products.ts; README, "DJ Duplicate Guard").
+  env: {
+    NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT: process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT ?? "",
+  },
 };
 
 export default nextConfig;

@@ -1,24 +1,45 @@
 import Head from "next/head";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { BUSINESS, chordToMidiUrl } from "@/lib/checkout/config";
+import { BUSINESS } from "@/lib/checkout/config";
 import type { Lang } from "@/lib/checkout/contract";
 import { CHECKOUT_COPY } from "@/lib/checkout/copy";
+import { productUrl, type CheckoutProduct, type ProductPage } from "@/lib/checkout/products";
+
+/** The footer's label of each of a product's legal and help pages. */
+const FOOTER_LABELS: Partial<
+  Record<ProductPage, "termsLink" | "refundLink" | "privacyLink" | "businessLink" | "helpLink">
+> = {
+  terms: "termsLink",
+  refund: "refundLink",
+  privacy: "privacyLink",
+  business: "businessLink",
+  help: "helpLink",
+};
 
 /**
  * The checkout's own frame: Culture & Tech's name, the page, and the seller's details at the bottom, as Toss Payments
- * asks of a merchant's payment pages. It loads nothing from other hosts: none of the homepage's embedded video, web
- * fonts or monitoring script (_document.tsx leaves those out here), so that a buyer's details on these pages reach only
- * Chord to MIDI's own backend and Toss Payments, as on Chord to MIDI's site.
+ * asks of a merchant's payment pages, with the product's own legal pages (none for a closed product). It loads nothing
+ * from other hosts: none of the homepage's embedded video, web fonts or monitoring script (_document.tsx leaves those
+ * out here), so that a buyer's details on these pages reach only the product's own backend and Toss Payments, as on the
+ * product's site.
  */
-export function CheckoutLayout({ lang, children }: { lang: Lang; children: ReactNode }) {
+export function CheckoutLayout({
+  product,
+  lang,
+  children,
+}: {
+  product: CheckoutProduct;
+  lang: Lang;
+  children: ReactNode;
+}) {
   const copy = CHECKOUT_COPY[lang];
   const business = BUSINESS[lang];
   const labels = copy.footer;
   return (
     <>
       <Head>
-        <title>{copy.pageTitle}</title>
+        <title>{product.enabled ? product.copy[lang].pageTitle : copy.closedTitle}</title>
         <meta name="robots" content="noindex" />
         <meta name="referrer" content="strict-origin" />
       </Head>
@@ -62,18 +83,20 @@ export function CheckoutLayout({ lang, children }: { lang: Lang; children: React
               {labels.hostingProvider}: {business.hostingProvider} · {labels.payments}
             </p>
             <p className="flex flex-wrap gap-x-4 gap-y-1 pt-2">
-              <a className="underline" href={chordToMidiUrl(lang, "terms")} target="_blank" rel="noopener noreferrer">
-                {copy.termsLink}
-              </a>
-              <a className="underline" href={chordToMidiUrl(lang, "refund")} target="_blank" rel="noopener noreferrer">
-                {copy.refundLink}
-              </a>
-              <a className="underline" href={chordToMidiUrl(lang, "privacy")} target="_blank" rel="noopener noreferrer">
-                {copy.privacyLink}
-              </a>
-              <a className="underline" href={chordToMidiUrl(lang, "business")} target="_blank" rel="noopener noreferrer">
-                {copy.businessLink}
-              </a>
+              {(product.enabled ? product.footerPages : []).map((page) => {
+                const label = FOOTER_LABELS[page];
+                return label ? (
+                  <a
+                    key={page}
+                    className="underline"
+                    href={productUrl(product, lang, page)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {copy[label]}
+                  </a>
+                ) : null;
+              })}
             </p>
           </div>
         </footer>
@@ -114,7 +137,7 @@ export function Spinner({ label }: { label: string }) {
   );
 }
 
-/** A link styled as a button (a page of Chord to MIDI, or of this checkout). */
+/** A link styled as a button (a page of the product's site, or of this checkout). */
 export function LinkButton({
   href,
   primary = false,

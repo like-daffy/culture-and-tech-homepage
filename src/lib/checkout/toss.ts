@@ -1,17 +1,10 @@
 /**
- * Toss Payments' 결제위젯 v2 (주문서형) for the checkout, as Chord to MIDI's purchase page drove it before the checkout
+ * Toss Payments' 결제위젯 v2 (주문서형) for the checkout, as Chord to MIDI's purchase page drove it before its checkout
  * moved here: the widget of the order's currency (its MID's client key and variants, from the checkout session), and
  * for dollars what PayPal needs (`foreignEasyPay`: the country the buyer chose and the product, no shipping).
  */
 import type { Currency } from "./contract";
 import { isCountryCode } from "./countries";
-
-/**
- * What PayPal is told about the purchase (in English, as Toss recommends), for its seller protection and risk checks:
- * a digital service, so there is no shipping.
- */
-const PRODUCT_DESCRIPTION =
-  "Digital service, no shipping: no banner ads on Chord to MIDI for the buyer's account. One-time payment.";
 
 export interface PaymentWidgetOptions {
   /** From the order. */
@@ -25,6 +18,11 @@ export interface PaymentWidgetOptions {
   /** CSS selectors of the elements for the payment methods and the terms (약관) UI. */
   methodsSelector: string;
   agreementSelector: string;
+  /**
+   * What PayPal is told about the purchase (in English, as Toss recommends), for its seller protection and risk
+   * checks: the product's own description (products.ts, `paypalDescription`), a digital service with no shipping.
+   */
+  productDescription: string;
 }
 
 export interface PaymentRequestOptions {
@@ -98,7 +96,7 @@ export function renderPaymentWidget(options: PaymentWidgetOptions): Promise<Paym
                     quantity: 1,
                     unitAmount: options.amount,
                     currency: options.currency,
-                    description: PRODUCT_DESCRIPTION,
+                    description: options.productDescription,
                   },
                 ],
               },

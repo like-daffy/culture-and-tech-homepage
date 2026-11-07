@@ -1,7 +1,9 @@
 /**
- * Chord to MIDI's checkout callables, called from this site: a Firebase app of the chord-to-midi project with App Check
- * (reCAPTCHA Enterprise) and Cloud Functions only. No Firebase Auth: the checkout session's id and key stand for the
- * buyer's account, and nothing of the buyer's sign-in on chord-to-midi.app ever comes here. Loaded on first use.
+ * A product's checkout callables, called from this site: a Firebase app of the product's own project (named after the
+ * product, never this site's) with App Check (reCAPTCHA Enterprise) and Cloud Functions only. No Firebase Auth: the
+ * checkout session's id and key stand for the buyer's account, and nothing of the buyer's sign-in on the product's
+ * site ever comes here. Each product's app is loaded on its first use, and a product whose checkout is closed in this
+ * build is never called.
  */
 import type { Functions } from "firebase/functions";
 import {
@@ -19,46 +21,39 @@ import {
   type PreparePaymentResumeRequest,
   type PreparePaymentResumeResponse,
 } from "./contract";
-import {
-  CHORD_TO_MIDI_FIREBASE,
-  CHORD_TO_MIDI_RECAPTCHA_SITE_KEY,
-  FUNCTIONS_REGION,
-  isCheckoutConfigured,
-  USES_EMULATORS,
-} from "./config";
+import { isProductConfigured, type OpenProduct, type ProductSlug } from "./products";
 
-/** The Firebase app's name here: Chord to MIDI's project, never this site's own. */
-const APP_NAME = "chord-to-midi";
+const loaded = new Map<ProductSlug, Promise<Functions>>();
 
-let functions: Promise<Functions> | null = null;
-
-function services(): Promise<Functions> {
-  if (!isCheckoutConfigured()) return Promise.reject(new Error("The checkout is not configured."));
+function services(product: OpenProduct): Promise<Functions> {
+  if (!isProductConfigured(product)) return Promise.reject(new Error("The checkout is not configured."));
+  let functions = loaded.get(product.slug);
   if (!functions) {
-    const loading = initialize();
+    const loading = initialize(product);
     functions = loading;
+    loaded.set(product.slug, loading);
     // A failed download (offline) may be retried by the next call.
     loading.catch(() => {
-      if (functions === loading) functions = null;
+      if (loaded.get(product.slug) === loading) loaded.delete(product.slug);
     });
   }
   return functions;
 }
 
-async function initialize(): Promise<Functions> {
+async function initialize(product: OpenProduct): Promise<Functions> {
   const [appModule, appCheckModule, functionsModule] = await Promise.all([
     import("firebase/app"),
     import("firebase/app-check"),
     import("firebase/functions"),
   ]);
   const app =
-    appModule.getApps().find((candidate) => candidate.name === APP_NAME) ??
-    appModule.initializeApp(CHORD_TO_MIDI_FIREBASE, APP_NAME);
+    appModule.getApps().find((candidate) => candidate.name === product.slug) ??
+    appModule.initializeApp(product.firebase, product.slug);
 
   // App Check before any call: the callables refuse requests without a token.
-  if (USES_EMULATORS) {
+  if (product.emulators) {
     // The Functions emulator decodes App Check tokens without verifying them: an unsigned stand-in lets the callables
-    // through. Only a test build (NEXT_PUBLIC_CHORD_TO_MIDI_EMULATORS=1) runs this; the real App Check refuses it.
+    // through. Only a test build (the product's NEXT_PUBLIC_…_EMULATORS=1) runs this; the real App Check refuses it.
     const part = (value: object) => btoa(JSON.stringify(value)).replace(/=+$/, "");
     const token = `${part({ alg: "none", typ: "JWT" })}.${part({ sub: "emulator", iss: "emulator", exp: 4102444800 })}.`;
     appCheckModule.initializeAppCheck(app, {
@@ -69,41 +64,41 @@ async function initialize(): Promise<Functions> {
     });
   } else {
     appCheckModule.initializeAppCheck(app, {
-      provider: new appCheckModule.ReCaptchaEnterpriseProvider(CHORD_TO_MIDI_RECAPTCHA_SITE_KEY),
+      provider: new appCheckModule.ReCaptchaEnterpriseProvider(product.recaptchaSiteKey),
       isTokenAutoRefreshEnabled: true,
     });
   }
 
-  const instance = functionsModule.getFunctions(app, FUNCTIONS_REGION);
-  if (USES_EMULATORS) functionsModule.connectFunctionsEmulator(instance, "127.0.0.1", 5001);
+  const instance = functionsModule.getFunctions(app, product.region);
+  if (product.emulators) functionsModule.connectFunctionsEmulator(instance, "127.0.0.1", 5001);
   return instance;
 }
 
-async function call<Request, Response>(name: CallableName, data: Request): Promise<Response> {
-  const [instance, { httpsCallable }] = await Promise.all([services(), import("firebase/functions")]);
+async function call<Request, Response>(product: OpenProduct, name: CallableName, data: Request): Promise<Response> {
+  const [instance, { httpsCallable }] = await Promise.all([services(product), import("firebase/functions")]);
   const result = await httpsCallable<Request, Response>(instance, name)(data);
   return result.data;
 }
 
 /** Binds this page's key to the checkout with the handoff code, or opens the checkout it holds again. */
-export const openCheckout = (request: OpenCheckoutRequest) =>
-  call<OpenCheckoutRequest, OpenCheckoutResponse>(CALLABLE.openCheckout, request);
+export const openCheckout = (product: OpenProduct, request: OpenCheckoutRequest) =>
+  call<OpenCheckoutRequest, OpenCheckoutResponse>(product, CALLABLE.openCheckout, request);
 
 /** After the buyer chose a currency and agreed: the order, at the server's price. */
-export const createCheckoutOrder = (request: CreateCheckoutOrderRequest) =>
-  call<CreateCheckoutOrderRequest, CreateOrderResponse>(CALLABLE.createCheckoutOrder, request);
+export const createCheckoutOrder = (product: OpenProduct, request: CreateCheckoutOrderRequest) =>
+  call<CreateCheckoutOrderRequest, CreateOrderResponse>(product, CALLABLE.createCheckoutOrder, request);
 
-/** The success page, with Toss's parameters: approves the payment and grants Remove Ads (a reload gets the same answer). */
-export const confirmCheckoutPayment = (request: ConfirmCheckoutPaymentRequest) =>
-  call<ConfirmCheckoutPaymentRequest, ConfirmPaymentResponse>(CALLABLE.confirmCheckoutPayment, request);
+/** The success page, with Toss's parameters: approves the payment and grants the product (a reload gets the same answer). */
+export const confirmCheckoutPayment = (product: OpenProduct, request: ConfirmCheckoutPaymentRequest) =>
+  call<ConfirmCheckoutPaymentRequest, ConfirmPaymentResponse>(product, CALLABLE.confirmCheckoutPayment, request);
 
 /** The fail page, with Toss's parameters, when they include an orderId. */
-export const failCheckoutOrder = (request: FailCheckoutOrderRequest) =>
-  call<FailCheckoutOrderRequest, FailOrderResponse>(CALLABLE.failCheckoutOrder, request);
+export const failCheckoutOrder = (product: OpenProduct, request: FailCheckoutOrderRequest) =>
+  call<FailCheckoutOrderRequest, FailOrderResponse>(product, CALLABLE.failCheckoutOrder, request);
 
-/** A payment that came back without its checkout: kept for its buyer to finish signed in on chord-to-midi.app. */
-export const preparePaymentResume = (request: PreparePaymentResumeRequest) =>
-  call<PreparePaymentResumeRequest, PreparePaymentResumeResponse>(CALLABLE.preparePaymentResume, request);
+/** A payment that came back without its checkout: kept for its buyer to finish signed in on the product's site. */
+export const preparePaymentResume = (product: OpenProduct, request: PreparePaymentResumeRequest) =>
+  call<PreparePaymentResumeRequest, PreparePaymentResumeResponse>(product, CALLABLE.preparePaymentResume, request);
 
 export interface CallableErrorInfo {
   /** The callable error code without "functions/": "unavailable", "failed-precondition", … */

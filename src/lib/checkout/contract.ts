@@ -1,7 +1,7 @@
 /**
- * What the checkout pages exchange with Chord to MIDI's Cloud Functions (Firebase project chord-to-midi), which take
- * the payment: a copy of the parts of chord-to-midi-web's functions/src/contract.ts the checkout uses. Change both
- * together.
+ * What the checkout pages exchange with a product's Cloud Functions, which take the payment: the same callables for
+ * every product. Copied from chord-to-midi-web's functions/src/contract.ts and dj-duplicate-guard's
+ * packages/commerce/src/checkout.ts; change them together.
  */
 
 export type Lang = "en" | "ko";
@@ -17,11 +17,17 @@ export const CALLABLE = {
 } as const;
 export type CallableName = (typeof CALLABLE)[keyof typeof CALLABLE];
 
-/** Codes in an error's `details.code` that come from Chord to MIDI rather than from Toss Payments. */
+/**
+ * Codes in an error's `details.code` that come from the product's backend rather than from Toss Payments: Chord to
+ * MIDI's, which DJ Duplicate Guard's CHECKOUT_ERROR shares for the same cases. A product's own code for an account
+ * that already has it is in its entry (products.ts, `alreadyOwnedCode`).
+ */
 export const APP_ERROR = {
   termsNotAccepted: "TERMS_NOT_ACCEPTED",
   ageNotConfirmed: "AGE_NOT_CONFIRMED",
   alreadyAdFree: "ALREADY_AD_FREE",
+  /** The product's server has its sales switch off, whatever a page shows. */
+  salesClosed: "SALES_CLOSED",
   currencyUnavailable: "CURRENCY_UNAVAILABLE",
   amountMismatch: "AMOUNT_MISMATCH",
   notOrderOwner: "NOT_ORDER_OWNER",
@@ -65,13 +71,16 @@ export interface CheckoutOption {
 }
 
 export interface OpenCheckoutResponse {
-  product: "remove_ads";
+  /** The product's own id on its orders (`remove_ads`, `expert_pass_364d`). */
+  product: string;
   lang: Lang;
   orderName: string;
   /** The account's confirmed email: the receipt address of an order made now. */
   receiptEmail: string;
   /** The currencies this checkout takes, won first. */
   options: CheckoutOption[];
+  /** A pass's length in days, for a product sold as a pass (shown before payment); absent otherwise. */
+  passDays?: number;
   /** ISO 8601: the session ends. */
   expiresAt: string;
 }
@@ -110,6 +119,8 @@ export interface ConfirmPaymentResponse {
   approvedAt: string;
   receiptUrl: string | null;
   receiptEmail: string | null;
+  /** A pass's start and end (ISO 8601 instants), for a product sold as a pass: shown with their time zone. */
+  pass?: { start: string; end: string };
 }
 
 export interface FailCheckoutOrderRequest extends CheckoutCredential {
@@ -122,7 +133,7 @@ export interface FailOrderResponse {
   status: "FAILED";
 }
 
-/** Keeps Toss's parameters for the order's buyer, who finishes signed in on chord-to-midi.app. Needs no session. */
+/** Keeps Toss's parameters for the order's buyer, who finishes signed in on the product's site. Needs no session. */
 export type PreparePaymentResumeRequest = PaymentDetails;
 export interface PreparePaymentResumeResponse {
   resumeId: string;

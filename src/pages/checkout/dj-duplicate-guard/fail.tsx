@@ -1,0 +1,7 @@
+import { CheckoutFail } from "@/components/checkout/CheckoutResult";
+import { PRODUCTS } from "@/lib/checkout/products";
+
+// Where Toss Payments sends the buyer back when a payment didn't go through, in English
+export default function DjDuplicateGuardCheckoutFail() {
+  return <CheckoutFail product={PRODUCTS["dj-duplicate-guard"]} lang="en" />;
+}

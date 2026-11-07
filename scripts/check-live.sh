@@ -45,25 +45,40 @@ moved /ko/apps/mac-get-space/ /ko/apps/clean-space/
 moved /ko/apps/mac-get-space /ko/apps/clean-space/
 moved /culture/mac-get-space/privacy.html /culture/clean-space/privacy.html
 moved /images/apps/mac-get-space/og.png /images/apps/clean-space/og.png
-# Chord to MIDI's checkout (README, "Chord to MIDI's checkout"): every page in both languages is 200, never cached
-# stale, never framed, out of search results, and loads nothing from other hosts but what the payment needs.
-for p in checkout/chord-to-midi/ checkout/chord-to-midi/success/ checkout/chord-to-midi/fail/ \
-         ko/checkout/chord-to-midi/ ko/checkout/chord-to-midi/success/ ko/checkout/chord-to-midi/fail/; do
-  headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
-  status=$(echo "$headers" | awk 'NR==1{print $2}')
-  header() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
-  if [ "$status" != 200 ]; then echo "FAIL $status (want 200) https://$host/$p"; fail=1; continue; fi
-  if header cache-control: | grep -q 'max-age=0' && [ "$(header x-frame-options:)" = DENY ] \
-     && header content-security-policy: | grep -q "frame-ancestors 'none'" \
-     && [ "$(header referrer-policy:)" = strict-origin ]; then
-    echo "ok   200 https://$host/$p (no cache, no framing, referrer origin only, also on this site)"
-  else echo "FAIL headers of https://$host/$p"; fail=1; fi
-  body=$(curl -s -m 20 "https://$host/$p")
-  if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL https://$host/$p loads another host"; fail=1; fi
-  if ! echo "$body" | grep -q '<meta name="robots" content="noindex"'; then echo "FAIL https://$host/$p has no noindex"; fail=1; fi
-done
-moved /checkout/chord-to-midi /checkout/chord-to-midi/
-moved /ko/checkout/chord-to-midi /ko/checkout/chord-to-midi/
+# The central checkout (README, "The central checkout"): every product's pages in both languages are 200, never cached
+# stale, never framed, out of search results, and load nothing from other hosts but what the payment needs.
+checkout_pages() {
+  local slug="$1" p headers status body
+  for p in "checkout/$slug/" "checkout/$slug/success/" "checkout/$slug/fail/" \
+           "ko/checkout/$slug/" "ko/checkout/$slug/success/" "ko/checkout/$slug/fail/"; do
+    headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
+    status=$(echo "$headers" | awk 'NR==1{print $2}')
+    header() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
+    if [ "$status" != 200 ]; then echo "FAIL $status (want 200) https://$host/$p"; fail=1; continue; fi
+    if header cache-control: | grep -q 'max-age=0' && [ "$(header x-frame-options:)" = DENY ] \
+       && header content-security-policy: | grep -q "frame-ancestors 'none'" \
+       && [ "$(header referrer-policy:)" = strict-origin ]; then
+      echo "ok   200 https://$host/$p (no cache, no framing, referrer origin only, also on this site)"
+    else echo "FAIL headers of https://$host/$p"; fail=1; fi
+    body=$(curl -s -m 20 "https://$host/$p")
+    if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL https://$host/$p loads another host"; fail=1; fi
+    if ! echo "$body" | grep -q '<meta name="robots" content="noindex"'; then echo "FAIL https://$host/$p has no noindex"; fail=1; fi
+  done
+  moved "/checkout/$slug" "/checkout/$slug/"
+  moved "/ko/checkout/$slug" "/ko/checkout/$slug/"
+}
+checkout_pages chord-to-midi
+checkout_pages dj-duplicate-guard
+# DJ Duplicate Guard's checkout stays closed until its owner opens Expert's sales (DJ_DUPLICATE_GUARD_SALES_OPEN in
+# scripts/check-checkout-config.mjs): its pages say so, and publish nothing of the offer.
+if ! grep -q '^const DJ_DUPLICATE_GUARD_SALES_OPEN = true;' "$(dirname "$0")/check-checkout-config.mjs"; then
+  for p in checkout/dj-duplicate-guard/ checkout/dj-duplicate-guard/success/ checkout/dj-duplicate-guard/fail/ \
+           ko/checkout/dj-duplicate-guard/ ko/checkout/dj-duplicate-guard/success/ ko/checkout/dj-duplicate-guard/fail/; do
+    body=$(curl -s -m 20 "https://$host/$p")
+    if echo "$body" | grep -q 'data-checkout="closed"' && ! echo "$body" | grep -q 'Expert'; then echo "ok   https://$host/$p is closed"
+    else echo "FAIL https://$host/$p isn't closed, or names the offer"; fail=1; fi
+  done
+fi
 for p in index terms privacy privacy-consent; do
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/$p.html")
   if echo "$body" | grep -qi '<script'; then echo "FAIL script tag in $p.html"; fail=1; fi

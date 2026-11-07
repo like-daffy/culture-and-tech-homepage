@@ -19,7 +19,7 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
-| `/checkout/chord-to-midi/` and `/ko/checkout/chord-to-midi/`, with `success/` and `fail/` under each | `src/pages/checkout/`, `src/pages/ko/checkout/`, `src/components/checkout/`, `src/lib/checkout/` | `npm run build`; see "Chord to MIDI's checkout" below |
+| `/checkout/<product>/` and `/ko/checkout/<product>/` (`chord-to-midi`, `dj-duplicate-guard`), with `success/` and `fail/` under each | `src/pages/checkout/`, `src/pages/ko/checkout/`, `src/components/checkout/`, `src/lib/checkout/` | `npm run build`; see "The central checkout" below |
 | `https://music.cafe24.com/…` (old address, not Firebase) | `cafe24/www/` | Uploaded by hand to the Cafe24 web root: 301 to `cultureand.tech`, checked by `scripts/check-music-cafe24.sh`; see `cafe24/README.md` |
 
 The `/culture/...` legal URLs are registered in the Toss console and App Store Connect. They must keep returning
@@ -91,35 +91,51 @@ When an app changes:
   files under `src/pages/apps/` and `src/pages/ko/apps/`, then the sitemap, `public/llms.txt` and
   `scripts/check-live.sh`.
 
-## Chord to MIDI's checkout
+## The central checkout
 
-Chord to MIDI (https://chord-to-midi.app) sells one product, Remove Ads, and takes its payment here: Toss Payments
-approved PayPal for this host, `cultureand.tech`, so the merchant's own payment pages are on it. The product, its
-price, terms and refund policy, and the buyers' accounts are Chord to MIDI's, unchanged (`chord-to-midi-web`:
-`site.config.json`, `content/`, `functions/src/checkout.ts`).
+Culture & Tech's products take their payments here: Toss Payments approved PayPal for this host, `cultureand.tech`,
+so the merchant's own payment pages are on it. Each product has its own pages, `/checkout/<product>/` (Korean:
+`/ko/checkout/<product>/`) with `success/` and `fail/`, and its own backend: the product's Firebase project takes the
+payment and keeps its orders, entitlements, webhook and refunds, and its pages call no other. The pages are one
+implementation (`src/components/checkout/`, `src/lib/checkout/`). A product is an entry in `PRODUCTS`
+(`src/lib/checkout/products.ts`): its backend's public settings, its site and the pages the checkout may link back to,
+its wording (`product-copy.ts`), the tab's storage key for its session, and whether the build opens its checkout.
 
-- **The way through.** A buyer signs in and confirms their email on chord-to-midi.app's purchase page and presses
-  "Continue to checkout". Chord to MIDI's backend records a checkout session for that account and sends the tab to
-  `/checkout/chord-to-midi/` (or `/ko/…`) with a one-time handoff code after `#`. The page takes the code out of the
-  address at once, binds a random key of its own to the session with it (kept in the tab's sessionStorage until the
-  payment goes through), and then shows the product, the account it is for, the currency, the agreements and Toss's
-  결제위젯. Toss sends the buyer back to `success/` or `fail/` here; the success page has the backend approve the payment
-  and grant Remove Ads, and links back to Chord to MIDI, where the account shows it. A tab that no longer holds the
-  session keeps the payment for its buyer, who finishes it signed in on chord-to-midi.app. No sign-in, token or
-  payment secret is ever put in an address.
-- **The backend is Chord to MIDI's.** The pages call the Cloud Functions of its Firebase project `chord-to-midi`
+| Product | Pages | Backend | Here |
+| --- | --- | --- | --- |
+| Chord to MIDI: Remove Ads | `/checkout/chord-to-midi/` | Firebase project `chord-to-midi` | Open |
+| DJ Duplicate Guard: Expert, a 364-day pass | `/checkout/dj-duplicate-guard/` | Firebase project `dj-duplicate-guard` (from its M4a) | Closed |
+
+- **The way through.** A buyer signs in on the product's site and continues to its checkout. The product's backend
+  records a checkout session for that account and sends the tab to the product's checkout page here with a one-time
+  handoff code after `#`. The page's first script takes the code out of the address before anything else runs
+  (`src/pages/_document.tsx`); the page binds a random key of its own to the session with it (kept in the tab's
+  sessionStorage until the payment goes through), and then shows the product, the account it is for, the currency, the
+  agreements and Toss's 결제위젯. Toss sends the buyer back to `success/` or
+  `fail/` here; the success page has the backend approve the payment and grant the product, and links back to the
+  product's site, where the account shows it. A tab that no longer holds the session keeps the payment for its buyer,
+  who finishes it signed in on the product's site. No sign-in, token or payment secret is ever put in an address.
+- **Each backend is the product's own.** The pages call the Cloud Functions of the product's Firebase project
   (`openCheckout`, `createCheckoutOrder`, `confirmCheckoutPayment`, `failCheckoutOrder`, `preparePaymentResume`), which
-  accept browsers from `https://cultureand.tech` only, with App Check. Its orders, purchases, webhook and refunds stay
-  there. This site's project is still Hosting only (Rules, below).
+  accept browsers from `https://cultureand.tech` only, with App Check. One product's session, storage key, prices or
+  answers are never used for another's. This site's project is still Hosting only (Rules, below).
 - **Nothing else loads there.** `src/pages/_document.tsx` leaves the Softgen script and Google Fonts out of the
   checkout pages, and they have their own frame (`CheckoutLayout`) without the homepage's YouTube footer, so a buyer's
-  details there reach only Chord to MIDI's backend (Google Firebase) and Toss Payments, as Chord to MIDI's privacy
-  policy says. Keep it so: no analytics, fonts, embeds or other scripts on these pages. `firebase.json` gives them
-  `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `Referrer-Policy: strict-origin` (only the origin, also to this site's other pages) and no stale
-  cache; their HTML has `noindex`, and they are not in the sitemap or `llms.txt`.
-- **The seller's details** in the checkout's footer (`BUSINESS` in `src/lib/checkout/config.ts`) and the product's
-  wording (`src/lib/checkout/copy.ts`) are copies of Chord to MIDI's `site.config.json` and `src/i18n/`; change them
-  together. So is the contract with its functions (`src/lib/checkout/contract.ts`).
+  details there reach only the product's backend (Google Firebase) and Toss Payments, as the product's privacy policy
+  says. Keep it so: no analytics, fonts, embeds or other scripts on these pages. `firebase.json` gives them
+  `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `Referrer-Policy: strict-origin` (only the origin, also to this
+  site's other pages) and no stale cache; their HTML has `noindex`, and they are not in the sitemap or `llms.txt`.
+- **Copies.** The seller's details in the checkout's footer (`BUSINESS` in `src/lib/checkout/config.ts`) are Culture &
+  Tech's, as each product's `site.config.json` has them. The checkout's own wording (`copy.ts`) is Chord to MIDI's
+  (`src/i18n/`), and each product's wording (`product-copy.ts`) is a copy of its own. So is the contract with the
+  functions (`contract.ts`). Change them together.
+
+### Chord to MIDI
+
+Chord to MIDI (https://chord-to-midi.app) sells one product, Remove Ads. The product, its price, terms and refund
+policy, and the buyers' accounts are Chord to MIDI's, unchanged (`chord-to-midi-web`: `site.config.json`, `content/`,
+`functions/src/checkout.ts`).
+
 - **Settings.** The build needs the public web app settings of the `chord-to-midi` project, the same values as
   `chord-to-midi-web`'s `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID` and
   `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY`, in `.env.production.local` (git-ignored):
@@ -140,11 +156,48 @@ price, terms and refund policy, and the buyers' accounts are Chord to MIDI's, un
   Firebase emulators and fake Toss, serve it as Firebase Hosting does, and buy through it from chord-to-midi.app's
   purchase page. They write that build into `out/`; the predeploy's `npm run build` replaces it.
 
+### DJ Duplicate Guard
+
+DJ Duplicate Guard (https://dj-duplicate-guard.app) is to sell one product, Expert: a 364-day pass, one payment, no
+renewal. Its sales are closed (`dj-duplicate-guard`: `docs/decisions/DL-52-checkout-on-cultureand-tech.md`,
+`docs/specs/checkout.md`), and so is its checkout, at both ends:
+
+- **Here.** Without `NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT=on`, its pages say the checkout isn't open, link only to
+  its home page, and call nothing, and the build carries none of its offer: its product entry and wording stay out of
+  the bundle. `scripts/check-checkout-config.mjs` refuses a deployment that sets the switch, or its test settings
+  (`NEXT_PUBLIC_DJ_DUPLICATE_GUARD_EMULATORS`, `NEXT_PUBLIC_DJ_DUPLICATE_GUARD_ORIGIN`), while
+  `DJ_DUPLICATE_GUARD_SALES_OPEN` in that script is `false`, and `scripts/check-live.sh` checks that its pages are
+  closed.
+- **There.** Its backend refuses every order until its own sales switch (`EXPERT_SALES_ENABLED`) is on, whatever a
+  page shows.
+
+#### Opening DJ Duplicate Guard's checkout
+
+Only when its owner opens Expert's sales, after the launch requirements in its DL-52 and `docs/specs/checkout.md`
+(among them its account service and account page, its published terms, refund and privacy pages, and Toss Payments'
+written confirmation for the product):
+
+1. In Google Cloud (project `dj-duplicate-guard`), its web app's reCAPTCHA Enterprise key lists `cultureand.tech`
+   among its domains, and its API key, if it has website restrictions, allows `https://cultureand.tech/*`.
+2. `.env.production.local` gets the switch and that web app's public settings:
+
+   ```
+   NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT=on
+   NEXT_PUBLIC_DJ_DUPLICATE_GUARD_FIREBASE_API_KEY=…
+   NEXT_PUBLIC_DJ_DUPLICATE_GUARD_FIREBASE_PROJECT_ID=dj-duplicate-guard
+   NEXT_PUBLIC_DJ_DUPLICATE_GUARD_FIREBASE_APP_ID=…
+   NEXT_PUBLIC_DJ_DUPLICATE_GUARD_RECAPTCHA_SITE_KEY=…
+   ```
+
+3. `DJ_DUPLICATE_GUARD_SALES_OPEN = true` in `scripts/check-checkout-config.mjs`, in a commit of its own: the predeploy
+   check then requires those settings, and `scripts/check-live.sh` stops expecting closed pages.
+4. Deploy as usual (Deploy, below).
+
 ## Deploy
 
 Releases are manual, from a clean, committed `main`, with the pinned CLI and an explicit project.
 Needs `firebase login` with the account that owns `cultureand-tech-web` (sochan@cultureand.tech).
-Channel deploys first check the settings of Chord to MIDI's checkout (`scripts/check-checkout-config.mjs`), then run
+Channel deploys first check the settings of the central checkout (`scripts/check-checkout-config.mjs`), then run
 `npm run build`, add the Cafe24 compatibility assets and check `out/culture/thai-learn/`, `out/culture/clean-space/` and
 `out/culture/english-thai-learn/` (`predeploy` in `firebase.json`).
 
@@ -200,10 +253,10 @@ Never edit the copied HTML by hand.
 - `public/` holds static HTML, CSS and the homepage's assets only. Never `publisher.json`, operator docs, server
   code, `.ait` bundles, service-account files or `.env` files.
 - Hosting only: never enable Firestore, Functions, Auth or Analytics in `cultureand-tech-web`, and never deploy
-  this site to another Firebase project. Chord to MIDI's checkout pages call Chord to MIDI's own project
-  (`chord-to-midi`) from the browser; nothing of it runs in this one.
-- Chord to MIDI's checkout pages load no third-party script, font or embed beyond Toss Payments and Chord to MIDI's
-  Firebase backend ("Chord to MIDI's checkout", above).
+  this site to another Firebase project. Each product's checkout pages call that product's own project (such as
+  `chord-to-midi`) from the browser; nothing of it runs in this one.
+- The checkout pages load no third-party script, font or embed beyond Toss Payments and the product's Firebase
+  backend ("The central checkout", above).
 - `Referrer-Policy: no-referrer` applies to `/culture/**` only; the homepage's YouTube embeds need a referrer.
 - Firebase itself sends `Strict-Transport-Security: max-age=31556926` (no `includeSubDomains`) on the custom
   domain. Do not add `includeSubDomains` or `preload`.

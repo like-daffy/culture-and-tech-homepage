@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { createCheckoutOrder, describeCallableError, openCheckout, type CallableErrorInfo } from "@/lib/checkout/api";
-import { checkoutPath, chordToMidiUrl, isCheckoutConfigured } from "@/lib/checkout/config";
 import {
   APP_ERROR,
   type CheckoutCredential,
@@ -11,8 +10,16 @@ import {
   type Lang,
   type OpenCheckoutResponse,
 } from "@/lib/checkout/contract";
-import { CHECKOUT_COPY, fill, formatPrice, type CheckoutCopy } from "@/lib/checkout/copy";
+import { CHECKOUT_COPY, fill, formatPrice } from "@/lib/checkout/copy";
 import { countryOptions } from "@/lib/checkout/countries";
+import {
+  checkoutPath,
+  isProductConfigured,
+  productUrl,
+  type CheckoutProduct,
+  type ClosedProduct,
+  type OpenProduct,
+} from "@/lib/checkout/products";
 import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type CheckoutHold } from "@/lib/checkout/session";
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
@@ -24,12 +31,37 @@ export function richText(text: string, nodes: Record<string, ReactNode>): ReactN
     .map((part, index) => <Fragment key={index}>{index % 2 === 1 ? (nodes[part] ?? `{${part}}`) : part}</Fragment>);
 }
 
-/** A page of Chord to MIDI linked from the checkout: in a new tab, so the checkout keeps its place. */
+/** A page of the product's site linked from the checkout: in a new tab, so the checkout keeps its place. */
 function NewTabLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a className="underline" href={href} target="_blank" rel="noopener noreferrer">
       {children}
     </a>
+  );
+}
+
+/**
+ * A product's checkout that this build keeps closed: it says so and offers nothing. It calls nothing (no Firebase, no
+ * Toss) and keeps nothing; a handoff in the address leaves it all the same. The product's own server refuses its sales
+ * too, whatever a page shows (its sales switch).
+ */
+export function ClosedCheckout({ product, lang }: { product: ClosedProduct; lang: Lang }) {
+  const name = product.name[lang];
+  useEffect(() => {
+    takeHandoff();
+  }, []);
+  return (
+    <CheckoutLayout product={product} lang={lang}>
+      <h1 className="text-2xl font-semibold">{name.productName}</h1>
+      <div className="mt-6 space-y-6" data-checkout="closed">
+        <Notice>{CHECKOUT_COPY[lang].closed}</Notice>
+        <div className="flex flex-wrap gap-3">
+          <LinkButton primary href={productUrl(product, lang, "home")}>
+            {name.backToProduct}
+          </LinkButton>
+        </div>
+      </div>
+    </CheckoutLayout>
   );
 }
 
@@ -39,48 +71,57 @@ type Opening =
   /** No handoff in the address, and nothing held in this tab. */
   | { kind: "missing" }
   | { kind: "refused"; message: string; code: string | null }
-  /** Chord to MIDI's backend couldn't be reached: the same open may go through. */
+  /** The product's backend couldn't be reached: the same open may go through. */
   | { kind: "unreachable"; message: string; hold: CheckoutHold }
   | { kind: "open"; checkout: OpenCheckoutResponse; credential: CheckoutCredential };
 
-/** What to say when the checkout can't be opened for a reason of Chord to MIDI's. */
-function openRefusal(copy: CheckoutCopy, info: CallableErrorInfo): string {
+/** What to say when the checkout can't be opened for a reason of the product's backend. */
+function openRefusal(product: OpenProduct, lang: Lang, info: CallableErrorInfo): string {
+  const copy = CHECKOUT_COPY[lang];
+  const productCopy = product.copy[lang];
+  if (info.code !== null && info.code === product.alreadyOwnedCode) return productCopy.already;
   switch (info.code) {
     case APP_ERROR.checkoutExpired:
-      return copy.ended;
-    case APP_ERROR.alreadyAdFree:
-      return copy.already;
+      return productCopy.ended;
     case APP_ERROR.accountDeleted:
-      return copy.accountDeleted;
+      return productCopy.accountDeleted;
     case APP_ERROR.emailNotConfirmed:
-      return copy.emailNotConfirmed;
+      return productCopy.emailNotConfirmed;
     case APP_ERROR.accountUnavailable:
-      return copy.accountUnavailable;
+      return productCopy.accountUnavailable;
     case APP_ERROR.currencyUnavailable:
       return copy.unavailable;
+    case APP_ERROR.salesClosed:
+      return productCopy.salesClosed;
     default:
       return fill(copy.openFailed, { message: info.message });
   }
 }
 
 /**
- * The checkout of Chord to MIDI's Remove Ads, /checkout/chord-to-midi/ (Korean: /ko/checkout/chord-to-midi/). Chord to
- * MIDI's purchase page sends the signed-in buyer here with a one-time handoff; this page opens the checkout with it
+ * A product's checkout, /checkout/<product>/ (Korean: /ko/checkout/<product>/), closed unless this build opens it.
+ * The product's site sends the signed-in buyer here with a one-time handoff; this page opens the checkout with it
  * (lib/checkout/session.ts), then shows the product and the account it is for, takes the currency, the agreements and,
  * for PayPal, the buyer's country, makes the order at the server's price and renders Toss's 결제위젯. Toss sends the
  * buyer back to this checkout's success or fail page.
  */
-export function CheckoutPage({ lang }: { lang: Lang }) {
+export function CheckoutPage({ product, lang }: { product: CheckoutProduct; lang: Lang }) {
+  if (product.enabled === false) return <ClosedCheckout product={product} lang={lang} />;
+  return <OpenCheckout product={product} lang={lang} />;
+}
+
+function OpenCheckout({ product, lang }: { product: OpenProduct; lang: Lang }) {
   const copy = CHECKOUT_COPY[lang];
+  const productCopy = product.copy[lang];
   const [state, setState] = useState<Opening>({ kind: "opening" });
   const started = useRef(false);
 
   const open = (hold: CheckoutHold) => {
     setState({ kind: "opening" });
-    openCheckout(hold).then(
+    openCheckout(product, hold).then(
       (checkout) => {
         const credential = { checkoutId: hold.checkoutId, checkoutKey: hold.checkoutKey };
-        saveHold(credential); // the code is spent: only the key opens the checkout from now on
+        saveHold(product, credential); // the code is spent: only the key opens the checkout from now on
         setState({ kind: "open", checkout, credential });
       },
       (error: unknown) => {
@@ -90,8 +131,8 @@ export function CheckoutPage({ lang }: { lang: Lang }) {
           return;
         }
         // Refused for good (ended, or an account that can't buy now): this tab keeps nothing of it.
-        forgetHold();
-        setState({ kind: "refused", message: openRefusal(copy, info), code: info.code });
+        forgetHold(product);
+        setState({ kind: "refused", message: openRefusal(product, lang, info), code: info.code });
       }
     );
   };
@@ -101,15 +142,15 @@ export function CheckoutPage({ lang }: { lang: Lang }) {
     started.current = true;
     // First of all, the code leaves the address (and so the history entry the browser keeps).
     const handoff = takeHandoff();
-    if (!isCheckoutConfigured()) {
+    if (!isProductConfigured(product)) {
       setState({ kind: "unconfigured" });
       return;
     }
-    let hold = readHold();
+    let hold = readHold(product);
     if (handoff) {
       // A new handoff replaces whatever this tab held: a key of this page's own, bound with the code.
       hold = { checkoutId: handoff.checkoutId, checkoutKey: newCheckoutKey(), handoffCode: handoff.handoffCode };
-      saveHold(hold);
+      saveHold(product, hold);
     }
     if (!hold) {
       setState({ kind: "missing" });
@@ -120,10 +161,10 @@ export function CheckoutPage({ lang }: { lang: Lang }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const backToPurchase = (
+  const backToStart = (
     <div className="flex flex-wrap gap-3">
-      <LinkButton primary href={chordToMidiUrl(lang, "purchase")}>
-        {copy.backToPurchase}
+      <LinkButton primary href={productUrl(product, lang, product.startPage)}>
+        {productCopy.backToProduct}
       </LinkButton>
     </div>
   );
@@ -137,35 +178,37 @@ export function CheckoutPage({ lang }: { lang: Lang }) {
       body = (
         <>
           <Notice tone="error">{copy.notConfigured}</Notice>
-          {backToPurchase}
+          {backToStart}
         </>
       );
       break;
     case "missing":
       body = (
         <>
-          <Notice>{copy.noCheckout}</Notice>
-          {backToPurchase}
+          <Notice>{productCopy.noCheckout}</Notice>
+          {backToStart}
         </>
       );
       break;
-    case "refused":
+    case "refused": {
+      const owned = state.code !== null && state.code === product.alreadyOwnedCode;
       body = (
         <>
-          <Notice tone={state.code === APP_ERROR.alreadyAdFree ? "success" : "error"}>{state.message}</Notice>
-          {state.code === APP_ERROR.alreadyAdFree ? (
+          <Notice tone={owned ? "success" : "error"}>{state.message}</Notice>
+          {owned ? (
             <div className="flex flex-wrap gap-3">
-              <LinkButton primary href={chordToMidiUrl(lang, "account")}>
+              <LinkButton primary href={productUrl(product, lang, "account")}>
                 {copy.seeAccount}
               </LinkButton>
-              <LinkButton href={chordToMidiUrl(lang, "")}>{copy.backToChordToMidi}</LinkButton>
+              <LinkButton href={productUrl(product, lang, "home")}>{productCopy.backToProduct}</LinkButton>
             </div>
           ) : (
-            backToPurchase
+            backToStart
           )}
         </>
       );
       break;
+    }
     case "unreachable":
       body = (
         <>
@@ -179,14 +222,14 @@ export function CheckoutPage({ lang }: { lang: Lang }) {
       );
       break;
     case "open":
-      body = <Checkout lang={lang} checkout={state.checkout} credential={state.credential} />;
+      body = <Checkout product={product} lang={lang} checkout={state.checkout} credential={state.credential} />;
       break;
   }
 
   return (
-    <CheckoutLayout lang={lang}>
-      <h1 className="text-2xl font-semibold">{copy.productName}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{copy.seller}</p>
+    <CheckoutLayout product={product} lang={lang}>
+      <h1 className="text-2xl font-semibold">{productCopy.productName}</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{productCopy.seller}</p>
       <div className="mt-6 space-y-6">{body}</div>
     </CheckoutLayout>
   );
@@ -199,36 +242,43 @@ function suggestedCurrency(lang: Lang, options: CheckoutOption[]): Currency {
 }
 
 function Checkout({
+  product,
   lang,
   checkout,
   credential,
 }: {
+  product: OpenProduct;
   lang: Lang;
   checkout: OpenCheckoutResponse;
   credential: CheckoutCredential;
 }) {
   const copy = CHECKOUT_COPY[lang];
+  const productCopy = product.copy[lang];
   const { options } = checkout;
   const testOption = options.find((option) => option.test) ?? null;
   const [currency, setCurrency] = useState<Currency>(() => suggestedCurrency(lang, options));
   const option = options.find((candidate) => candidate.currency === currency) ?? options[0] ?? null;
-  const terms = <NewTabLink href={chordToMidiUrl(lang, "terms")}>{copy.termsLink}</NewTabLink>;
-  const refund = <NewTabLink href={chordToMidiUrl(lang, "refund")}>{copy.refundLink}</NewTabLink>;
+  // The page states a pass's length in fixed words: a server that says otherwise stops the payment before it starts.
+  const termOutOfDate = product.passDays !== undefined && checkout.passDays !== product.passDays;
+  const terms = <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>;
+  const refund = <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>;
 
   return (
     <>
-      {testOption && <Notice>{fill(copy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>}
+      {testOption && (
+        <Notice>{fill(productCopy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>
+      )}
       <Notice>
-        {fill(copy.account, { email: checkout.receiptEmail })}{" "}
-        <a className="underline" href={chordToMidiUrl(lang, "purchase")}>
-          {copy.notYou}
+        {fill(productCopy.account, { email: checkout.receiptEmail })}{" "}
+        <a className="underline" href={productUrl(product, lang, product.startPage)}>
+          {productCopy.notYou}
         </a>
       </Notice>
       <section aria-labelledby="product" className="space-y-4 rounded-lg border border-border bg-card p-6">
         <h2 id="product" className="sr-only">
-          {copy.productName}
+          {productCopy.productName}
         </h2>
-        <p>{copy.lead}</p>
+        <p>{productCopy.lead}</p>
         {options.length > 1 ? (
           <fieldset className="space-y-2">
             <legend className="mb-2 text-sm font-medium">{copy.currencyLegend}</legend>
@@ -245,31 +295,34 @@ function Checkout({
                   onChange={() => setCurrency(candidate.currency)}
                   className="mt-1"
                 />
-                <PriceText lang={lang} option={candidate} />
+                <PriceText product={product} lang={lang} option={candidate} />
               </label>
             ))}
           </fieldset>
         ) : (
           options.map((candidate) => (
             <div key={candidate.currency} className="rounded-md border border-border p-3">
-              <PriceText lang={lang} option={candidate} />
+              <PriceText product={product} lang={lang} option={candidate} />
             </div>
           ))
         )}
-        <p className="text-sm text-muted-foreground">{copy.priceTerms}</p>
-        <p className="text-sm text-muted-foreground">{copy.period}</p>
+        <p className="text-sm text-muted-foreground">{productCopy.priceTerms}</p>
+        <p className="text-sm text-muted-foreground">{productCopy.period}</p>
         <ul className="list-disc space-y-1 pl-5 text-sm">
-          {copy.includes.map((line) => (
+          {productCopy.includes.map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
         <p className="text-sm text-muted-foreground">{richText(copy.policies, { terms, refund })}</p>
       </section>
-      {option ? (
+      {termOutOfDate ? (
+        <Notice tone="error">{copy.termChanged}</Notice>
+      ) : option ? (
         <section className="space-y-4 rounded-lg border border-border bg-card p-6">
           {/* A new currency starts the payment over: an order is in one currency. */}
           <Payment
             key={option.currency}
+            product={product}
             lang={lang}
             option={option}
             credential={credential}
@@ -285,14 +338,14 @@ function Checkout({
 }
 
 /** "₩6,600 / Korean won / For Korean cards and easy-pay services, VAT included"; a test amount says so. */
-function PriceText({ lang, option }: { lang: Lang; option: CheckoutOption }) {
+function PriceText({ product, lang, option }: { product: OpenProduct; lang: Lang; option: CheckoutOption }) {
   const copy = CHECKOUT_COPY[lang];
   return (
     <span className="flex flex-col gap-0.5">
       <span className="text-lg font-semibold">{formatPrice(option.price, option.currency, lang)}</span>
       {option.test && <span className="text-xs text-muted-foreground">{copy.testPrice}</span>}
       <span className="text-sm">{copy.currencyNames[option.currency]}</span>
-      <span className="text-xs text-muted-foreground">{copy.currencyNotes[option.currency]}</span>
+      <span className="text-xs text-muted-foreground">{product.copy[lang].currencyNotes[option.currency]}</span>
     </span>
   );
 }
@@ -303,33 +356,38 @@ type Step =
   | { kind: "paying"; order: CreateOrderResponse }
   | { kind: "error"; message: string; ended: boolean };
 
-/** What to say when the order is refused for a reason of Chord to MIDI's (Toss's own messages are shown as they come). */
-function orderRefusal(copy: CheckoutCopy, info: CallableErrorInfo): string {
+/** What to say when the order is refused for a reason of the product's backend (Toss's messages are shown as they come). */
+function orderRefusal(product: OpenProduct, lang: Lang, info: CallableErrorInfo): string {
+  const copy = CHECKOUT_COPY[lang];
+  const productCopy = product.copy[lang];
+  if (info.code !== null && info.code === product.alreadyOwnedCode) return productCopy.already;
   switch (info.code) {
     case APP_ERROR.checkoutExpired:
-      return copy.ended;
-    case APP_ERROR.alreadyAdFree:
-      return copy.already;
+      return productCopy.ended;
     case APP_ERROR.checkoutInProgress:
       return copy.inProgress;
     case APP_ERROR.accountDeleted:
-      return copy.accountDeleted;
+      return productCopy.accountDeleted;
     case APP_ERROR.emailNotConfirmed:
-      return copy.emailNotConfirmed;
+      return productCopy.emailNotConfirmed;
     case APP_ERROR.currencyUnavailable:
       return copy.unavailable;
+    case APP_ERROR.salesClosed:
+      return productCopy.salesClosed;
     default:
       return info.message;
   }
 }
 
 function Payment({
+  product,
   lang,
   option,
   credential,
   orderName,
   receiptEmail,
 }: {
+  product: OpenProduct;
   lang: Lang;
   option: CheckoutOption;
   credential: CheckoutCredential;
@@ -337,6 +395,7 @@ function Payment({
   receiptEmail: string;
 }) {
   const copy = CHECKOUT_COPY[lang];
+  const productCopy = product.copy[lang];
   const paypal = option.currency === "USD";
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -362,6 +421,7 @@ function Payment({
       agreementVariantKey: option.agreementVariantKey,
       methodsSelector: "#payment-methods",
       agreementSelector: "#payment-agreement",
+      productDescription: product.paypalDescription,
     }).then(
       (result) => {
         if (cancelled) {
@@ -382,13 +442,18 @@ function Payment({
       cancelled = true;
       void rendered?.destroy();
     };
-  }, [step, option]);
+  }, [step, option, product]);
 
   const ready = step.kind === "paying" && widget?.orderId === step.order.orderId ? widget.widget : null;
 
   const start = () => {
     setStep({ kind: "preparing" });
-    createCheckoutOrder({ ...credential, termsAccepted: true, ageConfirmed: true, currency: option.currency }).then(
+    createCheckoutOrder(product, {
+      ...credential,
+      termsAccepted: true,
+      ageConfirmed: true,
+      currency: option.currency,
+    }).then(
       (order) => {
         // What Toss charges must be what this page showed: a price changed since stops here, before anything reaches Toss.
         if (order.currency !== option.currency || order.amount !== option.price) {
@@ -399,8 +464,12 @@ function Payment({
       },
       (error: unknown) => {
         const info = describeCallableError(error);
-        if (info.code === APP_ERROR.checkoutExpired) forgetHold();
-        setStep({ kind: "error", message: orderRefusal(copy, info), ended: info.code === APP_ERROR.checkoutExpired });
+        if (info.code === APP_ERROR.checkoutExpired) forgetHold(product);
+        setStep({
+          kind: "error",
+          message: orderRefusal(product, lang, info),
+          ended: info.code === APP_ERROR.checkoutExpired,
+        });
       }
     );
   };
@@ -413,8 +482,8 @@ function Payment({
       .requestPayment({
         orderId: order.orderId,
         orderName: order.orderName || orderName,
-        successUrl: `${window.location.origin}${checkoutPath(lang, "success")}`,
-        failUrl: `${window.location.origin}${checkoutPath(lang, "fail")}`,
+        successUrl: `${window.location.origin}${checkoutPath(product, lang, "success")}`,
+        failUrl: `${window.location.origin}${checkoutPath(product, lang, "fail")}`,
         // The address frozen on the order: Toss sends the receipt there.
         customerEmail: order.receiptEmail,
         ...(paypal ? { country } : {}),
@@ -447,8 +516,8 @@ function Payment({
             />
             <span>
               {richText(copy.agreeTerms, {
-                terms: <NewTabLink href={chordToMidiUrl(lang, "terms")}>{copy.termsLink}</NewTabLink>,
-                refund: <NewTabLink href={chordToMidiUrl(lang, "refund")}>{copy.refundLink}</NewTabLink>,
+                terms: <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>,
+                refund: <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>,
               })}
             </span>
           </label>
@@ -481,8 +550,8 @@ function Payment({
         <Notice tone="error">{fill(copy.failed, { message: step.message })}</Notice>
         <div className="flex flex-wrap gap-3">
           {step.ended ? (
-            <LinkButton primary href={chordToMidiUrl(lang, "purchase")}>
-              {copy.backToPurchase}
+            <LinkButton primary href={productUrl(product, lang, product.startPage)}>
+              {productCopy.backToProduct}
             </LinkButton>
           ) : (
             <Button type="button" variant="outline" onClick={() => setStep({ kind: "agree" })}>
