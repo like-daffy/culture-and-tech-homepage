@@ -1,6 +1,7 @@
 /**
  * What each product's checkout says about the product, in English and Korean, in the product's own words:
- * - Chord to MIDI: chord-to-midi-web's src/i18n/{en,ko}.json (`purchase`, `purchaseResult`), word for word.
+ * - Chord to MIDI: chord-to-midi-web's src/i18n/{en,ko}.json (`purchase`, `purchaseResult`), word for word, except
+ *   that the English text here writes "Remove ADs" (the owner, 2026-11-08).
  * - DJ Duplicate Guard: its decisions D38 and DL-50 and its terms (Articles 2(7), 9, 11 and 15-2) in
  *   dj-duplicate-guard's apps/web/content/. A build carries it only when it opens that checkout (products.ts): until
  *   its owner opens the sales (DL-52), none of it is published.
@@ -44,10 +45,10 @@ export interface ProductCopy {
 
 export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
   en: {
-    pageTitle: "Checkout: Chord to MIDI Remove Ads | Culture & Tech",
-    productName: "Chord to MIDI — Remove Ads, 364 days",
+    pageTitle: "Checkout: Chord to MIDI Remove ADs | Culture & Tech",
+    productName: "Chord to MIDI — Remove ADs, 364 days",
     seller:
-      "Sold by Culture & Tech, which runs Chord to MIDI. You pay here, on cultureand.tech, Culture & Tech's checkout; Remove Ads applies to your Chord to MIDI account.",
+      "Sold by Culture & Tech, which runs Chord to MIDI. You pay here, on cultureand.tech, Culture & Tech's checkout; Remove ADs applies to your Chord to MIDI account.",
     account: "For the Chord to MIDI account whose receipt and recovery email is {email}.",
     notYou: "Not your account? Back to Chord to MIDI",
     lead: "One payment keeps ads off Chord to MIDI for 364 days whenever you're signed in to your account.",
@@ -70,20 +71,20 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     testMode:
       "Test checkout: dollar payments go to PayPal's Sandbox on test keys, and nothing real is charged. {price} matches the planned dollar price, but dollars aren't sold for real yet.",
     currencyNotes: { KRW: "For Korean cards and easy-pay services. VAT included.", USD: "Pay with PayPal." },
-    salesClosed: "Remove Ads isn't on sale now. Nothing was charged.",
-    already: "This account has Remove Ads until its period ends. Another period can be bought after that.",
-    accountDeleted: "This account is being deleted, so it cannot buy Remove Ads.",
+    salesClosed: "Remove ADs isn't on sale now. Nothing was charged.",
+    already: "This account has Remove ADs until its period ends. Another period can be bought after that.",
+    accountDeleted: "This account is being deleted, so it cannot buy Remove ADs.",
     emailNotConfirmed: "Confirm the email of your Chord to MIDI account before paying.",
     accountUnavailable: "This Chord to MIDI account is not available.",
     noCheckout: "Start your purchase on Chord to MIDI: sign in there, then continue to the checkout.",
     ended: "This checkout has ended, or was opened in another tab. Start again from Chord to MIDI.",
     backToProduct: "Back to Chord to MIDI",
-    successBody: "Remove Ads is on your account for 364 days and applies wherever you sign in to it.",
-    passTerm: "Remove Ads — 364 days: from {start} to {end}. It doesn't renew.",
+    successBody: "Remove ADs is on your account for 364 days and applies wherever you sign in to it.",
+    passTerm: "Remove ADs — 364 days: from {start} to {end}. It doesn't renew.",
     alreadyOwned:
-      "This account already has a period of Remove Ads that hasn’t ended, so this payment was not made. Nothing was charged.",
+      "This account already has a period of Remove ADs that hasn’t ended, so this payment was not made. Nothing was charged.",
     accountDeletedResult:
-      "The account was deleted while the payment was being confirmed, so Remove Ads could not be added to it.",
+      "The account was deleted while the payment was being confirmed, so Remove ADs could not be added to it.",
     finishOnProduct:
       "This tab no longer holds the checkout. To finish the payment, sign in on Chord to MIDI to the account you paid with.",
     finishButton: "Finish on Chord to MIDI",
