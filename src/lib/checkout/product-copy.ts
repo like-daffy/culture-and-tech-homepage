@@ -51,7 +51,7 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     account: "For the Chord to MIDI account whose receipt and recovery email is {email}.",
     notYou: "Not your account? Back to Chord to MIDI",
     lead: "One payment keeps ads off Chord to MIDI for 364 days whenever you're signed in to your account.",
-    priceTerms: "One payment, not a subscription: it doesn't renew, and nothing is charged again.",
+    priceTerms: "It doesn't renew, and nothing is charged again.",
     period:
       "Period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. Your account page shows the exact start and end.",
     renewal:
@@ -96,7 +96,7 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     account: "영수증 및 계정 복구 이메일이 {email}인 Chord to MIDI 계정에 적용됩니다.",
     notYou: "내 계정이 아닌가요? Chord to MIDI로 돌아가기",
     lead: "한 번 결제하면 364일 동안, 구매한 계정으로 로그인해 있는 동안 Chord to MIDI에 광고가 표시되지 않습니다.",
-    priceTerms: "구독이 아닌 1회 결제입니다. 자동으로 갱신되거나 다시 결제되지 않습니다.",
+    priceTerms: "자동으로 갱신되거나 다시 결제되지 않습니다.",
     period:
       "이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 정확한 시작과 만료 일시는 계정 페이지에 표시됩니다.",
     renewal:
