@@ -45,12 +45,13 @@ import { ProviderSignInError } from "@/lib/clean-space/oauth";
 import { DIRECT_SALE_POLICY_PATHS } from "@/lib/clean-space/site";
 import { sessionStore } from "@/lib/clean-space/storage";
 import { ContactVerification } from "./ContactVerification";
+import { EmailSignInForm } from "./EmailSignInForm";
 import { useCleanSpaceUser, useLoad, useQueryOnce, useSessionGuard } from "./hooks";
 import { Notice, PageTitle, Section, SensitiveLayout } from "./SensitiveLayout";
 import { SignInPanel } from "./SignInPanel";
 import { signInFailureMessage } from "./AuthCallbackPage";
 
-const ALL_PROVIDERS: Provider[] = ["google", "kakao", "naver"];
+const ALL_PROVIDERS: Provider[] = ["google", "kakao", "naver", "email"];
 
 /** Only an https page (Toss's receipt) is linked; an emulator build's fake Toss serves its receipts over http. */
 const safeReceipt = (url: string | null): string | null =>
@@ -80,6 +81,8 @@ export function AccountPage({ lang }: { lang: PageLang }) {
   const [message, setMessage] = useState<{ tone: "info" | "error" | "success"; text: string } | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
   const [changingContact, setChangingContact] = useState(false);
+  /** The email-entry form of linking the email method, or of proving the account again with its email method. */
+  const [emailForm, setEmailForm] = useState<"link" | "reauth" | null>(null);
 
   /** Runs an account change under this session; an answer for another session is dropped. */
   const run = async (name: string, action: () => Promise<string | null>) => {
@@ -122,9 +125,16 @@ export function AccountPage({ lang }: { lang: PageLang }) {
         return null;
       }
       const brokered = brokeredProvidersHere().find((provider) => linked.includes(provider));
-      if (!brokered) throw new ProviderSignInError("unavailable");
-      await startBrokeredSignIn(brokered, { returnTo: { route: "account", lang }, intent: "reauth" });
-      return null;
+      if (brokered) {
+        await startBrokeredSignIn(brokered, { returnTo: { route: "account", lang }, intent: "reauth" });
+        return null;
+      }
+      // The email method: a link to its own address, opened in this browser (the landing page signs in again).
+      if (linked.includes("email") && summary.emailSignIn) {
+        setEmailForm("reauth");
+        return null;
+      }
+      throw new ProviderSignInError("unavailable");
     });
 
   const link = (provider: Provider) => {
@@ -132,6 +142,10 @@ export function AccountPage({ lang }: { lang: PageLang }) {
     void run(`link-${provider}`, async () => {
       if (provider === "google") {
         await linkGoogle(cleanSpaceApi);
+        return null;
+      }
+      if (provider === "email") {
+        setEmailForm("link");
         return null;
       }
       await startBrokeredSignIn(provider, { returnTo: { route: "account", lang }, intent: "link" });
@@ -181,7 +195,7 @@ export function AccountPage({ lang }: { lang: PageLang }) {
       );
     const summary = account.value;
     const linked = summary.account.providers;
-    const offered = (provider: Provider) => provider === "google" || brokeredProvidersHere().includes(provider);
+    const offered = (provider: Provider) => provider === "google" || provider === "email" || brokeredProvidersHere().includes(provider);
     const deleting = summary.deletionRequestedAt !== null;
     return (
       <div className="space-y-6">
@@ -205,6 +219,11 @@ export function AccountPage({ lang }: { lang: PageLang }) {
               <Button variant="outline" onClick={() => void reauth(summary)} disabled={busy !== null}>
                 {copy.signInAgain}
               </Button>
+              {emailForm === "reauth" && summary.emailSignIn && (
+                <div className="sm:max-w-sm">
+                  <EmailSignInForm lang={lang} intent="reauth" returnTo={{ route: "account", lang }} initialEmail={summary.emailSignIn.email} fixedEmail />
+                </div>
+              )}
             </div>
           )}
           <ul className="divide-y divide-border">
@@ -216,6 +235,11 @@ export function AccountPage({ lang }: { lang: PageLang }) {
                   <span className="font-medium">
                     {copy.providerNames[provider]}
                     {isLinked && <span className="ml-2 text-xs text-muted-foreground">{copy.linkedLabel}</span>}
+                    {provider === "email" && isLinked && summary.emailSignIn && (
+                      <span className="block text-xs font-normal text-muted-foreground">
+                        {copy.methodEmailAddress(summary.emailSignIn.email)} · {copy.methodEmailNote}
+                      </span>
+                    )}
                   </span>
                   {isLinked ? (
                     <span className="flex flex-col items-end gap-1">
@@ -233,6 +257,23 @@ export function AccountPage({ lang }: { lang: PageLang }) {
               );
             })}
           </ul>
+          {emailForm === "link" && !linked.includes("email") && (
+            <div className="mt-4 space-y-3 sm:max-w-sm">
+              <p className="text-sm text-muted-foreground">{copy.linkEmailIntro}</p>
+              <EmailSignInForm
+                lang={lang}
+                intent="link"
+                returnTo={{ route: "account", lang }}
+                onRefused={(error) => {
+                  if (describeError(error).code !== "RECENT_SIGN_IN_REQUIRED") return false;
+                  setEmailForm(null);
+                  setNeedsReauth(true);
+                  setMessage({ tone: "info", text: copy.recentSignInNeeded });
+                  return true;
+                }}
+              />
+            </div>
+          )}
         </Section>
 
         {summary.account.contact && !changingContact ? (
@@ -246,6 +287,7 @@ export function AccountPage({ lang }: { lang: PageLang }) {
           !deleting && (
             <ContactVerification
               lang={lang}
+              initialEmail={summary.emailSignIn?.email}
               api={cleanSpaceApi}
               sessionKey={user.sessionKey}
               currentSession={currentSession}

@@ -1,8 +1,10 @@
 /**
  * What the Clean Space pages keep in this tab's sessionStorage, under Clean Space's own keys (the central checkout keeps
- * its session under its own, src/lib/checkout/session.ts). Nothing here is a credential: OAuth states, a payment's
- * resume handle and an activation request id, each with its time so stale ones are dropped. Every access is guarded:
- * storage throws in some private modes and when site data is blocked.
+ * its session under its own, src/lib/checkout/session.ts): OAuth states, a payment's resume handle, an activation
+ * request id, and an email sign-in link opened in this tab (its one-time code, kept here only, never in the address
+ * bar, until it is used: email-link.ts). localStorage keeps only which address this browser asked a sign-in link for
+ * and which link bindings it began (no code). Each entry has its time so stale ones are dropped. Every access is
+ * guarded: storage throws in some private modes and when site data is blocked.
  */
 
 export interface KeyValueStore {
@@ -21,6 +23,12 @@ export const STORAGE_KEYS = {
   paymentResume: "cleanSpace.checkout.resume",
   /** The activation request this tab is approving (the id only). */
   activationRequest: "cleanSpace.activate.request",
+  /** An email sign-in link opened in this tab and not used yet: its query, one-time code included (sessionStorage). */
+  emailLinkPending: "cleanSpace.emailLink.pending",
+  /** The address this browser last asked a sign-in link for, with its time (localStorage; no code). */
+  emailSignIn: "cleanSpace.emailSignIn",
+  /** Link bindings (beginEmailLink) this browser began, by action id: the address and account (localStorage; no code). */
+  emailLinkActions: "cleanSpace.emailLink.actions",
 } as const;
 
 /** This tab's sessionStorage, or null where it can't be used. */
@@ -31,6 +39,19 @@ export function sessionStore(): KeyValueStore | null {
     window.sessionStorage.setItem(probe, "1");
     window.sessionStorage.removeItem(probe);
     return window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+/** This browser's localStorage, or null where it can't be used (email links open in another tab). */
+export function localStore(): KeyValueStore | null {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return null;
+    const probe = "cleanSpace.probe";
+    window.localStorage.setItem(probe, "1");
+    window.localStorage.removeItem(probe);
+    return window.localStorage;
   } catch {
     return null;
   }

@@ -11,6 +11,10 @@ import {
   CALLABLE,
   type ApproveActivationRequest,
   type ApproveActivationResponse,
+  type BeginEmailLinkRequest,
+  type BeginEmailLinkResponse,
+  type CompleteEmailSignInRequest,
+  type CompleteEmailSignInResponse,
   type BeginContactVerificationRequest,
   type BeginContactVerificationResponse,
   type CallableName,
@@ -44,6 +48,10 @@ export type ResumePaymentRequest = Extract<ConfirmPaymentRequest, { resumeID: st
 export interface CleanSpaceApi {
   getOffer(): Promise<GetOfferResponse>;
   signInWithProvider(request: SignInWithProviderRequest): Promise<SignInWithProviderResponse>;
+  /** Binds an email sign-in link that adds the email method to the signed-in account (before Firebase sends it). */
+  beginEmailLink(request: BeginEmailLinkRequest): Promise<BeginEmailLinkResponse>;
+  /** "Continue with email": the service redeems the emailed link's one-time code and answers with its own session. */
+  completeEmailSignIn(request: CompleteEmailSignInRequest): Promise<CompleteEmailSignInResponse>;
   getAccount(): Promise<GetAccountResponse>;
   beginContactVerification(request: BeginContactVerificationRequest): Promise<BeginContactVerificationResponse>;
   confirmContactVerification(request: ConfirmContactVerificationRequest): Promise<ConfirmContactVerificationResponse>;
@@ -68,6 +76,8 @@ export function createCallableApi(call: CallableTransport): CleanSpaceApi {
   return {
     getOffer: () => call(CALLABLE.getOffer, {}),
     signInWithProvider: (request) => call(CALLABLE.signInWithProvider, request),
+    beginEmailLink: (request) => call(CALLABLE.beginEmailLink, request),
+    completeEmailSignIn: (request) => call(CALLABLE.completeEmailSignIn, request),
     getAccount: () => call(CALLABLE.getAccount, {}),
     beginContactVerification: (request) => call(CALLABLE.beginContactVerification, request),
     confirmContactVerification: (request) => call(CALLABLE.confirmContactVerification, request),

@@ -111,10 +111,10 @@ for p in privacy support; do
   if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in english-thai-learn/$p.html"; fail=1; fi
   if echo "$body" | grep -q "<link rel=\"canonical\" href=\"https://cultureand.tech/culture/english-thai-learn/$p.html\">"; then echo "ok   english-thai-learn/$p.html canonical"; else echo "FAIL english-thai-learn/$p.html canonical"; fail=1; fi
 done
-# Clean Space's account, sign-in callback and activation pages (docs/clean-space-direct-sale.md; its checkout pages are
+# Clean Space's account, sign-in callback, email link and activation pages (docs/clean-space-direct-sale.md; its checkout pages are
 # the central checkout's, above): every page in both languages is 200, never stored, never framed, out of search
 # results, sends no referrer beyond the origin, and loads no font, monitoring script or embed.
-for p in apps/clean-space/account/ apps/clean-space/auth/callback/ apps/clean-space/activate/; do
+for p in apps/clean-space/account/ apps/clean-space/auth/callback/ apps/clean-space/auth/email/ apps/clean-space/activate/; do
   for l in "" ko/; do
     url="https://$host/$l$p"
     headers=$(curl -s -o /dev/null -D - -m 20 "$url" | tr -d '\r')

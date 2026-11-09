@@ -1,15 +1,17 @@
 /**
- * Who is signed in to Clean Space in this browser, and the three ways to sign in (plan §6.1): Google through Firebase
- * Auth's popup on the named app, Kakao and Naver through the service's broker (oauth.ts). Linking a provider needs a
- * recent sign-in of the account, and never switches or merges accounts.
+ * Who is signed in to Clean Space in this browser, and the four ways to sign in (plan §6.1): Google through Firebase
+ * Auth's popup on the named app, Kakao and Naver through the service's broker (oauth.ts), and a passwordless email link
+ * that Firebase sends and the service redeems (email-link.ts). Linking a method needs a recent sign-in of the account,
+ * and never switches or merges accounts.
  */
 import type { User } from "firebase/auth";
-import type { AccountSummary, BrokeredProvider, ReturnTarget, SignInIntent } from "./contract.generated";
+import { canonicalEmail, isEmailAddress, type AccountSummary, type BrokeredProvider, type ReturnTarget, type SignInIntent } from "./contract.generated";
+import { emailLinkContinueUrl, rememberLinkAction, rememberSignInEmail } from "./email-link";
 import type { CleanSpaceApi } from "./api";
 import { CLEAN_SPACE } from "./config";
 import { getCleanSpaceFirebase } from "./firebase";
 import { beginBrokeredSignIn, ProviderSignInError } from "./oauth";
-import { sessionStore } from "./storage";
+import { localStore, sessionStore } from "./storage";
 
 export interface CleanSpaceUser {
   uid: string;
@@ -190,4 +192,32 @@ export async function startBrokeredSignIn(provider: BrokeredProvider, options: {
     { store: sessionStore(), now: Date.now },
   );
   window.location.assign(url);
+}
+
+/** Has Firebase email a sign-in link to `email` (the page's language for the email); remembers the address here. */
+export async function sendEmailSignInLink(email: string, intent: "signin" | "reauth", returnTo: ReturnTarget): Promise<string> {
+  const address = canonicalEmail(email);
+  if (!isEmailAddress(address)) throw new Error("invalid-email");
+  const [{ auth }, { sendSignInLinkToEmail }] = await Promise.all([getCleanSpaceFirebase(), import("firebase/auth")]);
+  auth.languageCode = returnTo.lang;
+  await sendSignInLinkToEmail(auth, address, { url: emailLinkContinueUrl(window.location.origin, intent, returnTo), handleCodeInApp: true });
+  rememberSignInEmail(localStore(), address, Date.now());
+  return address;
+}
+
+/**
+ * Adds the email method to the signed-in account: the service binds the link to this account and sign-in first
+ * (beginEmailLink, which needs a recent sign-in), then Firebase emails it. It completes when opened in this browser.
+ */
+export async function sendEmailLinkForAccount(api: Pick<CleanSpaceApi, "beginEmailLink">, email: string, returnTo: ReturnTarget): Promise<string> {
+  const address = canonicalEmail(email);
+  if (!isEmailAddress(address)) throw new Error("invalid-email");
+  const [{ auth }, { sendSignInLinkToEmail }] = await Promise.all([getCleanSpaceFirebase(), import("firebase/auth")]);
+  const user = auth.currentUser;
+  if (!user) throw new ProviderSignInError("signed-out");
+  const { actionID } = await api.beginEmailLink({ email: address, lang: returnTo.lang });
+  rememberLinkAction(localStore(), actionID, address, user.uid, Date.now());
+  auth.languageCode = returnTo.lang;
+  await sendSignInLinkToEmail(auth, address, { url: emailLinkContinueUrl(window.location.origin, "link", returnTo, actionID), handleCodeInApp: true });
+  return address;
 }

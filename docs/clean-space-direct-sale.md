@@ -21,6 +21,7 @@ buyer over to the central checkout.
 | Product page | `/apps/clean-space/`, `/ko/apps/clean-space/` | The app; with the release switch, also the website edition: its download, the 364 days Unlock (price, access period, no renewal, refund), the basic features and what the Unlock adds, the policies, and a button to the account page (`src/lib/clean-space/channel-copy.ts`) |
 | Account | `/apps/clean-space/account/` (+ `/ko/`) | Sign-in, the access period, the purchase (hands over to the checkout), purchases and refund requests (email), sign-in methods (link, remove), contact email, Macs signed in, sign-out, deletion; finishes a payment the checkout kept (`?resume=`) |
 | Sign-in callback | `/apps/clean-space/auth/callback/` (+ `/ko/`) | Kakao and Naver return here; the code is exchanged once and the browser goes on to an allow-listed page |
+| Email link | `/apps/clean-space/auth/email/` (+ `/ko/`) | Where a "Continue with email" link lands (the continue URL given to Firebase): its query leaves the address bar, stays in this tab only, and the service redeems the code; then an allow-listed page |
 | Activation | `/apps/clean-space/activate/` (+ `/ko/`) | Approves Clean Space on a Mac: shows the request's code, approves only on an explicit click |
 | Checkout | `/checkout/clean-space/` (`success/`, `fail/`) (+ `/ko/`) | The central checkout's pages for Clean Space (README, "The central checkout") |
 
@@ -39,7 +40,9 @@ the body's SHA-256 and fails on any edit. To take a new contract version: in mac
 `node services/licensing/contract/scripts/export.mjs <this repo>/src/lib/clean-space/contract.generated.ts`, then adapt
 the pages, test and commit both.
 
-The pinned copy is still the one of 2026-11-07 (sha256 `052af3e0…`). The contract's source has since gained the shared
+Update (2026-11-09): the pinned copy is now contract v1 sha256 `01c5c418…` (the shared checkout, test payments in
+the offer, and "Continue with email": `beginEmailLink`, `completeEmailSignIn`, `PAGE_PATH.emailLink`, provider
+`email`); the rest of this paragraph records the earlier state. The pinned copy was then the one of 2026-11-07 (sha256 `052af3e0…`). The contract's source has since gained the shared
 checkout (mac-get-space commit `5b1ccfe`, sha256 `b80bcedc…`: `beginCheckout`, `CHECKOUT_CALLABLE`, `CHECKOUT_ERROR`,
 the removal of the browser `createOrder`, `failOrder`, `preparePaymentResume` and `requestRefund`). Exporting it here
 works, but the copy then fails `tsc` in this repository, which compiles without `strictNullChecks`: four early returns
@@ -123,6 +126,24 @@ The account, sign-in callback and activation pages (`src/lib/clean-space/sensiti
   belongs to another account), then `linkProvider({ provider: "google", googleIdToken })` so the service verifies and
   records it; if the service refuses, the page unlinks Google again. Removing Google: the service first, then this
   browser's copy. Kakao and Naver are linked through the callback with intent `link`.
+- **Continue with email** (owner's decision, 2026-11-09; Chord to MIDI's "이메일로 계속하기"): a passwordless email
+  link, a sign-in method of its own. The panel asks for the address and Firebase emails a link
+  (`sendSignInLinkToEmail`, `handleCodeInApp`) whose continue URL is the email link page above with `intent` and
+  `return` (and `action` for a link); this browser remembers the address (localStorage, a day). The landing page takes
+  the query (Firebase's one-time `oobCode` with it) out of the address bar at once (`takeQueryOnce`), keeps it in this
+  tab's sessionStorage for an hour, and has the service redeem it (`completeEmailSignIn`), which answers with its own
+  custom token; Firebase's own email-link session is never used. A link opened in another browser asks for the address
+  it was sent to; one opened while an account is signed in asks before switching. The address signs in only to its own
+  email account (a new address makes a new account): never to an account whose Google, Kakao or Naver email or whose
+  contact email it is. Linking it (account page, recent sign-in): the service binds the link to this account and sign-in
+  first (`beginEmailLink`), and it completes only when opened in this browser while that account is signed in. Removing
+  it needs another method (the contact email is not one). An email-only account proves itself again with a link to its
+  own address (intent `reauth`). The contact email stays the receipt and support address with its 6-digit code; its
+  field is prefilled with the sign-in address, which still needs the code.
+- In the Clean Space Firebase project for the email link (the owner's console): Authentication → Sign-in method →
+  Email/Password on with **Email link (passwordless sign-in)**; Settings → User account linking → **Create multiple
+  accounts for each identity provider**; `cultureand.tech` in the authorized domains (the continue URL's host); the
+  service's `AUTH_WEB_API_KEY` set to the web app's API key (mac-get-space `services/licensing/docs/configuration.md`).
 - Changing sign-in methods and deleting the account need a sign-in within 5 minutes (checked here and by the
   service); the page offers "Sign in again" with a method the account still has.
 
