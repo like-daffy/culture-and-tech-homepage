@@ -218,7 +218,7 @@ switch while `ALL_IN_ONE_SALES_OPEN` is false. Closed, its pages say so and the 
 portal's All-in-one page and published policies live, `services/commerce` deployed, and the portal project's web app
 settings for cultureand.tech (`NEXT_PUBLIC_ALL_IN_ONE_FIREBASE_*`, `NEXT_PUBLIC_ALL_IN_ONE_RECAPTCHA_SITE_KEY`: an App
 Check key whose domains list cultureand.tech). Its copy is `ALL_IN_ONE_COPY` in `src/lib/checkout/product-copy.ts`;
-`ALL_IN_ONE_ALREADY_OWNED_CODE` in `products.ts` is provisional until `services/commerce` fixes it.
+`ALL_IN_ONE_ALREADY_OWNED_CODE` in `products.ts` is `ALREADY_ACTIVE`, `services/commerce`'s same-SKU code.
 
 ### Clean Space
 

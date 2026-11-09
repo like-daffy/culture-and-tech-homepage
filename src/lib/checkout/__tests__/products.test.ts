@@ -181,7 +181,7 @@ describe("All-in-one's checkout", () => {
   it("open, starts and resumes on the portal's All-in-one page, in the portal's project and region", async () => {
     const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT: "on" });
     const product = built["all-in-one"] as OpenProduct;
-    expect(product).toMatchObject({ region: "asia-northeast3", startPage: "purchase", passDays: 364, footerPages: ["terms", "refund", "privacy"] });
+    expect(product).toMatchObject({ region: "asia-northeast3", startPage: "purchase", passDays: 364, alreadyOwnedCode: "ALREADY_ACTIVE", footerPages: ["terms", "refund", "privacy"] });
     expect(productUrl(product, "en", "purchase")).toBe("https://portal.cultureand.tech/products/all-in-one");
     expect(productUrl(product, "ko", "terms")).toBe("https://portal.cultureand.tech/ko/terms");
     expect(productResumeUrl(product, "ko", RESUME)).toBe(`https://portal.cultureand.tech/ko/products/all-in-one?resume=${RESUME}`);

@@ -225,10 +225,11 @@ const ALL_IN_ONE_NAME: ProductIdentity["name"] = {
 };
 
 /**
- * Its server's code for a second All-in-one while one is active (the same-SKU rule, IDENTITY.md section 9).
- * Provisional until services/commerce (t1b) fixes it; an individual pass never triggers it (overlap is allowed).
+ * Its server's code for a second All-in-one while one hasn't ended (the same-SKU rule, IDENTITY.md section 9):
+ * services/commerce CODE.alreadyActive (6ec1abf), the shared checkout's APP_ERROR value. An individual pass never
+ * triggers it (overlap is allowed).
  */
-export const ALL_IN_ONE_ALREADY_OWNED_CODE = "ACTIVE_PASS";
+export const ALL_IN_ONE_ALREADY_OWNED_CODE = "ALREADY_ACTIVE";
 
 /**
  * All-in-one — 364 Days, once its owner opens the sales: the central commerce codebase (services/commerce, t1b) in the
