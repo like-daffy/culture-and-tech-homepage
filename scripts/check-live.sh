@@ -9,6 +9,16 @@ set -u
 host="$1"; version="${2:-}"; fail=0
 code() { curl -s -o /dev/null -m 20 -w '%{http_code}' "$1"; }
 expect() { local got; got=$(code "$2"); if [ "$got" = "$1" ]; then echo "ok   $1 $2"; else echo "FAIL $got (want $1) $2"; fail=1; fi; }
+# All-in-one's checkout stays closed until its owner opens its sales (ALL_IN_ONE_SALES_OPEN in
+# scripts/check-checkout-config.mjs): its pages say so, and publish nothing of the offer (its price or terms).
+if ! grep -q '^const ALL_IN_ONE_SALES_OPEN = true;' "$(dirname "$0")/check-checkout-config.mjs"; then
+  for p in checkout/all-in-one/ checkout/all-in-one/success/ checkout/all-in-one/fail/ \
+           ko/checkout/all-in-one/ ko/checkout/all-in-one/success/ ko/checkout/all-in-one/fail/; do
+    body=$(curl -s -m 20 "https://$host/$p")
+    if echo "$body" | grep -q 'data-checkout="closed"' && ! echo "$body" | grep -qE '13,200|9\.99|every current'; then echo "ok   https://$host/$p is closed"
+    else echo "FAIL https://$host/$p isn't closed, or names the offer"; fail=1; fi
+  done
+fi
 for p in index terms privacy privacy-consent; do expect 200 "https://$host/culture/thai-learn/$p.html"; done
 expect 200 "https://$host/culture/thai-learn/styles.css"
 expect 200 "https://$host/culture/clean-space/privacy.html"
@@ -70,6 +80,7 @@ checkout_pages() {
 checkout_pages chord-to-midi
 checkout_pages dj-duplicate-guard
 checkout_pages clean-space
+checkout_pages all-in-one
 # DJ Duplicate Guard's checkout stays closed until its owner opens Expert's sales (DJ_DUPLICATE_GUARD_SALES_OPEN in
 # scripts/check-checkout-config.mjs): its pages say so, and publish nothing of the offer.
 if ! grep -q '^const DJ_DUPLICATE_GUARD_SALES_OPEN = true;' "$(dirname "$0")/check-checkout-config.mjs"; then
@@ -111,24 +122,16 @@ for p in privacy support; do
   if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in english-thai-learn/$p.html"; fail=1; fi
   if echo "$body" | grep -q "<link rel=\"canonical\" href=\"https://cultureand.tech/culture/english-thai-learn/$p.html\">"; then echo "ok   english-thai-learn/$p.html canonical"; else echo "FAIL english-thai-learn/$p.html canonical"; fail=1; fi
 done
-# Clean Space's account, sign-in callback, email link and activation pages (docs/clean-space-direct-sale.md; its checkout pages are
-# the central checkout's, above): every page in both languages is 200, never stored, never framed, out of search
-# results, sends no referrer beyond the origin, and loads no font, monitoring script or embed.
-for p in apps/clean-space/account/ apps/clean-space/auth/callback/ apps/clean-space/auth/email/ apps/clean-space/activate/; do
-  for l in "" ko/; do
-    url="https://$host/$l$p"
-    headers=$(curl -s -o /dev/null -D - -m 20 "$url" | tr -d '\r')
-    status=$(echo "$headers" | awk 'NR==1{print $2}')
-    hval() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
-    if [ "$status" != 200 ]; then echo "FAIL $status (want 200) $url"; fail=1; continue; fi
-    if [ "$(hval cache-control:)" = no-store ] && [ "$(hval x-frame-options:)" = DENY ] && [ "$(hval referrer-policy:)" = strict-origin ] \
-       && hval content-security-policy: | grep -q "frame-ancestors 'none'" && hval x-robots-tag: | grep -q noindex; then
-      echo "ok   200 $url (no-store, no framing, origin-only referrer, noindex)"
-    else echo "FAIL headers of $url"; fail=1; fi
-    body=$(curl -s -m 20 "$url")
-    if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL $url loads another host"; fail=1; fi
-    if ! echo "$body" | grep -q '<meta name="robots" content="noindex, nofollow"'; then echo "FAIL $url has no noindex"; fail=1; fi
-  done
+# Clean Space's account, sign-in and activation pages moved to the shared portal (mac-get-space 99437af): the old
+# addresses send installed apps and bookmarks there with a 301 (the browser keeps an activation's #request fragment).
+movedto() { local got; got=$(curl -s -o /dev/null -m 20 -w '%{http_code} %{redirect_url}' "https://$host$1")
+  if [ "$got" = "301 $2" ]; then echo "ok   301 $1 -> $2"; else echo "FAIL $got (want 301 $2) https://$host$1"; fail=1; fi; }
+for l in "" ko/; do
+  portal="https://portal.cultureand.tech/${l}products/clean-space"; portal="${portal%/}"
+  movedto "/${l}apps/clean-space/account/" "$portal"
+  movedto "/${l}apps/clean-space/activate/" "$portal/activate"
+  movedto "/${l}apps/clean-space/auth/callback/" "$portal"
+  movedto "/${l}apps/clean-space/auth/email/" "$portal"
 done
 if [ -n "$version" ]; then
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/privacy.html")

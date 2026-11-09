@@ -1,7 +1,7 @@
 // GENERATED FILE: a pinned copy of the Clean Space licensing contract. Do not edit.
 // Source: mac-get-space services/licensing/contract/src/index.ts (node scripts/export.mjs <this file>).
 // contract-version: 1
-// sha256: 01c5c41841d0945662824b7fd08554e1f791a520197df81d1fbd8e20bd9f30c8
+// sha256: 3febe84b59da3beac2176927b4176f69ddecc713e7eaa4a0be45f7d31b5fe9c1
 // Clean Space licensing contract, version 1 (docs/plans/364-days-option.md §5.2, §7, §8).
 //
 // The one description of what the Clean Space licensing service, the cultureand.tech pages and the website build of the
@@ -36,6 +36,12 @@ export const DEFAULT_FUNCTIONS_REGION = 'asia-northeast3' as const;
 
 /** The exact origin of the pages that sell, sign in and approve (plan §2.1). */
 export const SITE_ORIGIN = 'https://cultureand.tech' as const;
+
+/**
+ * The shared account portal (owner's choice A, 2026-11-09; docs/15): Clean Space's account and Mac-approval pages live
+ * there, under /products/clean-space, in clean URLs without a trailing slash. Product and checkout stay on SITE_ORIGIN.
+ */
+export const PORTAL_ORIGIN = 'https://portal.cultureand.tech' as const;
 
 // ---- The one product (plan §2, §7.1) ----
 
@@ -520,7 +526,7 @@ export interface BeginActivationResponse {
   contractVersion: ContractVersion;
   requestID: string;
   confirmationCode: string;
-  /** The fixed activation page with only the request id, in the fragment: https://cultureand.tech/[ko/]apps/clean-space/activate/#request=… */
+  /** The fixed activation page with only the request id, in the fragment: https://portal.cultureand.tech/[ko/]products/clean-space/activate#request=… */
   activationURL: string;
   expiresAt: number;
   pollIntervalSeconds: number;
@@ -645,6 +651,12 @@ export const PAGE_PATH: Readonly<Record<ReturnRoute | 'callback' | 'emailLink' |
   /** Where an email sign-in link lands (the continue URL given to Firebase, with its own query; see EMAIL_LINK). */
   emailLink: { en: '/apps/clean-space/auth/email/', ko: '/ko/apps/clean-space/auth/email/' },
   activate: { en: '/apps/clean-space/activate/', ko: '/ko/apps/clean-space/activate/' },
+};
+
+/** The portal's Clean Space pages (on PORTAL_ORIGIN). The activation page keeps the fragment `#request=<id>`. */
+export const PORTAL_PAGE_PATH: Readonly<Record<'account' | 'activate', Readonly<Record<PageLang, string>>>> = {
+  account: { en: '/products/clean-space', ko: '/ko/products/clean-space' },
+  activate: { en: '/products/clean-space/activate', ko: '/ko/products/clean-space/activate' },
 };
 
 /** sign in (or sign up), add a provider to the signed-in account, or prove the account again. */

@@ -26,7 +26,7 @@ describe("the product page's website edition", () => {
     expect(page.content.ko.faq.at(-1)?.question).toBe("지금 받을 수 있나요?");
   });
 
-  it("shows what a buyer needs before paying, with the buy button to the account page and the three policies", () => {
+  it("shows what a buyer needs before paying, with the buy button to the account page on the portal and the three policies", () => {
     const released = withWebsiteChannel(APPS["clean-space"], DOWNLOAD);
     for (const language of ["en", "ko"] as const) {
       const sections = released.content[language].sections;
@@ -48,7 +48,7 @@ describe("the product page's website edition", () => {
         { label: language === "en" ? "Download for Mac" : "Mac용 다운로드", href: DOWNLOAD, download: true },
         {
           label: language === "en" ? "Buy the 364 days Unlock" : "364일 잠금 해제 구매하기",
-          href: language === "ko" ? "/ko/apps/clean-space/account/" : "/apps/clean-space/account/",
+          href: language === "ko" ? "https://portal.cultureand.tech/ko/products/clean-space" : "https://portal.cultureand.tech/products/clean-space",
         },
       ]);
       expect(Object.values(channel?.linkLine?.links ?? {}).map((link) => link.href)).toEqual([
@@ -80,7 +80,7 @@ describe("the product page's website edition", () => {
     const released = withWebsiteChannel(APPS["clean-space"], "");
     for (const language of ["en", "ko"] as const) {
       expect(released.content[language].sections.at(-2)?.links?.map((link) => link.href)).toEqual([
-        language === "ko" ? "/ko/apps/clean-space/account/" : "/apps/clean-space/account/",
+        language === "ko" ? "https://portal.cultureand.tech/ko/products/clean-space" : "https://portal.cultureand.tech/products/clean-space",
       ]);
       expect(released.content[language].faq.at(-1)).toEqual(APPS["clean-space"].content[language].faq.at(-1));
     }

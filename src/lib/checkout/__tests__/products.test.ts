@@ -1,10 +1,10 @@
 // Clean Space as the central checkout's third product (products.ts, product-copy.ts): closed unless a build opens it,
 // its pages on this site (its legal pages once for both languages), and the other products' links unchanged.
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { PAGE_PATH } from "@/lib/clean-space/contract.generated";
+import { PAGE_PATH, PORTAL_ORIGIN, PORTAL_PAGE_PATH } from "@/lib/clean-space/contract.generated";
 import { PURCHASE_COPY } from "@/lib/clean-space/copy";
-import { ALREADY_OWNED_CODE, CLEAN_SPACE_PAGES } from "@/lib/clean-space/site";
-import { CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY } from "../product-copy";
+import { ALREADY_OWNED_CODE, CLEAN_SPACE_PAGES, CLEAN_SPACE_PORTAL } from "@/lib/clean-space/site";
+import { ALL_IN_ONE_COPY, CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY } from "../product-copy";
 import { checkoutPath, PRODUCTS, productResumeUrl, productUrl, type OpenProduct } from "../products";
 
 const RESUME = "R".repeat(43);
@@ -48,14 +48,14 @@ describe("Clean Space's checkout, closed", () => {
 });
 
 describe("Clean Space's checkout, open", () => {
-  it("links its account page (start, resume) and its home page in the checkout's language, and its policies once", async () => {
+  it("links its account page on the portal (start, resume), its home page here, and its policies once", async () => {
     const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT: "on" });
     const product = built["clean-space"] as OpenProduct;
     expect(product.enabled).toBe(true);
     expect(product).toMatchObject({
       region: "asia-northeast3",
       startPage: "account",
-      resumePath: "apps/clean-space/account/",
+      resumePath: { origin: "https://portal.cultureand.tech", path: "products/clean-space" },
       footerPages: ["terms", "refund", "privacy"],
       storageKey: "cultureandtech.checkout.clean-space",
       alreadyOwnedCode: "ALREADY_ACTIVE",
@@ -64,16 +64,16 @@ describe("Clean Space's checkout, open", () => {
       paypalDescription:
         "Digital service, no shipping: the 364 days Unlock of the Clean Space Mac app for the buyer's account for 364 days from payment. One payment; it doesn't renew.",
     });
-    expect(productUrl(product, "en", "account")).toBe("https://cultureand.tech/apps/clean-space/account/");
-    expect(productUrl(product, "ko", "account")).toBe("https://cultureand.tech/ko/apps/clean-space/account/");
+    expect(productUrl(product, "en", "account")).toBe("https://portal.cultureand.tech/products/clean-space");
+    expect(productUrl(product, "ko", "account")).toBe("https://portal.cultureand.tech/ko/products/clean-space");
     expect(productUrl(product, "ko", "home")).toBe("https://cultureand.tech/ko/apps/clean-space/");
     for (const lang of ["en", "ko"] as const) {
       expect(productUrl(product, lang, "terms")).toBe("https://cultureand.tech/culture/clean-space/direct-terms.html");
       expect(productUrl(product, lang, "refund")).toBe("https://cultureand.tech/culture/clean-space/direct-refunds.html");
       expect(productUrl(product, lang, "privacy")).toBe("https://cultureand.tech/culture/clean-space/direct-privacy.html");
     }
-    expect(productResumeUrl(product, "ko", RESUME)).toBe(`https://cultureand.tech/ko/apps/clean-space/account/?resume=${RESUME}`);
-    expect(productResumeUrl(product, "en", RESUME)).toBe(`https://cultureand.tech/apps/clean-space/account/?resume=${RESUME}`);
+    expect(productResumeUrl(product, "ko", RESUME)).toBe(`https://portal.cultureand.tech/ko/products/clean-space?resume=${RESUME}`);
+    expect(productResumeUrl(product, "en", RESUME)).toBe(`https://portal.cultureand.tech/products/clean-space?resume=${RESUME}`);
   });
 
   it("uses its own Firebase settings, and its emulator suite in a test build", async () => {
@@ -99,7 +99,10 @@ describe("Clean Space's checkout, open", () => {
     const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT: "on" });
     const product = built["clean-space"];
     for (const lang of ["en", "ko"] as const) expect(checkoutPath(product, lang)).toBe(PAGE_PATH.checkout[lang]);
-    expect(`/${CLEAN_SPACE_PAGES.account}`).toBe(PAGE_PATH.account.en);
+    expect(CLEAN_SPACE_PORTAL.origin).toBe(PORTAL_ORIGIN);
+    for (const lang of ["en", "ko"] as const) {
+      expect(productUrl(product, lang, "account")).toBe(`${PORTAL_ORIGIN}${PORTAL_PAGE_PATH.account[lang]}`);
+    }
     expect(`/${CLEAN_SPACE_PAGES.home}`).toBe(PAGE_PATH.product.en);
     expect(ALREADY_OWNED_CODE).toBe((product as OpenProduct).alreadyOwnedCode);
   });
@@ -152,5 +155,46 @@ describe("Clean Space's checkout wording", () => {
     expect(CLEAN_SPACE_COPY.ko.testKeys).toBe(
       "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 테스트 결제로 받은 이용 기간은 정식 판매가 시작되면 끝납니다.",
     );
+  });
+});
+
+describe("All-in-one's checkout", () => {
+  it("is closed in a build without its switch: its name and the portal, nothing of its offer", async () => {
+    const product = PRODUCTS["all-in-one"];
+    expect(product).toEqual({
+      slug: "all-in-one",
+      enabled: false,
+      origin: "https://portal.cultureand.tech",
+      name: {
+        en: { productName: "All-in-one — 364 Days", backToProduct: "Back to your Culture & Tech account" },
+        ko: { productName: "All-in-one — 364 Days", backToProduct: "컬처앤테크 계정으로 돌아가기" },
+      },
+    });
+    expect(productUrl(product, "ko", "home")).toBe("https://portal.cultureand.tech/ko/");
+    expect(checkoutPath(product, "en")).toBe("/checkout/all-in-one/");
+    for (const value of ["", "1", "true", "ON"]) {
+      const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT: value });
+      expect(built["all-in-one"].enabled).toBe(false);
+    }
+  });
+
+  it("open, starts and resumes on the portal's All-in-one page, in the portal's project and region", async () => {
+    const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT: "on" });
+    const product = built["all-in-one"] as OpenProduct;
+    expect(product).toMatchObject({ region: "asia-northeast3", startPage: "purchase", passDays: 364, footerPages: ["terms", "refund", "privacy"] });
+    expect(productUrl(product, "en", "purchase")).toBe("https://portal.cultureand.tech/products/all-in-one");
+    expect(productUrl(product, "ko", "terms")).toBe("https://portal.cultureand.tech/ko/terms");
+    expect(productResumeUrl(product, "ko", RESUME)).toBe(`https://portal.cultureand.tech/ko/products/all-in-one?resume=${RESUME}`);
+  });
+
+  it("keeps the English name in both languages and states the owner's terms", () => {
+    for (const lang of ["en", "ko"] as const) {
+      expect(ALL_IN_ONE_COPY[lang].productName).toBe("All-in-one — 364 Days");
+      expect(ALL_IN_ONE_COPY[lang].period).toBe(CLEAN_SPACE_COPY[lang].period);
+      expect(ALL_IN_ONE_COPY[lang].priceTerms).toBe(CHORD_TO_MIDI_COPY[lang].priceTerms);
+      expect(JSON.stringify(ALL_IN_ONE_COPY[lang])).not.toMatch(/올인원|연장|renew your|extend/);
+    }
+    expect(ALL_IN_ONE_COPY.ko.includes.join(" ")).toContain("기존 구매 금액은 자동으로 차감되지 않으며");
+    expect(ALL_IN_ONE_COPY.en.includes.at(-1)).toBe(CHORD_TO_MIDI_COPY.en.includes.at(-1));
   });
 });

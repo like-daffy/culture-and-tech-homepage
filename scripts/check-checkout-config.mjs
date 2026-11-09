@@ -22,6 +22,14 @@ const DJ_DUPLICATE_GUARD_SALES_OPEN = false;
  */
 const CLEAN_SPACE_SALES_OPEN = false;
 
+/**
+ * All-in-one — 364 Days isn't on sale yet: a deployment refuses to open its checkout. Its owner opens it (on Toss's test
+ * keys first, for Toss's review) by changing this line in a commit of its own, once the portal's All-in-one page, its
+ * published policies (portal.cultureand.tech/terms, /refund, /privacy) and the commerce callables (services/commerce)
+ * are live; the deployment then needs the portal project's web app settings for cultureand.tech.
+ */
+const ALL_IN_ONE_SALES_OPEN = false;
+
 /** Clean Space's Terms of Service, Refund Policy and Privacy Policy, which its checkout links (src/lib/clean-space/site.ts). */
 const CLEAN_SPACE_POLICIES = [
   "/culture/clean-space/direct-terms.html",
@@ -106,6 +114,27 @@ refuseTestSettings("NEXT_PUBLIC_CLEAN_SPACE", "https://cultureand.tech", {
   name: "NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=emulator",
 });
 
+// All-in-one: closed until its owner opens its sales.
+const aioSwitch = value("NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT");
+if (!ALL_IN_ONE_SALES_OPEN) {
+  if (aioSwitch) {
+    problems.push(
+      "NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT is set: All-in-one's sales are closed (ALL_IN_ONE_SALES_OPEN), so its checkout stays closed; remove it"
+    );
+  }
+} else {
+  if (aioSwitch !== "on") problems.push("NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT isn't on: its sales are open, so open its checkout");
+  requireSettings("NEXT_PUBLIC_ALL_IN_ONE", "the portal project's web app settings for cultureand.tech", "cultureand-tech-web");
+}
+refuseTestSettings("NEXT_PUBLIC_ALL_IN_ONE", "https://portal.cultureand.tech", {
+  on: value("NEXT_PUBLIC_ALL_IN_ONE_EMULATORS") !== "",
+  name: "NEXT_PUBLIC_ALL_IN_ONE_EMULATORS",
+});
+const portalOrigin = value("NEXT_PUBLIC_PORTAL_ORIGIN");
+if (portalOrigin && portalOrigin !== "https://portal.cultureand.tech") {
+  problems.push("NEXT_PUBLIC_PORTAL_ORIGIN is set to another site: remove it (accounts link to https://portal.cultureand.tech)");
+}
+
 if (problems.length > 0) {
   console.error("The central checkout isn't configured for a deployment:");
   for (const problem of problems) console.error(`  - ${problem}`);
@@ -116,6 +145,11 @@ console.log(
   DJ_DUPLICATE_GUARD_SALES_OPEN
     ? "DJ Duplicate Guard's checkout: open, with the production project's web app settings."
     : "DJ Duplicate Guard's checkout: closed (its sales are closed)."
+);
+console.log(
+  ALL_IN_ONE_SALES_OPEN
+    ? "All-in-one's checkout: open, with the portal project's web app settings."
+    : "All-in-one's checkout: closed (its sales are closed)."
 );
 console.log(
   CLEAN_SPACE_SALES_OPEN

@@ -8,10 +8,21 @@
 /** Clean Space has no site of its own: its pages are on cultureand.tech (another origin only in test builds). */
 export const CLEAN_SPACE_SITE_ORIGIN = "https://cultureand.tech";
 
-/** Its pages below the language's root ("" or "/ko"), with their trailing slash (the contract's PAGE_PATH has them too). */
+import { PORTAL_ORIGIN, PORTAL_PAGE_PATH } from "./contract.generated";
+
+/** Its product page below the language's root ("" or "/ko"), with its trailing slash (the contract's PAGE_PATH too). */
 export const CLEAN_SPACE_PAGES = {
   home: "apps/clean-space/",
-  account: "apps/clean-space/account/",
+} as const;
+
+/**
+ * Its account page is on the shared portal (contract PORTAL_ORIGIN and PORTAL_PAGE_PATH, mac-get-space 99437af): where
+ * its buyers sign in, begin a checkout and finish a payment kept for them. Product page and checkout stay here.
+ */
+export const CLEAN_SPACE_PORTAL = {
+  origin: process.env.NEXT_PUBLIC_PORTAL_ORIGIN || PORTAL_ORIGIN,
+  /** Below the language's root on the portal, without a trailing slash. */
+  account: PORTAL_PAGE_PATH.account.en.replace(/^\//, ""),
 } as const;
 
 /**

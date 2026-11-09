@@ -330,3 +330,101 @@ export const CLEAN_SPACE_COPY: Record<Lang, ProductCopy> = {
   },
 };
 
+
+/** While All-in-one's currencies are on Toss's test keys (before the launch, for Toss's review). */
+const ALL_IN_ONE_TEST_PAYMENTS = {
+  en: "Test payment: payments run in Toss Payments' test environment for now, and nothing is actually charged. Access received through a test payment ends when sales start for real.",
+  ko: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 테스트 결제로 받은 이용 권한은 정식 판매가 시작되면 끝납니다.",
+};
+
+/**
+ * All-in-one — 364 Days: the owner's confirmed terms (2026-11-09): one payment, no renewal, 364 days from approval;
+ * every current service and every service launched while it is active, with its end unchanged; individual passes keep
+ * their own dates, access while either is active, nothing deducted or converted; a refund ends All-in-one only; full
+ * refund within 7 days. The name stays in English in both languages. Period and price-terms wording follows Chord to
+ * MIDI's Toss-reviewed text. Which services it covers, and what it gives in each, is shown on the portal (terms
+ * article 2), not claimed here. A build carries it only when it opens that checkout (products.ts).
+ */
+export const ALL_IN_ONE_COPY: Record<Lang, ProductCopy> = {
+  en: {
+    pageTitle: "Checkout: All-in-one — 364 Days | Culture & Tech",
+    productName: "All-in-one — 364 Days",
+    seller:
+      "Sold by Culture & Tech, which runs every Culture & Tech service. You pay here, on cultureand.tech, Culture & Tech's checkout; All-in-one applies to your Culture & Tech account.",
+    account: "For the Culture & Tech account whose contact email is {email}.",
+    receiptEmail: "Receipt and contact email: {email}",
+    notYou: "Not your account? Back to your Culture & Tech account",
+    lead: "One payment gives your Culture & Tech account every current Culture & Tech service, and every new one launched while it is active, for 364 days.",
+    priceTerms: "It doesn't renew, and nothing is charged again.",
+    period:
+      "Access period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. Your account page shows the exact start and end.",
+    renewal:
+      "After it ends, you can buy another 364 days yourself, at the price shown then. Its end never moves: a service added while it is active is included until the same end.",
+    includes: [
+      "Every service included now, as your account page lists it with what All-in-one gives in each, for 364 days.",
+      "Passes you already bought for single services keep their original end dates, and you have access while either is active. What you paid for them isn't deducted, and they aren't converted into All-in-one.",
+      "If All-in-one is refunded, only All-in-one ends. Valid individual passes continue.",
+      "Full refund on request within 7 days of payment.",
+    ],
+    testMode: ALL_IN_ONE_TEST_PAYMENTS.en,
+    testKeys: ALL_IN_ONE_TEST_PAYMENTS.en,
+    currencyNotes: { KRW: "For Korean cards and easy-pay services. VAT included.", USD: "Pay with PayPal." },
+    salesClosed: "All-in-one isn't on sale now. Nothing was charged.",
+    already: "This account has All-in-one until its access period ends. Another can be bought after that.",
+    accountDeleted: "This account is being deleted, so it cannot buy All-in-one.",
+    emailNotConfirmed: "Confirm the contact email of your Culture & Tech account before paying.",
+    accountUnavailable: "This Culture & Tech account is not available.",
+    noCheckout: "Start your purchase on the All-in-one page of your Culture & Tech account: sign in there, then continue to the checkout.",
+    ended: "This checkout has ended, or was opened in another tab. Start again from the All-in-one page of your Culture & Tech account.",
+    backToProduct: "Back to your Culture & Tech account",
+    successBody: "All-in-one is on your Culture & Tech account for 364 days. Sign in to each service with this account to use it.",
+    passTerm: "All-in-one — 364 Days: from {start} to {end}. It doesn't renew.",
+    alreadyOwned:
+      "This account already has an All-in-one access period that hasn't ended, so this payment was not made. Nothing was charged.",
+    accountDeletedResult:
+      "The account was deleted while the payment was being confirmed, so All-in-one could not be added to it.",
+    finishOnProduct:
+      "This tab no longer holds the checkout. To finish the payment, sign in on the All-in-one page of your Culture & Tech account with the account you paid with.",
+    finishButton: "Finish on your Culture & Tech account",
+  },
+  ko: {
+    pageTitle: "결제: All-in-one — 364 Days | 컬처앤테크",
+    productName: "All-in-one — 364 Days",
+    seller:
+      "컬처앤테크의 모든 서비스를 운영하는 컬처앤테크가 판매합니다. 결제는 이곳, 컬처앤테크의 결제 페이지(cultureand.tech)에서 진행되며, All-in-one은 컬처앤테크 계정에 적용됩니다.",
+    account: "연락용 이메일이 {email}인 컬처앤테크 계정에 적용됩니다.",
+    receiptEmail: "영수증 및 연락용 이메일: {email}",
+    notYou: "내 계정이 아닌가요? 컬처앤테크 계정으로 돌아가기",
+    lead: "한 번 결제하면 364일 동안, 컬처앤테크 계정으로 현재의 모든 컬처앤테크 서비스와 이용 기간 중 새로 출시되는 서비스를 이용할 수 있습니다.",
+    priceTerms: "자동으로 갱신되거나 다시 결제되지 않습니다.",
+    period:
+      "이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 정확한 시작과 만료 일시는 계정 페이지에 표시됩니다.",
+    renewal:
+      "이용 기간이 끝난 뒤에는 그때 표시되는 가격으로 직접 다시 구매할 수 있습니다. 종료일은 바뀌지 않으며, 이용 기간 중 추가된 서비스도 같은 종료일까지 포함됩니다.",
+    includes: [
+      "현재 포함된 모든 서비스를 364일 동안 이용할 수 있습니다. 포함된 서비스와 각 서비스에서 All-in-one으로 받는 혜택은 계정 페이지에 표시됩니다.",
+      "이미 구매한 개별 서비스 이용권은 원래 종료일을 그대로 유지하며, 둘 중 하나라도 유효하면 이용할 수 있습니다. 기존 구매 금액은 자동으로 차감되지 않으며, 개별 이용권이 All-in-one으로 전환되지 않습니다.",
+      "All-in-one을 환불하면 All-in-one만 종료되며, 유효한 개별 이용권은 계속 이용할 수 있습니다.",
+      "결제 후 7일 이내에 요청하면 전액 환불됩니다.",
+    ],
+    testMode: ALL_IN_ONE_TEST_PAYMENTS.ko,
+    testKeys: ALL_IN_ONE_TEST_PAYMENTS.ko,
+    currencyNotes: { KRW: "국내 카드·간편결제로 결제, 부가세 포함", USD: "PayPal로 결제" },
+    salesClosed: "지금은 All-in-one을 판매하지 않습니다. 청구된 금액은 없습니다.",
+    already: "이 계정에는 이용 기간이 남은 All-in-one이 있습니다. 다음 이용 기간은 지금 기간이 끝난 뒤에 구매할 수 있습니다.",
+    accountDeleted: "삭제 중인 계정이라 All-in-one을 구매할 수 없습니다.",
+    emailNotConfirmed: "결제하기 전에 컬처앤테크 계정의 연락용 이메일을 확인해 주세요.",
+    accountUnavailable: "이 컬처앤테크 계정은 사용할 수 없습니다.",
+    noCheckout: "컬처앤테크 계정의 All-in-one 페이지에서 로그인한 뒤 결제 페이지로 이동해 주세요.",
+    ended: "이 결제 페이지는 끝났거나 다른 탭에서 열렸습니다. 컬처앤테크 계정의 All-in-one 페이지에서 다시 시작해 주세요.",
+    backToProduct: "컬처앤테크 계정으로 돌아가기",
+    successBody: "All-in-one이 364일 동안 컬처앤테크 계정에 적용됩니다. 각 서비스에서 이 계정으로 로그인하면 이용할 수 있습니다.",
+    passTerm: "All-in-one — 364 Days: {start}부터 {end}까지. 자동으로 갱신되지 않습니다.",
+    alreadyOwned:
+      "이 계정에는 아직 끝나지 않은 All-in-one 이용 기간이 있어 이번 결제는 진행하지 않았습니다. 청구된 금액은 없습니다.",
+    accountDeletedResult: "결제를 확인하는 동안 계정이 삭제되어 All-in-one을 적용하지 못했습니다.",
+    finishOnProduct:
+      "이 탭에는 결제 정보가 남아 있지 않습니다. 컬처앤테크 계정의 All-in-one 페이지에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
+    finishButton: "컬처앤테크 계정에서 마무리하기",
+  },
+};

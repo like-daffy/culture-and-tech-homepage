@@ -16,7 +16,7 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
 | `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
-| `/apps/clean-space/account/`, `/apps/clean-space/auth/callback/`, `/apps/clean-space/auth/email/`, `/apps/clean-space/activate/`, each also under `/ko/` (Clean Space's account, sign-in callback, email sign-in link and app activation) | `src/pages/apps/clean-space/`, `src/pages/ko/apps/clean-space/`, `src/components/clean-space/`, `src/lib/clean-space/` | `npm run build`; see "Clean Space" under "The central checkout" below |
+| `/apps/clean-space/account/`, `/apps/clean-space/activate/`, `/apps/clean-space/auth/…`, each also under `/ko/` (Clean Space's former account, activation and sign-in pages) | `firebase.json` redirects | 301 to the shared portal: account and sign-in to `https://portal.cultureand.tech/[ko/]products/clean-space`, activation to `…/products/clean-space/activate` (the browser keeps the `#request=` fragment). The old page sources stay until the removal gate in `docs/portal-integration.md` passes |
 | `/culture/clean-space/direct-terms.html`, `direct-refunds.html`, `direct-privacy.html` (the website edition's Terms of Service, Refund Policy and Privacy Policy, Korean authoritative with the English translation; published 2026-11-10) | `public/culture/clean-space/` once published (all three or none) | `scripts/sync-mac-get-space-legal.sh --direct` from `mac-get-space` (`docs/13-direct-sale/`, `scripts/build-direct-sale-pages.py --release`); see "Publishing Clean Space's direct-sale policies" |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
@@ -202,6 +202,23 @@ written confirmation for the product):
 3. `DJ_DUPLICATE_GUARD_SALES_OPEN = true` in `scripts/check-checkout-config.mjs`, in a commit of its own: the predeploy
    check then requires those settings, and `scripts/check-live.sh` stops expecting closed pages.
 4. Deploy as usual (Deploy, below).
+
+### All-in-one — 364 Days
+
+The fourth purchase option: one payment, every Culture & Tech service, 364 days (the owner's terms of 2026-11-09). Its
+name stays in English in both languages. It is sold by the central commerce codebase (`services/commerce`, in the
+portal's project `cultureand-tech-web`, `asia-northeast3`), and its customers start and finish on the portal
+(`https://portal.cultureand.tech/[ko/]products/all-in-one`), which calls `beginAllInOneCheckout` and hands over to
+`/checkout/all-in-one/` here. The checkout pages call the shared commerce callables (`openCheckout`,
+`createCheckoutOrder`, `confirmCheckoutPayment`, `failCheckoutOrder`, `preparePaymentResume`).
+
+**Closed.** `NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT` opens it in a build, and `scripts/check-checkout-config.mjs` refuses that
+switch while `ALL_IN_ONE_SALES_OPEN` is false. Closed, its pages say so and the build carries none of its offer
+(`next.config.mjs` writes the switch in so the open branch is dropped). Opening it needs, in a commit of its own: the
+portal's All-in-one page and published policies live, `services/commerce` deployed, and the portal project's web app
+settings for cultureand.tech (`NEXT_PUBLIC_ALL_IN_ONE_FIREBASE_*`, `NEXT_PUBLIC_ALL_IN_ONE_RECAPTCHA_SITE_KEY`: an App
+Check key whose domains list cultureand.tech). Its copy is `ALL_IN_ONE_COPY` in `src/lib/checkout/product-copy.ts`;
+`ALL_IN_ONE_ALREADY_OWNED_CODE` in `products.ts` is provisional until `services/commerce` fixes it.
 
 ### Clean Space
 

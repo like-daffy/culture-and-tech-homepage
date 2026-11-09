@@ -17,9 +17,9 @@ import type { AppContent, AppInfo, AppSection } from "@/lib/apps";
 import { CHECKOUT_COPY } from "@/lib/checkout/copy";
 import type { SupportedLanguage } from "@/lib/language-detection";
 import { isHttpsAddress } from "./config-rules";
-import { OFFER_PRICES, PAGE_PATH } from "./contract.generated";
+import { OFFER_PRICES, PORTAL_PAGE_PATH } from "./contract.generated";
 import { formatPrice } from "./display";
-import { DIRECT_SALE_POLICY_PATHS } from "./site";
+import { CLEAN_SPACE_PORTAL, DIRECT_SALE_POLICY_PATHS } from "./site";
 
 /**
  * The website download's address from the build's setting (NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL): an https address,
@@ -156,7 +156,7 @@ function channelSection(language: SupportedLanguage, downloadUrl: string): AppSe
     // The account page is where the purchase starts: a full page load, so that nothing this page loads goes along.
     links: [
       ...(downloadUrl ? [{ label: copy.download, href: downloadUrl, download: true }] : []),
-      { label: copy.buy, href: PAGE_PATH.account[language] },
+      { label: copy.buy, href: `${CLEAN_SPACE_PORTAL.origin}${PORTAL_PAGE_PATH.account[language]}` },
     ],
     linkLine: {
       text: copy.policies,

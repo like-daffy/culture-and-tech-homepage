@@ -12,19 +12,32 @@
 import {
   ALREADY_OWNED_CODE as CLEAN_SPACE_ALREADY_OWNED,
   CLEAN_SPACE_PAGES,
+  CLEAN_SPACE_PORTAL,
   CLEAN_SPACE_SITE_ORIGIN,
   DIRECT_SALE_POLICY_PATHS,
 } from "@/lib/clean-space/site";
 import { APP_ERROR, type Lang } from "./contract";
-import { CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY, type ProductCopy } from "./product-copy";
+import { ALL_IN_ONE_COPY, CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY, type ProductCopy } from "./product-copy";
 
-export type ProductSlug = "chord-to-midi" | "dj-duplicate-guard" | "clean-space";
+export type ProductSlug = "chord-to-midi" | "dj-duplicate-guard" | "clean-space" | "all-in-one";
 
 /**
  * The product's pages a checkout may link to, by their path below the language's root, or from the site's root for a
  * page that exists once for both languages (it then starts with "/"); nothing from an address.
  */
 export type ProductPage = "home" | "purchase" | "account" | "help" | "terms" | "refund" | "privacy" | "business";
+
+/**
+ * A page on another of the operator's sites (the account portal), by its path below the language's root there
+ * (English at the root, Korean under /ko); the portal's URLs have no trailing slash.
+ */
+export interface ExternalPage {
+  origin: string;
+  path: string;
+}
+
+/** The account portal (portal.cultureand.tech): accounts, All-in-one and the portal's policies live there. */
+const PORTAL_ORIGIN = CLEAN_SPACE_PORTAL.origin;
 
 interface ProductIdentity {
   slug: ProductSlug;
@@ -53,11 +66,11 @@ export interface OpenProduct extends ProductIdentity {
   functionsEmulator?: { host: string; port: number };
   /** Region of the product's Cloud Functions. */
   region: string;
-  /** Its pages the checkout links, by path. */
-  pages: Partial<Record<ProductPage, string>>;
+  /** Its pages the checkout links, by path, or on the portal. */
+  pages: Partial<Record<ProductPage, string | ExternalPage>>;
   /** The page where its customers sign in, begin a checkout, and finish a payment kept for them (`?resume=`). */
   startPage: ProductPage;
-  resumePath: string;
+  resumePath: string | ExternalPage;
   /** The legal and help pages the checkout's footer links. */
   footerPages: ProductPage[];
   /** This tab's hold on a checkout of the product (sessionStorage). */
@@ -186,13 +199,13 @@ function cleanSpaceOpen(): OpenProduct {
     // Its legal pages exist once for both languages, from the site's root.
     pages: {
       home: CLEAN_SPACE_PAGES.home,
-      account: CLEAN_SPACE_PAGES.account,
+      account: { origin: PORTAL_ORIGIN, path: CLEAN_SPACE_PORTAL.account },
       terms: DIRECT_SALE_POLICY_PATHS.terms,
       refund: DIRECT_SALE_POLICY_PATHS.refund,
       privacy: DIRECT_SALE_POLICY_PATHS.privacy,
     },
     startPage: "account",
-    resumePath: CLEAN_SPACE_PAGES.account,
+    resumePath: { origin: PORTAL_ORIGIN, path: CLEAN_SPACE_PORTAL.account },
     footerPages: ["terms", "refund", "privacy"],
     storageKey: "cultureandtech.checkout.clean-space",
     paypalDescription:
@@ -202,6 +215,60 @@ function cleanSpaceOpen(): OpenProduct {
     // 364 days (31,449,600 seconds) from the payment's approval (its contract's DURATION_DAYS).
     passDays: 364,
     copy: CLEAN_SPACE_COPY,
+  };
+}
+
+const ALL_IN_ONE_NAME: ProductIdentity["name"] = {
+  // The option's name stays in English in both languages (the owner, 2026-11-09).
+  en: { productName: "All-in-one — 364 Days", backToProduct: "Back to your Culture & Tech account" },
+  ko: { productName: "All-in-one — 364 Days", backToProduct: "컬처앤테크 계정으로 돌아가기" },
+};
+
+/**
+ * Its server's code for a second All-in-one while one is active (the same-SKU rule, IDENTITY.md section 9).
+ * Provisional until services/commerce (t1b) fixes it; an individual pass never triggers it (overlap is allowed).
+ */
+export const ALL_IN_ONE_ALREADY_OWNED_CODE = "ACTIVE_PASS";
+
+/**
+ * All-in-one — 364 Days, once its owner opens the sales: the central commerce codebase (services/commerce, t1b) in the
+ * portal's project cultureand-tech-web takes the payment; the customer starts and finishes on the portal.
+ */
+function allInOneOpen(): OpenProduct {
+  return {
+    slug: "all-in-one",
+    enabled: true,
+    origin: PORTAL_ORIGIN,
+    name: ALL_IN_ONE_NAME,
+    firebase: {
+      apiKey: process.env.NEXT_PUBLIC_ALL_IN_ONE_FIREBASE_API_KEY ?? "",
+      projectId: process.env.NEXT_PUBLIC_ALL_IN_ONE_FIREBASE_PROJECT_ID ?? "",
+      appId: process.env.NEXT_PUBLIC_ALL_IN_ONE_FIREBASE_APP_ID ?? "",
+    },
+    // A portal-project App Check key whose domains list cultureand.tech (coordinated by t1g).
+    recaptchaSiteKey: process.env.NEXT_PUBLIC_ALL_IN_ONE_RECAPTCHA_SITE_KEY ?? "",
+    emulators: process.env.NEXT_PUBLIC_ALL_IN_ONE_EMULATORS === "1",
+    functionsEmulator: { host: "127.0.0.1", port: 5301 },
+    // The portal's region (IDENTITY.md section 13).
+    region: "asia-northeast3",
+    pages: {
+      home: "",
+      purchase: "products/all-in-one",
+      account: "account",
+      terms: "terms",
+      refund: "refund",
+      privacy: "privacy",
+    },
+    startPage: "purchase",
+    resumePath: "products/all-in-one",
+    footerPages: ["terms", "refund", "privacy"],
+    storageKey: "cultureandtech.checkout.all-in-one",
+    paypalDescription:
+      "Digital service, no shipping: All-in-one access to every Culture & Tech service for the buyer's account for 364 days from payment. One payment; it doesn't renew.",
+    alreadyOwnedCode: ALL_IN_ONE_ALREADY_OWNED_CODE,
+    // 364 days from the payment's approval (ALL_IN_ONE.durationMs in the portal's contract).
+    passDays: 364,
+    copy: ALL_IN_ONE_COPY,
   };
 }
 
@@ -220,6 +287,12 @@ export const PRODUCTS: Record<ProductSlug, CheckoutProduct> = {
     process.env.NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT === "on"
       ? cleanSpaceOpen()
       : { slug: "clean-space", enabled: false, origin: CLEAN_SPACE_ORIGIN, name: CLEAN_SPACE_NAME, home: CLEAN_SPACE_PAGES.home },
+  // Closed unless a build turns it on: All-in-one isn't on sale until its owner opens it, and the predeploy check
+  // refuses the switch until then (ALL_IN_ONE_SALES_OPEN). Closed, the build leaves allInOneOpen() and its copy out.
+  "all-in-one":
+    process.env.NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT === "on"
+      ? allInOneOpen()
+      : { slug: "all-in-one", enabled: false, origin: PORTAL_ORIGIN, name: ALL_IN_ONE_NAME },
 };
 
 /** With its backend's settings: only then is the product's backend ever called. */
@@ -238,12 +311,18 @@ export function checkoutPath(product: CheckoutProduct, lang: Lang, page: "" | "s
  * from the site's root (it starts with "/") exists once for both languages, and is linked as it is.
  */
 export function productUrl(product: CheckoutProduct, lang: Lang, page: ProductPage): string {
-  const path = product.enabled ? (product.pages[page] ?? "") : (product.home ?? "");
-  if (path.startsWith("/")) return `${product.origin}${path}`;
-  return `${product.origin}${lang === "ko" ? "/ko" : ""}/${path}`;
+  return pageUrl(product.origin, product.enabled ? (product.pages[page] ?? "") : (product.home ?? ""), lang);
+}
+
+/** A page by its path below the language's root (or from the site's root when it starts with "/"), or on the portal. */
+function pageUrl(origin: string, ref: string | ExternalPage, lang: Lang): string {
+  const prefix = lang === "ko" ? "/ko" : "";
+  if (typeof ref !== "string") return ref.path ? `${ref.origin}${prefix}/${ref.path}` : `${ref.origin}${prefix || "/"}`;
+  if (ref.startsWith("/")) return `${origin}${ref}`;
+  return `${origin}${prefix}/${ref}`;
 }
 
 /** Where a customer whose checkout ended in this tab finishes a payment kept for them, signed in on the product's site. */
 export function productResumeUrl(product: OpenProduct, lang: Lang, resumeId: string): string {
-  return `${product.origin}${lang === "ko" ? "/ko" : ""}/${product.resumePath}?resume=${encodeURIComponent(resumeId)}`;
+  return `${pageUrl(product.origin, product.resumePath, lang)}?resume=${encodeURIComponent(resumeId)}`;
 }

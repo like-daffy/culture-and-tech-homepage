@@ -37,6 +37,19 @@ describe("the central checkout's predeploy check", () => {
     expect(output).toContain("DJ Duplicate Guard's checkout: closed (its sales are closed).");
   });
 
+  it("keeps All-in-one closed: refuses its switch, its test settings and another portal origin", () => {
+    expect(check(CHORD_TO_MIDI).output).toContain("All-in-one's checkout: closed (its sales are closed).");
+    const on = check({ ...CHORD_TO_MIDI, NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT: "on" });
+    expect(on.status).toBe(1);
+    expect(on.output).toMatch(/NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT is set: All-in-one's sales are closed/);
+    const emulators = check({ ...CHORD_TO_MIDI, NEXT_PUBLIC_ALL_IN_ONE_EMULATORS: "1" });
+    expect(emulators.status).toBe(1);
+    expect(emulators.output).toMatch(/NEXT_PUBLIC_ALL_IN_ONE_EMULATORS is set: a test setting/);
+    const portal = check({ ...CHORD_TO_MIDI, NEXT_PUBLIC_PORTAL_ORIGIN: "http://127.0.0.1:3000" });
+    expect(portal.status).toBe(1);
+    expect(portal.output).toMatch(/NEXT_PUBLIC_PORTAL_ORIGIN is set to another site/);
+  });
+
   it("refuses Clean Space's switch while its sales are closed", () => {
     const { status, output } = check({ ...CHORD_TO_MIDI, NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT: "on" });
     expect(status).toBe(1);
