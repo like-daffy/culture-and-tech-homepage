@@ -1,9 +1,9 @@
 /**
  * The text of Clean Space's account, sign-in callback and activation pages.
  *
- * COPY is English only for now. The Korean pages (/ko/…) show it, marked `lang="en"` (CONTENT_LANG), until the owner
- * reviews a Korean translation: no Korean is written there unless the site's published copy already has that meaning
- * (docs/clean-space-direct-sale.md lists those strings).
+ * COPY's Korean (KO) covers the account page's sign-in, contact email, sign-in methods and account deletion and the
+ * sign-in callback page (the owner's approval to draft them, 2026-11-09; pending the owner's review of the wording).
+ * The activation page and the account page's Macs section stay English on the Korean pages, marked `lang="en"`.
  *
  * PURCHASE_COPY, the account page's purchase part (the 364 days Unlock and its access period, the handoff to the
  * central checkout, the purchases with their refund requests, and the finish of a payment the checkout kept for its
@@ -20,8 +20,14 @@ import type { PageLang, Provider, PurchaseStatus } from "./contract.generated";
 import type { ProviderSignInFailure } from "./oauth";
 import type { PurchaseRefusal, ResumeRefusal } from "./checkout-handoff";
 
-/** The language the main text of a page is written in: English on both until Korean is reviewed. */
+/**
+ * The language the main text of the activation page is written in: English on both until its Korean is approved. The
+ * account and sign-in callback pages are written in the page's language (ACCOUNT_LANG).
+ */
 export const CONTENT_LANG: Record<PageLang, "en" | "ko"> = { en: "en", ko: "en" };
+
+/** The account and sign-in callback pages: the page's own language (Korean approved by the owner, 2026-11-09). */
+export const ACCOUNT_LANG: Record<PageLang, "en" | "ko"> = { en: "en", ko: "ko" };
 
 /** The language of the account page's purchase part: the page's own (its Korean pending the owner's review). */
 export const PURCHASE_LANG: Record<PageLang, "en" | "ko"> = { en: "en", ko: "ko" };
@@ -120,15 +126,75 @@ export const EN = {
 export type Copy = typeof EN;
 
 /**
- * Korean pages: the English text above, except what the site has already published in Korean with the same meaning
- * (the brand "컬처앤테크" of the Korean navigation, the app pages' "문의" for Support) and the language link's own name.
- * Everything else waits for the owner's review.
+ * Korean pages. The owner approved Korean for the account page's sign-in, contact email and account deletion
+ * (2026-11-09); it follows Chord to MIDI's reviewed Korean where the meaning is the same ("Google로 계속하기",
+ * "카카오 로그인", "네이버 로그인", its sign-in errors, "로그인 방법", "연결됨", "해제") and waits for the owner's review
+ * (docs/clean-space-ko-review.md). The activation page and the account page's Macs section stay English (marked
+ * lang="en" there) until their Korean is approved.
  */
 export const KO: Copy = {
   ...EN,
   brand: "컬처앤테크",
   languageLink: "English",
+  loading: "불러오는 중…",
+  tryAgain: "다시 시도",
+  notConfigured: "이 사이트에서는 아직 Clean Space 계정과 구매를 이용할 수 없습니다.",
+  accountChanged: "진행하는 동안 다른 계정으로 로그인되어 그 결과를 쓰지 않았습니다. 다시 시도해 주세요.",
+  signedInAs: (label: string) => `${label}(으)로 로그인됨`,
+  thisAccount: "이 계정",
+  signOutHere: "이 브라우저에서 로그아웃",
   support: "문의",
+
+  signInTitle: "로그인",
+  signInIntro: "Google, 카카오 또는 네이버 계정으로 로그인하세요. 구매는 로그인한 계정에 적용됩니다.",
+  continueWith: (provider: string) => (provider === "Google" ? "Google로 계속하기" : `${provider} 로그인`),
+  signInBusy: "로그인하는 중…",
+  signInFailures: {
+    cancelled: "로그인을 취소했습니다.",
+    missing: "이 탭에서 시작한 로그인이 아니거나 이미 끝난 로그인입니다. 처음부터 다시 로그인해 주세요.",
+    state: "이 탭에서 시작한 로그인이 아니거나 이미 끝난 로그인입니다. 처음부터 다시 로그인해 주세요.",
+    expired: "로그인 시간이 지났습니다. 처음부터 다시 로그인해 주세요.",
+    storage: "이 브라우저가 로그인에 필요한 저장소를 막고 있습니다. cultureand.tech의 사이트 데이터를 허용하거나 다른 브라우저를 사용해 주세요.",
+    "account-mismatch": "이 작업을 시작한 계정과 다른 계정으로 로그인되어 있습니다. 시작한 계정으로 로그인한 뒤 다시 시도해 주세요.",
+    "signed-out": "먼저 로그인해 주세요.",
+    unavailable: "지금은 이 로그인 방법을 사용할 수 없습니다.",
+    refused: "로그인하지 못했습니다. 처음부터 다시 로그인해 주세요.",
+  } satisfies Record<ProviderSignInFailure, string>,
+  popupFailed: "Google 창을 열지 못했습니다. cultureand.tech의 팝업을 허용한 뒤 다시 시도해 주세요.",
+  callbackTitle: "로그인",
+  callbackWorking: "로그인하는 중…",
+
+  contactHeading: "연락용 이메일",
+  contactIntro:
+    "결제하기 전에 이메일 주소를 확인해 주세요. 토스페이먼츠가 영수증을 이 주소로 보내며, 문의 답변과 중요한 안내에도 씁니다. 이메일을 받기만 하는 주소이며 로그인 방법이 아닙니다.",
+  contactEmailLabel: "이메일 주소",
+  contactSend: "코드 보내기",
+  contactCodeLabel: "6자리 코드",
+  contactCodeSent: (email: string) => `${email}(으)로 코드를 보냈습니다. 15분 안에 입력해 주세요.`,
+  contactConfirm: "확인",
+  contactResend: "다른 주소 사용",
+  contactConfirmed: (email: string) => `연락용 이메일: ${email}`,
+  contactInvalidEmail: "올바른 이메일 주소를 입력해 주세요.",
+  contactInvalidCode: "이메일로 받은 6자리 코드를 입력해 주세요.",
+
+  accountTitle: "Clean Space 계정",
+  methodsHeading: "로그인 방법",
+  linkedLabel: "연결됨",
+  linkMethod: (provider: string) => `${provider} 연결`,
+  removeMethod: "해제",
+  lastMethod: "이 방법을 해제하기 전에 다른 로그인 방법을 연결해 주세요.",
+  recentSignInNeeded: "보안을 위해 로그인 방법을 바꾸거나 계정을 삭제하기 전에 다시 로그인해 주세요.",
+  signInAgain: "다시 로그인",
+  contactNone: "아직 확인한 연락용 이메일이 없습니다.",
+  contactChange: "연락용 이메일 변경",
+
+  deleteHeading: "계정 삭제",
+  deleteText:
+    "계정을 삭제해도 환불되지 않습니다. 남은 이용 기간은 끝나고 Mac의 Clean Space는 기본 기능으로 돌아가며, 결제 기록은 법령에 따라 보관합니다. 환불을 원하시면 먼저 환불을 요청해 주세요.",
+  deleteConfirm: "계정을 삭제해도 환불되지 않는다는 것을 이해했습니다.",
+  deleteButton: "계정 삭제",
+  deleteRequested: (date: string) => `${date}에 삭제를 요청했습니다. 삭제는 자동으로 끝납니다.`,
+  providerNames: { google: "Google", kakao: "카카오", naver: "네이버" } satisfies Record<Provider, string>,
 };
 
 export const COPY: Record<PageLang, Copy> = { en: EN, ko: KO };

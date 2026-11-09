@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { brokeredProvidersHere, firebaseErrorCode, POPUP_DISMISSED, signInWithGoogle, startBrokeredSignIn } from "@/lib/clean-space/auth";
 import { CLEAN_SPACE } from "@/lib/clean-space/config";
-import { COPY } from "@/lib/clean-space/copy";
+import { ACCOUNT_LANG, COPY } from "@/lib/clean-space/copy";
 import type { BrokeredProvider, PageLang, ReturnTarget } from "@/lib/clean-space/contract.generated";
 import { ProviderSignInError } from "@/lib/clean-space/oauth";
 import { Notice, Section } from "./SensitiveLayout";
@@ -51,7 +51,9 @@ export function SignInPanel({ lang, returnTo, title, intro }: SignInPanelProps) 
     }
   };
 
+  // Written in the page's language (ACCOUNT_LANG), also inside the activation page, whose own text is English for now.
   return (
+    <div lang={ACCOUNT_LANG[lang]}>
     <Section title={title ?? copy.signInTitle}>
       <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{intro ?? copy.signInIntro}</p>
       <div className="flex flex-col gap-3 sm:max-w-sm">
@@ -72,5 +74,6 @@ export function SignInPanel({ lang, returnTo, title, intro }: SignInPanelProps) 
         </Notice>
       )}
     </Section>
+    </div>
   );
 }

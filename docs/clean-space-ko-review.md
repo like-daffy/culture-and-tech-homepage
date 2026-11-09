@@ -17,8 +17,11 @@ Where the words come from:
 
 Not listed (unchanged): the page's existing reviewed Korean that the product page's website-edition section keeps as it
 is ("파일은 Mac에서 처리합니다", "파일에 관한 정보를 어딘가로 보내나요?", "지금 받을 수 있나요?"), the checkout's own text
-(`src/lib/checkout/copy.ts`, which also labels the account pages' footer), and the parts of the account, sign-in and
-activation pages that are still English on `/ko/` (`docs/clean-space-direct-sale.md`, "Korean text").
+(`src/lib/checkout/copy.ts`, which also labels the account pages' footer), and the parts still English on `/ko/`: the
+activation page and the account page's Macs section (`docs/clean-space-direct-sale.md`, "Korean text").
+
+Rows 114–160 (added 2026-11-09, the owner's approval to draft them): the account page's sign-in, contact email, sign-in
+methods and account deletion, and the sign-in callback page (`COPY.ko`).
 
 When each row shows: the checkout rows (`CLEAN_SPACE_COPY`) only in a build that opens Clean Space's checkout, except
 `backToProduct`, which the closed checkout pages show now; the product page rows (`COPY (product page)`) only with
@@ -140,3 +143,50 @@ once the account pages are configured. `{name}` parts are filled in by the page.
 | 111 | `COPY (product page).ko.unlockFaq.question` (clean-space/channel-copy.ts) | 364일 잠금 해제는 무엇인가요? | What is the 364 days Unlock? | pending review |  |
 | 112 | `COPY (product page).ko.unlockFaq.answer` (clean-space/channel-copy.ts) | 이 사이트에서 한 번 결제({krw}, 부가세 포함)하면 결제가 승인된 때부터 364일 동안 Clean Space 웹사이트 버전의 모든 기능을 쓸 수 있습니다. 자동으로 갱신되지 않으며, 이용 기간이 끝나도 기본 기능은 그대로 쓸 수 있습니다. 웹사이트 버전에만 적용되며 Mac App Store 버전에는 적용되지 않습니다. | One payment of {krw} (VAT included) or {usd} on this site that unlocks every feature of the Clean Space website edition for 364 days from the moment the payment is approved. It doesn't renew, and the basic features stay after the access period. It is for the website edition only, not the Mac App Store app. | pending review | {krw}: the won price, ₩3,300 |
 | 113 | `COPY (product page).ko.availableFaq.answer` (clean-space/channel-copy.ts) | 네. 이 페이지에서 웹사이트 버전을 내려받을 수 있습니다. Mac App Store 버전은 출시를 준비하고 있으며, 출시되면 이 페이지에 링크를 걸어 두겠습니다. | Yes: download the website edition from this page. Its Mac App Store listing is being prepared, and this page will link to it once it is available. | pending review |  |
+| 114 | `COPY.ko.loading` (clean-space/copy.ts) | 불러오는 중… | Loading… | pending review | Chord to MIDI's reviewed `loading` |
+| 115 | `COPY.ko.tryAgain` (clean-space/copy.ts) | 다시 시도 | Try again | pending review | Chord to MIDI's reviewed `tryAgain` |
+| 116 | `COPY.ko.notConfigured` (clean-space/copy.ts) | 이 사이트에서는 아직 Clean Space 계정과 구매를 이용할 수 없습니다. | Clean Space accounts and purchases are not available on this site yet. | pending review |  |
+| 117 | `COPY.ko.accountChanged` (clean-space/copy.ts) | 진행하는 동안 다른 계정으로 로그인되어 그 결과를 쓰지 않았습니다. 다시 시도해 주세요. | You signed in to another account while this was in progress, so its answer was not used. Try again. | pending review |  |
+| 118 | `COPY.ko.signedInAs` (clean-space/copy.ts) | {label}(으)로 로그인됨 | Signed in as {label} | pending review | Chord to MIDI's reviewed `signedInAs` |
+| 119 | `COPY.ko.thisAccount` (clean-space/copy.ts) | 이 계정 | this account | pending review |  |
+| 120 | `COPY.ko.signOutHere` (clean-space/copy.ts) | 이 브라우저에서 로그아웃 | Sign out of this browser | pending review |  |
+| 121 | `COPY.ko.signInTitle` (clean-space/copy.ts) | 로그인 | Sign in | pending review | Chord to MIDI's reviewed sign-in title |
+| 122 | `COPY.ko.signInIntro` (clean-space/copy.ts) | Google, 카카오 또는 네이버 계정으로 로그인하세요. 구매는 로그인한 계정에 적용됩니다. | Sign in with Google, Kakao or Naver. A purchase belongs to the account you sign in with. | pending review |  |
+| 123 | `COPY.ko.continueWith` (clean-space/copy.ts) | Google로 계속하기 / 카카오 로그인 / 네이버 로그인 | Continue with {provider} | pending review | Chord to MIDI's reviewed sign-in buttons |
+| 124 | `COPY.ko.signInBusy`, `callbackWorking` (clean-space/copy.ts) | 로그인하는 중… | Signing in… / Finishing sign-in… | pending review | Chord to MIDI's reviewed `callback.working` |
+| 125 | `COPY.ko.signInFailures.cancelled` (clean-space/copy.ts) | 로그인을 취소했습니다. | Signing in was cancelled. | pending review | Chord to MIDI's reviewed `errors.cancelled` |
+| 126 | `COPY.ko.signInFailures.missing`, `.state` (clean-space/copy.ts) | 이 탭에서 시작한 로그인이 아니거나 이미 끝난 로그인입니다. 처음부터 다시 로그인해 주세요. | This sign-in did not start in this tab, or it was already finished. Start signing in again. | pending review |  |
+| 127 | `COPY.ko.signInFailures.expired` (clean-space/copy.ts) | 로그인 시간이 지났습니다. 처음부터 다시 로그인해 주세요. | Signing in took too long. Start again. | pending review | Chord to MIDI's reviewed `errors.expired` |
+| 128 | `COPY.ko.signInFailures.storage` (clean-space/copy.ts) | 이 브라우저가 로그인에 필요한 저장소를 막고 있습니다. cultureand.tech의 사이트 데이터를 허용하거나 다른 브라우저를 사용해 주세요. | This browser blocks the storage that signing in needs. Allow site data for cultureand.tech, or use another browser. | pending review | after Chord to MIDI's `errors.storage` |
+| 129 | `COPY.ko.signInFailures.account-mismatch` (clean-space/copy.ts) | 이 작업을 시작한 계정과 다른 계정으로 로그인되어 있습니다. 시작한 계정으로 로그인한 뒤 다시 시도해 주세요. | A different account is signed in now than the one that started this. Sign in to that account and try again. | pending review | Chord to MIDI's reviewed `errors.accountMismatch` |
+| 130 | `COPY.ko.signInFailures.signed-out` (clean-space/copy.ts) | 먼저 로그인해 주세요. | Sign in first. | pending review | Chord to MIDI's reviewed `errors.signedOut` |
+| 131 | `COPY.ko.signInFailures.unavailable` (clean-space/copy.ts) | 지금은 이 로그인 방법을 사용할 수 없습니다. | This sign-in method is not available yet. | pending review |  |
+| 132 | `COPY.ko.signInFailures.refused` (clean-space/copy.ts) | 로그인하지 못했습니다. 처음부터 다시 로그인해 주세요. | Signing in did not work. Start again. | pending review |  |
+| 133 | `COPY.ko.popupFailed` (clean-space/copy.ts) | Google 창을 열지 못했습니다. cultureand.tech의 팝업을 허용한 뒤 다시 시도해 주세요. | The Google window could not open. Allow pop-ups for cultureand.tech and try again. | pending review |  |
+| 134 | `COPY.ko.callbackTitle` (clean-space/copy.ts) | 로그인 | Signing in | pending review | Chord to MIDI's reviewed `callback.title` |
+| 135 | `COPY.ko.contactHeading` (clean-space/copy.ts) | 연락용 이메일 | Contact email | pending review | the facts sheet's term |
+| 136 | `COPY.ko.contactIntro` (clean-space/copy.ts) | 결제하기 전에 이메일 주소를 확인해 주세요. 토스페이먼츠가 영수증을 이 주소로 보내며, 문의 답변과 중요한 안내에도 씁니다. 이메일을 받기만 하는 주소이며 로그인 방법이 아닙니다. | Confirm an email address before you pay: Toss Payments sends your receipts there, and we use it for support and important notices. It only receives email: it is not a way to sign in. | pending review |  |
+| 137 | `COPY.ko.contactEmailLabel` (clean-space/copy.ts) | 이메일 주소 | Email address | pending review |  |
+| 138 | `COPY.ko.contactSend` (clean-space/copy.ts) | 코드 보내기 | Send code | pending review |  |
+| 139 | `COPY.ko.contactCodeLabel` (clean-space/copy.ts) | 6자리 코드 | 6-digit code | pending review |  |
+| 140 | `COPY.ko.contactCodeSent` (clean-space/copy.ts) | {email}(으)로 코드를 보냈습니다. 15분 안에 입력해 주세요. | We sent a code to {email}. Enter it within 15 minutes. | pending review |  |
+| 141 | `COPY.ko.contactConfirm` (clean-space/copy.ts) | 확인 | Confirm | pending review |  |
+| 142 | `COPY.ko.contactResend` (clean-space/copy.ts) | 다른 주소 사용 | Use another address | pending review |  |
+| 143 | `COPY.ko.contactConfirmed` (clean-space/copy.ts) | 연락용 이메일: {email} | Contact email: {email} | pending review |  |
+| 144 | `COPY.ko.contactInvalidEmail` (clean-space/copy.ts) | 올바른 이메일 주소를 입력해 주세요. | Enter a valid email address. | pending review |  |
+| 145 | `COPY.ko.contactInvalidCode` (clean-space/copy.ts) | 이메일로 받은 6자리 코드를 입력해 주세요. | Enter the 6-digit code from the email. | pending review |  |
+| 146 | `COPY.ko.contactNone` (clean-space/copy.ts) | 아직 확인한 연락용 이메일이 없습니다. | No contact email confirmed yet. | pending review |  |
+| 147 | `COPY.ko.contactChange` (clean-space/copy.ts) | 연락용 이메일 변경 | Change contact email | pending review |  |
+| 148 | `COPY.ko.accountTitle` (clean-space/copy.ts) | Clean Space 계정 | Your Clean Space account | pending review |  |
+| 149 | `COPY.ko.methodsHeading` (clean-space/copy.ts) | 로그인 방법 | Sign-in methods | pending review | Chord to MIDI's reviewed `methods.title` |
+| 150 | `COPY.ko.linkedLabel` (clean-space/copy.ts) | 연결됨 | Linked | pending review | Chord to MIDI's reviewed `methods.linked` |
+| 151 | `COPY.ko.linkMethod` (clean-space/copy.ts) | {provider} 연결 | Link {provider} | pending review | after Chord to MIDI's `methods.add` |
+| 152 | `COPY.ko.removeMethod` (clean-space/copy.ts) | 해제 | Remove | pending review | Chord to MIDI's reviewed `methods.remove` |
+| 153 | `COPY.ko.lastMethod` (clean-space/copy.ts) | 이 방법을 해제하기 전에 다른 로그인 방법을 연결해 주세요. | Add another sign-in method before removing this one. | pending review |  |
+| 154 | `COPY.ko.recentSignInNeeded` (clean-space/copy.ts) | 보안을 위해 로그인 방법을 바꾸거나 계정을 삭제하기 전에 다시 로그인해 주세요. | For your security, sign in again before changing sign-in methods or deleting the account. | pending review | after Chord to MIDI's `errors.recentSignIn` |
+| 155 | `COPY.ko.signInAgain` (clean-space/copy.ts) | 다시 로그인 | Sign in again | pending review |  |
+| 156 | `COPY.ko.deleteHeading`, `deleteButton` (clean-space/copy.ts) | 계정 삭제 | Delete account | pending review | Chord to MIDI's reviewed `deleteTitle` |
+| 157 | `COPY.ko.deleteText` (clean-space/copy.ts) | 계정을 삭제해도 환불되지 않습니다. 남은 이용 기간은 끝나고 Mac의 Clean Space는 기본 기능으로 돌아가며, 결제 기록은 법령에 따라 보관합니다. 환불을 원하시면 먼저 환불을 요청해 주세요. | Deleting your account is not a refund. Any remaining access period ends, Clean Space on your Macs returns to the basic features, and payment records are kept as the law requires. To ask for a refund, use Request a refund first. | pending review |  |
+| 158 | `COPY.ko.deleteConfirm` (clean-space/copy.ts) | 계정을 삭제해도 환불되지 않는다는 것을 이해했습니다. | I understand that deleting my account is not a refund. | pending review |  |
+| 159 | `COPY.ko.deleteRequested` (clean-space/copy.ts) | {date}에 삭제를 요청했습니다. 삭제는 자동으로 끝납니다. | Deletion was requested on {date}. It finishes by itself. | pending review |  |
+| 160 | `COPY.ko.providerNames` (clean-space/copy.ts) | Google / 카카오 / 네이버 | Google / Kakao / Naver | pending review | Chord to MIDI's reviewed provider names |

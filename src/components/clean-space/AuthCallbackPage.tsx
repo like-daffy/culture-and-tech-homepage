@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { describeError } from "@/lib/clean-space/api";
 import { currentUid, signInWithToken } from "@/lib/clean-space/auth";
-import { COPY, type Copy } from "@/lib/clean-space/copy";
+import { ACCOUNT_LANG, COPY, type Copy } from "@/lib/clean-space/copy";
 import { PAGE_PATH, type PageLang } from "@/lib/clean-space/contract.generated";
 import { cleanSpaceApi } from "@/lib/clean-space/firebase";
 import { finishBrokeredSignInOnce, ProviderSignInError } from "@/lib/clean-space/oauth";
@@ -53,7 +53,7 @@ export function AuthCallbackPage({ lang }: { lang: PageLang }) {
   }, [params, copy, lang]);
 
   return (
-    <SensitiveLayout lang={lang} title={copy.callbackTitle}>
+    <SensitiveLayout lang={lang} title={copy.callbackTitle} contentLang={ACCOUNT_LANG[lang]}>
       <PageTitle title={copy.callbackTitle} />
       {!failure ? (
         <p className="text-muted-foreground">{copy.callbackWorking}</p>
