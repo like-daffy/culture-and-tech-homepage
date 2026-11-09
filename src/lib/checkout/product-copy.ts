@@ -5,6 +5,10 @@
  * - DJ Duplicate Guard: its decisions D38 and DL-50 and its terms (Articles 2(7), 9, 11 and 15-2) in
  *   dj-duplicate-guard's apps/web/content/. A build carries it only when it opens that checkout (products.ts): until
  *   its owner opens the sales (DL-52), none of it is published.
+ * - Clean Space: the facts sheet of its direct sale (mac-get-space docs/13-direct-sale/facts.md, the owner's decisions
+ *   of 2026-11-09), in Chord to MIDI's Toss-reviewed wording for the period, the price terms, the refund and the test
+ *   payments; the Korean name "364일 잠금 해제" is the owner's. Its Korean text awaits the owner's review
+ *   (docs/clean-space-ko-review.md). A build carries it only when it opens that checkout (products.ts).
  * Change them with their sources.
  */
 import type { Currency, Lang } from "./contract";
@@ -14,6 +18,11 @@ export interface ProductCopy {
   productName: string;
   seller: string;
   account: string;
+  /**
+   * The label of the address the order's receipt goes to (`{email}`), for a product whose account email is something
+   * else than the checkout's own wording says (copy.ts `receiptEmail`, "Receipt and recovery email").
+   */
+  receiptEmail?: string;
   notYou: string;
   lead: string;
   priceTerms: string;
@@ -24,6 +33,11 @@ export interface ProductCopy {
   periodTerms?: { text: string; link: string; anchor: string };
   includes: string[];
   testMode: string;
+  /**
+   * For a product sold on Toss's test keys before its launch: shown while a currency's client key is a test key (and
+   * it isn't the PayPal TEST checkout, which testMode covers). Products without it show nothing for that.
+   */
+  testKeys?: string;
   currencyNotes: Record<Currency, string>;
   /** The product's server says its sales are closed (SALES_CLOSED). */
   salesClosed: string;
@@ -206,6 +220,102 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
     finishOnProduct:
       "이 탭에는 결제 정보가 남아 있지 않습니다. DJ Duplicate Guard에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
     finishButton: "DJ Duplicate Guard에서 마무리하기",
+  },
+};
+
+/** While its currencies are on Toss's test keys (before the launch, for Toss's review): what the checkout says. */
+const CLEAN_SPACE_TEST_PAYMENTS = {
+  en: "Test payment: payments run in Toss Payments' test environment for now, and nothing is actually charged. An access period received through a test payment ends when sales start for real.",
+  ko: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 테스트 결제로 받은 이용 기간은 정식 판매가 시작되면 끝납니다.",
+};
+
+/**
+ * Clean Space's account email is its contact email: Toss Payments' receipts, support and notices, never a way to sign
+ * in or recover the account (mac-get-space docs/13). Its words: "364 days Unlock" / "364일 잠금 해제", "access period" /
+ * "이용 기간", "basic features" / "기본 기능", "contact email" / "연락용 이메일".
+ */
+export const CLEAN_SPACE_COPY: Record<Lang, ProductCopy> = {
+  en: {
+    pageTitle: "Checkout: Clean Space 364 days Unlock | Culture & Tech",
+    productName: "Clean Space — 364 days Unlock",
+    seller:
+      "Sold by Culture & Tech, which makes Clean Space. You pay here, on cultureand.tech, Culture & Tech's checkout; the 364 days Unlock applies to your Clean Space account.",
+    account: "For the Clean Space account whose contact email is {email}.",
+    receiptEmail: "Receipt and contact email: {email}",
+    notYou: "Not your account? Back to your Clean Space account",
+    lead: "One payment unlocks every feature of the Clean Space Mac app's website edition for 364 days, in the app signed in to your account.",
+    priceTerms: "It doesn't renew, and nothing is charged again.",
+    period:
+      "Access period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. Your account page shows the exact start and end.",
+    renewal:
+      "After it ends, you can buy another 364 days yourself, at the price shown then. Signing in on another Mac or installing the app again never restarts or extends an access period.",
+    includes: [
+      "Every feature of the website edition for 364 days, including Plugin Cleaner, Docker and simulator management, the administrator helper and Spotlight maintenance.",
+      "For the website edition downloaded from cultureand.tech, on every Mac signed in to this account. It doesn't unlock the Mac App Store app.",
+      "When the access period ends, the basic features stay, and so do your settings, history, reports and Put Back.",
+      "Full refund on request within 7 days of payment.",
+    ],
+    testMode: CLEAN_SPACE_TEST_PAYMENTS.en,
+    testKeys: CLEAN_SPACE_TEST_PAYMENTS.en,
+    currencyNotes: { KRW: "For Korean cards and easy-pay services. VAT included.", USD: "Pay with PayPal." },
+    salesClosed: "The 364 days Unlock isn't on sale now. Nothing was charged.",
+    already: "This account has the 364 days Unlock until its access period ends. Another can be bought after that.",
+    accountDeleted: "This account is being deleted, so it cannot buy the 364 days Unlock.",
+    emailNotConfirmed: "Confirm the contact email of your Clean Space account before paying.",
+    accountUnavailable: "This Clean Space account is not available.",
+    noCheckout: "Start your purchase on your Clean Space account page: sign in there, then continue to the checkout.",
+    ended: "This checkout has ended, or was opened in another tab. Start again from your Clean Space account page.",
+    backToProduct: "Back to Clean Space",
+    successBody:
+      "The 364 days Unlock is on your account for 364 days. Sign in to Clean Space on your Mac with this account to use it.",
+    passTerm: "364 days Unlock: from {start} to {end}. It doesn't renew.",
+    alreadyOwned:
+      "This account already has an access period of the 364 days Unlock that hasn't ended, so this payment was not made. Nothing was charged.",
+    accountDeletedResult:
+      "The account was deleted while the payment was being confirmed, so the 364 days Unlock could not be added to it.",
+    finishOnProduct:
+      "This tab no longer holds the checkout. To finish the payment, sign in on your Clean Space account page to the account you paid with.",
+    finishButton: "Finish on your Clean Space account",
+  },
+  ko: {
+    pageTitle: "결제: Clean Space 364일 잠금 해제 | 컬처앤테크",
+    productName: "Clean Space — 364일 잠금 해제",
+    seller:
+      "Clean Space를 만드는 컬처앤테크가 판매합니다. 결제는 이곳, 컬처앤테크의 결제 페이지(cultureand.tech)에서 진행되며, 364일 잠금 해제는 Clean Space 계정에 적용됩니다.",
+    account: "연락용 이메일이 {email}인 Clean Space 계정에 적용됩니다.",
+    receiptEmail: "영수증 및 연락용 이메일: {email}",
+    notYou: "내 계정이 아닌가요? Clean Space 계정으로 돌아가기",
+    lead: "한 번 결제하면 364일 동안, 이 계정으로 로그인한 Clean Space Mac 앱(웹사이트 버전)의 모든 기능을 쓸 수 있습니다.",
+    priceTerms: "자동으로 갱신되거나 다시 결제되지 않습니다.",
+    period:
+      "이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 정확한 시작과 만료 일시는 계정 페이지에 표시됩니다.",
+    renewal:
+      "이용 기간이 끝난 뒤에는 그때 표시되는 가격으로 직접 다시 구매할 수 있습니다. 다른 Mac에서 로그인하거나 앱을 다시 설치해도 이용 기간은 다시 시작되거나 늘어나지 않습니다.",
+    includes: [
+      "364일 동안 웹사이트 버전의 모든 기능을 쓸 수 있으며, 플러그인 클리너, Docker와 시뮬레이터 관리, 관리자 도우미, Spotlight 유지 관리도 포함됩니다.",
+      "cultureand.tech에서 내려받은 웹사이트 버전에 적용되며, 이 계정으로 로그인한 모든 Mac에서 쓸 수 있습니다. Mac App Store 버전에는 적용되지 않습니다.",
+      "이용 기간이 끝나도 기본 기능은 그대로 쓸 수 있고, 설정, 기록, 보고서, 복구하기도 그대로 남습니다.",
+      "결제 후 7일 이내에 요청하면 전액 환불됩니다.",
+    ],
+    testMode: CLEAN_SPACE_TEST_PAYMENTS.ko,
+    testKeys: CLEAN_SPACE_TEST_PAYMENTS.ko,
+    currencyNotes: { KRW: "국내 카드·간편결제로 결제, 부가세 포함", USD: "PayPal로 결제" },
+    salesClosed: "지금은 364일 잠금 해제를 판매하지 않습니다. 청구된 금액은 없습니다.",
+    already: "이 계정에는 이용 기간이 남은 364일 잠금 해제가 있습니다. 다음 이용 기간은 지금 기간이 끝난 뒤에 구매할 수 있습니다.",
+    accountDeleted: "삭제 중인 계정이라 364일 잠금 해제를 구매할 수 없습니다.",
+    emailNotConfirmed: "결제하기 전에 Clean Space 계정의 연락용 이메일을 확인해 주세요.",
+    accountUnavailable: "이 Clean Space 계정은 사용할 수 없습니다.",
+    noCheckout: "Clean Space 계정 페이지에서 로그인한 뒤 결제 페이지로 이동해 주세요.",
+    ended: "이 결제 페이지는 끝났거나 다른 탭에서 열렸습니다. Clean Space 계정 페이지에서 다시 시작해 주세요.",
+    backToProduct: "Clean Space로 돌아가기",
+    successBody: "364일 잠금 해제가 364일 동안 계정에 적용됩니다. Mac의 Clean Space에서 이 계정으로 로그인하면 쓸 수 있습니다.",
+    passTerm: "364일 잠금 해제: {start}부터 {end}까지. 자동으로 갱신되지 않습니다.",
+    alreadyOwned:
+      "이 계정에는 아직 끝나지 않은 364일 잠금 해제 이용 기간이 있어 이번 결제는 진행하지 않았습니다. 청구된 금액은 없습니다.",
+    accountDeletedResult: "결제를 확인하는 동안 계정이 삭제되어 364일 잠금 해제를 적용하지 못했습니다.",
+    finishOnProduct:
+      "이 탭에는 결제 정보가 남아 있지 않습니다. Clean Space 계정 페이지에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
+    finishButton: "Clean Space 계정에서 마무리하기",
   },
 };
 

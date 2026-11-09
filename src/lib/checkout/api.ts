@@ -70,7 +70,10 @@ async function initialize(product: OpenProduct): Promise<Functions> {
   }
 
   const instance = functionsModule.getFunctions(app, product.region);
-  if (product.emulators) functionsModule.connectFunctionsEmulator(instance, "127.0.0.1", 5001);
+  if (product.emulators) {
+    const { host, port } = product.functionsEmulator ?? { host: "127.0.0.1", port: 5001 };
+    functionsModule.connectFunctionsEmulator(instance, host, port);
+  }
   return instance;
 }
 

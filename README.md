@@ -16,10 +16,12 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
 | `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
+| `/apps/clean-space/account/`, `/apps/clean-space/auth/callback/`, `/apps/clean-space/activate/`, each also under `/ko/` (Clean Space's account, sign-in callback and app activation) | `src/pages/apps/clean-space/`, `src/pages/ko/apps/clean-space/`, `src/components/clean-space/`, `src/lib/clean-space/` | `npm run build`; see "Clean Space" under "The central checkout" below |
+| `/culture/clean-space/direct-terms.html`, `direct-refunds.html`, `direct-privacy.html` (the website edition's Terms of Service, Refund Policy and Privacy Policy, Korean authoritative with the English translation; linked, not published yet) | `public/culture/clean-space/` once published (all three or none) | `scripts/sync-mac-get-space-legal.sh --direct` from `mac-get-space` (`docs/13-direct-sale/`, `scripts/build-direct-sale-pages.py --release`); see "Publishing Clean Space's direct-sale policies" |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
-| `/checkout/<product>/` and `/ko/checkout/<product>/` (`chord-to-midi`, `dj-duplicate-guard`), with `success/` and `fail/` under each | `src/pages/checkout/`, `src/pages/ko/checkout/`, `src/components/checkout/`, `src/lib/checkout/` | `npm run build`; see "The central checkout" below |
+| `/checkout/<product>/` and `/ko/checkout/<product>/` (`chord-to-midi`, `dj-duplicate-guard`, `clean-space`), with `success/` and `fail/` under each | `src/pages/checkout/`, `src/pages/ko/checkout/`, `src/components/checkout/`, `src/lib/checkout/` | `npm run build`; see "The central checkout" below |
 | `https://music.cafe24.com/…` (old address, not Firebase) | `cafe24/www/` | Uploaded by hand to the Cafe24 web root: 301 to `cultureand.tech`, checked by `scripts/check-music-cafe24.sh`; see `cafe24/README.md` |
 
 The `/culture/...` legal URLs are registered in the Toss console and App Store Connect. They must keep returning
@@ -85,6 +87,9 @@ When an app changes:
   Store ones (without a `note`), and update `public/llms.txt`.
 - Clean Space's privacy policy changes: see "Updating Clean Space's privacy page" below. Its app pages link to
   it through `privacyPolicyPath` (published 2026-10-23).
+- Clean Space's website edition released: `NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1` and the download's https address
+  in `NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL` (without it, no download button) add its section to the app pages (see
+  "Clean Space" under "The central checkout"); update `public/llms.txt` and the sitemap's `<lastmod>` with it.
 - Chord to MIDI: mention DAW drag only once its extension is on the Chrome Web Store, and ads only once AdSense has
   approved the site.
 - A new app: an entry in `APPS` and `APP_SLUGS` (`src/lib/apps.ts`) and in `APP_METADATA` (`src/lib/seo.ts`), page
@@ -105,6 +110,7 @@ its wording (`product-copy.ts`), the tab's storage key for its session, and whet
 | --- | --- | --- | --- |
 | Chord to MIDI: Remove Ads, 364 days | `/checkout/chord-to-midi/` | Firebase project `chord-to-midi` | Open |
 | DJ Duplicate Guard: Expert, a 364-day pass | `/checkout/dj-duplicate-guard/` | Firebase project `dj-duplicate-guard` (from its M4a) | Closed |
+| Clean Space: 364 days Unlock | `/checkout/clean-space/` | its own Firebase project | Closed |
 
 - **The way through.** A buyer signs in on the product's site and continues to its checkout. The product's backend
   records a checkout session for that account and sends the tab to the product's checkout page here with a one-time
@@ -127,8 +133,8 @@ its wording (`product-copy.ts`), the tab's storage key for its session, and whet
   site's other pages) and no stale cache; their HTML has `noindex`, and they are not in the sitemap or `llms.txt`.
 - **Copies.** The seller's details in the checkout's footer (`BUSINESS` in `src/lib/checkout/config.ts`) are Culture &
   Tech's, as each product's `site.config.json` has them. The checkout's own wording (`copy.ts`) is Chord to MIDI's
-  (`src/i18n/`), and each product's wording (`product-copy.ts`) is a copy of its own. So is the contract with the
-  functions (`contract.ts`). Change them together.
+  (`src/i18n/`), and each product's wording (`product-copy.ts`) is a copy of its own (Clean Space's: its direct sale's
+  facts sheet). So is the contract with the functions (`contract.ts`). Change them together.
 
 ### Chord to MIDI
 
@@ -197,17 +203,102 @@ written confirmation for the product):
    check then requires those settings, and `scripts/check-live.sh` stops expecting closed pages.
 4. Deploy as usual (Deploy, below).
 
+### Clean Space
+
+Clean Space (`mac-get-space`) is to sell one product with its website edition, the 364 days Unlock: ₩3,300 (VAT
+included), or US$2.49 through PayPal, for 364 days from Toss's approval of the payment, ending at the same time of day;
+one payment, no renewal, another only after it ends. The facts its pages state are its direct sale's (`mac-get-space`:
+`docs/13-direct-sale/facts.md`, `docs/plans/364-days-option.md` §0). Its sales are closed, and so is its checkout, as
+DJ Duplicate Guard's: without `NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT=on` its pages say the checkout isn't open, link only to
+its home page and call nothing, and the build carries none of its offer. `scripts/check-checkout-config.mjs` refuses a
+deployment that sets the switch, or its test settings, while `CLEAN_SPACE_SALES_OPEN` in that script is `false`, and
+`scripts/check-live.sh` checks that its pages are closed. Its own server refuses every order until its sales are open,
+whatever a page shows.
+
+How it differs from the other products:
+
+- **Its site is this one.** Clean Space has no site of its own: its product page, its account page
+  (`/apps/clean-space/account/`, sign-in with Google, Kakao or Naver), its sign-in callback and its app activation page
+  are here (`src/components/clean-space/`, `src/lib/clean-space/`), and its checkout links back to them (its `origin` is
+  `https://cultureand.tech`). Those pages call its licensing service's Firebase project through a pinned copy of its
+  contract (`src/lib/clean-space/contract.generated.ts`, checked by `scripts/check-clean-space-contract.mjs`); this
+  site's project stays Hosting only. They load nothing but Firebase, are out of search results, and have their own
+  headers in `firebase.json` (`no-store` and a content security policy).
+- **Its account page starts the checkout.** Its purchase button calls the service's `beginCheckout({ lang })`, which
+  answers the checkout's address with the one-time handoff (`https://cultureand.tech[/ko]/checkout/clean-space/#handoff=…`);
+  the page opens only an https address on this site's origin, Clean Space's checkout page in either language
+  (`checkoutAddress`, `src/lib/clean-space/checkout-handoff.ts`). Its refusals (sales closed, no currency, an account
+  being deleted or without a confirmed contact email, another checkout in progress, too many checkouts, a 364 days
+  Unlock that hasn't ended: `ALREADY_OWNED_CODE` in `src/lib/clean-space/site.ts`, provisionally `ALREADY_ACTIVE`) are
+  said in the page's words. A payment the checkout kept for its buyer comes back as `?resume=<id>`: the page takes it
+  out of the address and finishes it with `confirmPayment({ resumeID })` once that buyer is signed in.
+- **Its legal pages exist once.** Its checkout links its Terms of Service, Refund Policy and Privacy Policy at
+  `/culture/clean-space/direct-terms.html`, `direct-refunds.html` and `direct-privacy.html`, one bilingual page each (a
+  page path that starts with `/` is linked as it is, without `/ko`). They are drafted in `mac-get-space`
+  (`docs/13-direct-sale/`) and published like its privacy page; the predeploy check requires them once its sales open.
+- **Its account email is a contact email.** It receives Toss Payments' receipts, support and notices, and is never a
+  way to sign in or recover the account: its checkout says "Receipt and contact email" (`receiptEmail` in its wording)
+  where the others say "Receipt and recovery email". Refunds are requested by email from its account page (a `mailto:`
+  link with the order number), as on Chord to MIDI's.
+- **Test payments.** While a currency is on Toss's test keys (before its launch, for Toss's review), its checkout says
+  that payments are test payments and that an access period they give ends when sales start for real (`testKeys` in its
+  wording, shown for a test client key), and so does its account page where the offer says so (`testCurrencies`).
+- **Settings.** Its checkout reads its account pages' settings (`src/lib/clean-space/config-rules.ts`, checked by
+  `scripts/check-clean-space-config.mjs --deploy`): `NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_API_KEY`, `_PROJECT_ID`, `_APP_ID`
+  and `_RECAPTCHA_SITE_KEY`, and in test builds `NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=emulator` (its emulator suite,
+  Functions on port 5101) and `NEXT_PUBLIC_CLEAN_SPACE_ORIGIN` (this site served elsewhere). The account pages also need
+  `NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=production`, `_FIREBASE_AUTH_DOMAIN`, `_KAKAO_CLIENT_ID` and `_NAVER_CLIENT_ID`
+  (`docs/clean-space-direct-sale.md`). The product page's website-edition section (the download, the offer, the policies
+  and a button to the account page) comes with `NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1` and
+  `NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL`; without the switch, the build leaves it out.
+- **Korean.** Its checkout wording, its account page's purchase part and its product page's section are written in
+  Korean too, awaiting the owner's review (`docs/clean-space-ko-review.md`); the rest of its account, sign-in and
+  activation pages is English on `/ko/` until a reviewed translation.
+
+#### Opening Clean Space's checkout
+
+Only when its owner opens the 364 days Unlock's sales (first on Toss Payments' test keys, for Toss's review before
+its contract):
+
+1. Its Terms of Service, Refund Policy and Privacy Policy are published at the three addresses above ("Publishing
+   Clean Space's direct-sale policies", below).
+2. In Google Cloud (its licensing project), its web app's reCAPTCHA Enterprise key lists `cultureand.tech` among its
+   domains, its API key, if it has website restrictions, allows `https://cultureand.tech/*`, and Firebase
+   Authentication's authorized domains list `cultureand.tech`.
+3. `.env.production.local` gets the switch and that web app's public settings, with its account pages' settings:
+
+   ```
+   NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT=on
+   NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=production
+   NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_API_KEY=…
+   NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_AUTH_DOMAIN=…
+   NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_PROJECT_ID=…
+   NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_APP_ID=…
+   NEXT_PUBLIC_CLEAN_SPACE_RECAPTCHA_SITE_KEY=…
+   NEXT_PUBLIC_CLEAN_SPACE_KAKAO_CLIENT_ID=…
+   NEXT_PUBLIC_CLEAN_SPACE_NAVER_CLIENT_ID=…
+   ```
+
+   and, for the download and the offer on its product page, `NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1` with
+   `NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL=https://…`.
+4. `CLEAN_SPACE_SALES_OPEN = true` in `scripts/check-checkout-config.mjs`, in a commit of its own: the predeploy check
+   then requires those settings and the published policies, and `scripts/check-live.sh` stops expecting closed pages.
+5. Deploy as usual (Deploy, below).
+
 ## Deploy
 
 Releases are manual, from a clean, committed `main`, with the pinned CLI and an explicit project.
 Needs `firebase login` with the account that owns `cultureand-tech-web` (sochan@cultureand.tech).
-Channel deploys first check the settings of the central checkout (`scripts/check-checkout-config.mjs`), then run
-`npm run build`, add the Cafe24 compatibility assets and check `out/culture/thai-learn/`, `out/culture/clean-space/` and
-`out/culture/english-thai-learn/` (`predeploy` in `firebase.json`).
+Channel deploys first check the settings of the central checkout (`scripts/check-checkout-config.mjs`), Clean Space's
+pinned contract (`scripts/check-clean-space-contract.mjs`) and its account pages' settings
+(`scripts/check-clean-space-config.mjs --deploy`), then run `npm run build`, add the Cafe24 compatibility assets and
+check `out/culture/thai-learn/`, `out/culture/clean-space/` and `out/culture/english-thai-learn/` (`predeploy` in
+`firebase.json`). `npm test` runs the unit tests (vitest) of Clean Space's pages and checkout entry and of the
+predeploy checks.
 
 ```bash
 fb() { npx --yes firebase-tools@15.32.1 "$@"; }
-npm ci && npm run lint && node_modules/.bin/tsc --noEmit --incremental false
+npm ci && npm run lint && node_modules/.bin/tsc --noEmit --incremental false && npm test
 
 # Preview: a temporary *.web.app URL, no effect on the live site
 fb hosting:channel:deploy cafe24-migration --expires 7d --no-authorized-domains --project cultureand-tech-web
@@ -241,6 +332,19 @@ Never edit the copied HTML by hand.
    `/culture/clean-space/privacy.html`; its address until 2026-11-05, `/culture/mac-get-space/privacy.html`, is a 301
    to it. The script and the app's build folders (`build/legal-upload/mac-get-space/`) keep the repository's name.
 
+## Publishing Clean Space's direct-sale policies
+
+The website edition's Terms of Service, Refund Policy and Privacy Policy (`direct-terms.html`, `direct-refunds.html`,
+`direct-privacy.html`) share `public/culture/clean-space/` and its `styles.css` with the App Store privacy page; each
+sync replaces only its own pages, and the predeploy check accepts the folder only with all three or none of them.
+
+1. In `mac-get-space`: the owner approves each document's text by fingerprint (docs/13 "Publishing"; previews from
+   `scripts/build-direct-sale-pages.py` in `build/legal-preview/clean-space-direct/`); on the publication day set the
+   effective date in all six files, commit, and run `scripts/build-direct-sale-pages.py --release`.
+2. Here: `scripts/sync-mac-get-space-legal.sh --direct` (refuses drafts, placeholders, scripts, other hosts' resources,
+   links that are not https, mailto or these pages, and uncommitted sources), commit ("Clean Space legal: …"), deploy.
+   Add the three addresses to `scripts/check-live.sh` and `public/sitemap.xml` with that deploy.
+
 ## Updating English-Thai Learn's privacy and support pages
 
 1. In `thai-word-learn-app`: edit `docs/legal/privacy-policy-draft.md` or `docs/legal/support-page-draft.md`, review
@@ -258,9 +362,12 @@ Never edit the copied HTML by hand.
   code, `.ait` bundles, service-account files or `.env` files.
 - Hosting only: never enable Firestore, Functions, Auth or Analytics in `cultureand-tech-web`, and never deploy
   this site to another Firebase project. Each product's checkout pages call that product's own project (such as
-  `chord-to-midi`) from the browser; nothing of it runs in this one.
+  `chord-to-midi`) from the browser, and so do Clean Space's account, sign-in callback and activation pages; nothing
+  of it runs in this one.
 - The checkout pages load no third-party script, font or embed beyond Toss Payments and the product's Firebase
-  backend ("The central checkout", above).
+  backend, and Clean Space's account, sign-in callback and activation pages nothing beyond its Firebase project ("The
+  central checkout", above). Links into those pages are full page loads (never client-side navigation), so that nothing
+  another page loaded comes along.
 - `Referrer-Policy: no-referrer` applies to `/culture/**` only; the homepage's YouTube embeds need a referrer.
 - Firebase itself sends `Strict-Transport-Security: max-age=31556926` (no `includeSubDomains`) on the custom
   domain. Do not add `includeSubDomains` or `preload`.

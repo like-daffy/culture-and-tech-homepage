@@ -1,0 +1,84 @@
+// A fake Clean Space service for the unit tests: answers shaped exactly as the contract says, records every call, and
+// refuses the way the real callables do (an object with `code: "functions/<status>"` and `details: { code, message }`).
+import type { CleanSpaceApi } from "../api";
+import {
+  DURATION_DAYS,
+  DURATION_SECONDS,
+  OFFER_PRICES,
+  OFFER_VERSION,
+  PRODUCT_DISPLAY_NAME,
+  PRODUCT_ID,
+  type AccountSummary,
+  type GetAccountResponse,
+  type GetOfferResponse,
+} from "../contract.generated";
+
+export const NOW = 1_795_595_600;
+
+/** A refusal as a callable throws it. `code` may be one the contract doesn't list yet (the service's new checkout codes). */
+export function serviceError(status: string, code: string, message = "Refused."): Error & { code: string; details: unknown } {
+  return Object.assign(new Error(message), { code: `functions/${status}`, details: { code, message } });
+}
+
+export function offer(overrides: Partial<GetOfferResponse> = {}): GetOfferResponse {
+  return {
+    contractVersion: 1,
+    productID: PRODUCT_ID,
+    offerVersion: OFFER_VERSION,
+    displayName: PRODUCT_DISPLAY_NAME,
+    durationDays: DURATION_DAYS,
+    durationSeconds: DURATION_SECONDS,
+    prices: [
+      { ...OFFER_PRICES.KRW, available: true, test: false },
+      { ...OFFER_PRICES.USD, available: true, test: false },
+    ],
+    salesOpen: true,
+    policyVersions: { terms: "2026-11-07", privacy: "2026-11-07", refunds: "2026-11-07" },
+    serverTime: NOW,
+    ...overrides,
+  };
+}
+
+export function accountSummary(overrides: Partial<AccountSummary> = {}): AccountSummary {
+  return {
+    accountID: "uid-buyer",
+    providers: ["kakao"],
+    displayLabel: "b•••@example.com",
+    contact: { email: "buyer@example.com", verifiedAt: NOW - 600 },
+    ...overrides,
+  };
+}
+
+export function account(overrides: Partial<GetAccountResponse> = {}): GetAccountResponse {
+  return {
+    account: accountSummary(),
+    license: { productID: PRODUCT_ID, status: "none", startsAt: null, expiresAt: null, revision: 0 },
+    deletionRequestedAt: null,
+    acceptedPolicies: null,
+    nativeSessions: [],
+    serverTime: NOW,
+    ...overrides,
+  };
+}
+
+type Calls = Array<{ method: keyof CleanSpaceApi; request: unknown }>;
+
+/** A fake service: each method answers from `answers` (a value or a function of the request), or refuses. */
+export function fakeApi(answers: Partial<Record<keyof CleanSpaceApi, unknown>> = {}): CleanSpaceApi & { calls: Calls } {
+  const calls: Calls = [];
+  const handler = (method: keyof CleanSpaceApi) => async (request?: unknown) => {
+    calls.push({ method, request });
+    const answer = answers[method];
+    if (answer instanceof Error) throw answer;
+    if (typeof answer === "function") return (answer as (r: unknown) => unknown)(request);
+    if (answer === undefined) throw serviceError("unimplemented", "INTERNAL", `${method} not faked`);
+    return answer;
+  };
+  const methods = [
+    "getOffer", "signInWithProvider", "getAccount", "beginContactVerification", "confirmContactVerification", "linkProvider",
+    "unlinkProvider", "requestAccountDeletion", "endNativeSessions", "beginCheckout", "confirmPayment",
+    "getAccountPurchases", "inspectActivation", "approveActivation", "denyActivation",
+  ] as const satisfies readonly (keyof CleanSpaceApi)[];
+  const api = Object.fromEntries(methods.map((m) => [m, handler(m)])) as unknown as CleanSpaceApi;
+  return Object.assign(api, { calls });
+}

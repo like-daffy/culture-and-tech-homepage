@@ -46,10 +46,14 @@ const nextConfig = {
     ],
   },
   allowedDevOrigins: ["*.daytona.work", "*.softgen.dev"],
-  // DJ Duplicate Guard's checkout switch, written into the pages whether it is set or not: a build that keeps the
-  // checkout closed then leaves its offer out of the bundle (src/lib/checkout/products.ts; README, "DJ Duplicate Guard").
+  // DJ Duplicate Guard's and Clean Space's checkout switches, and Clean Space's website-edition switch, written into the
+  // pages whether they are set or not: a build that keeps a checkout closed, or the website edition unreleased, then
+  // leaves its offer out of the bundle (src/lib/checkout/products.ts, src/lib/apps.ts; README, "DJ Duplicate Guard" and
+  // "Clean Space").
   env: {
     NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT: process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT ?? "",
+    NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT: process.env.NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT ?? "",
+    NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE: process.env.NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE ?? "",
   },
 };
 

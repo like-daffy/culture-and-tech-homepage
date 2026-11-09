@@ -257,6 +257,9 @@ function Checkout({
   const productCopy = product.copy[lang];
   const { options } = checkout;
   const testOption = options.find((option) => option.test) ?? null;
+  // A product sold on Toss's test keys before its launch says so while a currency's client key is a test key.
+  const onTestKeys =
+    productCopy.testKeys !== undefined && options.some((option) => !option.test && /^test_/.test(option.clientKey));
   const [currency, setCurrency] = useState<Currency>(() => suggestedCurrency(lang, options));
   const option = options.find((candidate) => candidate.currency === currency) ?? options[0] ?? null;
   // The page states a pass's length in fixed words: a server that says otherwise stops the payment before it starts.
@@ -269,6 +272,7 @@ function Checkout({
       {testOption && (
         <Notice>{fill(productCopy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>
       )}
+      {!testOption && onTestKeys && <Notice>{productCopy.testKeys}</Notice>}
       <Notice>
         {fill(productCopy.account, { email: checkout.receiptEmail })}{" "}
         <a className="underline" href={productUrl(product, lang, product.startPage)}>
@@ -528,7 +532,9 @@ function Payment({
   };
 
   const shownEmail = step.kind === "paying" ? step.order.receiptEmail : receiptEmail;
-  const receipt = <p className="text-sm text-muted-foreground">{fill(copy.receiptEmail, { email: shownEmail })}</p>;
+  // The product's own label where its account email isn't a recovery address (Clean Space's contact email).
+  const receiptLabel = productCopy.receiptEmail ?? copy.receiptEmail;
+  const receipt = <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail })}</p>;
 
   if (step.kind === "agree" || step.kind === "preparing") {
     return (

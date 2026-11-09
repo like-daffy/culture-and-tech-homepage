@@ -1,6 +1,7 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ChevronRight, Download, ExternalLink } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -49,6 +50,24 @@ function SectionItems({ section }: { section: AppSection }) {
         </div>
       ))}
     </div>
+  );
+}
+
+/** A section's line of links: each `{name}` in its text becomes the link of that name */
+function LinkLine({ line }: { line: NonNullable<AppSection["linkLine"]> }) {
+  return (
+    <p className="mt-6 max-w-3xl text-sm text-muted-foreground leading-relaxed">
+      {line.text.split(/\{(\w+)\}/).map((part, index) => {
+        const link = index % 2 === 1 ? line.links[part] : undefined;
+        return link ? (
+          <a key={index} href={link.href} className="font-medium text-primary underline underline-offset-4 hover:text-accent">
+            {link.label}
+          </a>
+        ) : (
+          <Fragment key={index}>{part}</Fragment>
+        );
+      })}
+    </p>
   );
 }
 
@@ -184,6 +203,20 @@ export function AppPage({ slug, language }: AppPageProps) {
                     {section.note}
                   </p>
                 )}
+                {section.links && section.links.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    {/* Full page loads (no client-side navigation): the account page loads nothing of this page's. */}
+                    {section.links.map((link, index) => (
+                      <Button key={link.href} asChild size="lg" variant={index === 0 ? "default" : "outline"}>
+                        <a href={link.href}>
+                          {link.label}
+                          {link.download ? <Download /> : <ArrowRight />}
+                        </a>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                {section.linkLine && <LinkLine line={section.linkLine} />}
               </div>
             </section>
           ))}
