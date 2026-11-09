@@ -30,7 +30,7 @@ import {
   type ResumeRefusal,
 } from "@/lib/clean-space/checkout-handoff";
 import { CLEAN_SPACE, SUPPORT_EMAIL } from "@/lib/clean-space/config";
-import { COPY, PURCHASE_COPY, PURCHASE_LANG } from "@/lib/clean-space/copy";
+import { ACCOUNT_LANG, COPY, PURCHASE_COPY, PURCHASE_LANG } from "@/lib/clean-space/copy";
 import type {
   ConfirmPaymentResponse,
   GetAccountResponse,
@@ -288,6 +288,8 @@ export function AccountPage({ lang }: { lang: PageLang }) {
           </Section>
         </div>
 
+        {/* Still English on the Korean page until its Korean is approved. */}
+        <div lang="en">
         <Section title={copy.appsHeading}>
           {summary.nativeSessions.length === 0 ? (
             <p className="text-sm">{copy.appsNone}</p>
@@ -313,6 +315,7 @@ export function AccountPage({ lang }: { lang: PageLang }) {
             {copy.endSessions}
           </Button>
         </Section>
+        </div>
 
         {!deleting && <DeleteAccount lang={lang} busy={busy !== null} onDelete={deleteAccount} />}
       </div>
@@ -320,7 +323,7 @@ export function AccountPage({ lang }: { lang: PageLang }) {
   })();
 
   return (
-    <SensitiveLayout lang={lang} title={copy.accountTitle} languageRoute="account" seller>
+    <SensitiveLayout lang={lang} title={copy.accountTitle} languageRoute="account" seller contentLang={ACCOUNT_LANG[lang]}>
       <PageTitle title={copy.accountTitle} />
       {message && (
         <Notice tone={message.tone} className="mb-6">

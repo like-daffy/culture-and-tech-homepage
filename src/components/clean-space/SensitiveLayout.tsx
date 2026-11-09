@@ -19,6 +19,8 @@ interface SensitiveLayoutProps {
   languageRoute?: "account" | "activate";
   /** Show the seller's details (the account page, where a purchase starts). */
   seller?: boolean;
+  /** The language the page's main text is written in (default CONTENT_LANG: the activation page is English for now). */
+  contentLang?: "en" | "ko";
   children: ReactNode;
 }
 
@@ -32,7 +34,7 @@ interface SensitiveLayoutProps {
  * details as the checkout does (BUSINESS, labelled by the checkout's reviewed words, src/lib/checkout/), in the page's
  * language.
  */
-export function SensitiveLayout({ lang, title, languageRoute, seller = false, children }: SensitiveLayoutProps) {
+export function SensitiveLayout({ lang, title, languageRoute, seller = false, contentLang, children }: SensitiveLayoutProps) {
   const copy = COPY[lang];
   const checkoutCopy = CHECKOUT_COPY[lang];
   const labels = checkoutCopy.footer;
@@ -65,7 +67,7 @@ export function SensitiveLayout({ lang, title, languageRoute, seller = false, ch
             )}
           </div>
         </header>
-        <main lang={CONTENT_LANG[lang]} className="container max-w-3xl flex-1 py-10 md:py-14">
+        <main lang={contentLang ?? CONTENT_LANG[lang]} className="container max-w-3xl flex-1 py-10 md:py-14">
           {children}
         </main>
         <footer lang={lang} className="border-t border-border bg-muted/30 py-8 text-xs text-muted-foreground">

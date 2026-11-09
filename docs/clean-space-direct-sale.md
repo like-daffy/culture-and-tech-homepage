@@ -192,9 +192,10 @@ that copy. It never claims Docker, the helper or Spotlight for the App Store app
 ## Korean text
 
 New Korean text (the checkout's wording for Clean Space, the account page's purchase part, the product page's section
-and the test-payment notices) is listed for the owner's review in `docs/clean-space-ko-review.md`. The rest of the
-account, sign-in and activation pages shows the English text below on `/ko/`, marked `lang="en"`, until the owner
-reviews a translation. Already Korean, from the site's published copy: the brand `컬처앤테크` (Korean navigation), `문의`
+and the test-payment notices, and since 2026-11-09 the account page's sign-in, contact email, sign-in methods and account
+deletion and the sign-in callback page) is listed for the owner's review in `docs/clean-space-ko-review.md`. The
+activation page and the account page's Macs section still show their English text on `/ko/`, marked `lang="en"`, until
+the owner approves a translation. Already Korean, from the site's published copy: the brand `컬처앤테크` (Korean navigation), `문의`
 (Support, the app pages), the language link `English`, and the footer (the checkout's reviewed seller and policy
 labels).
 
