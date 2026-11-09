@@ -5,6 +5,7 @@ import { CLEAN_SPACE } from "@/lib/clean-space/config";
 import { ACCOUNT_LANG, COPY } from "@/lib/clean-space/copy";
 import type { BrokeredProvider, PageLang, ReturnTarget } from "@/lib/clean-space/contract.generated";
 import { ProviderSignInError } from "@/lib/clean-space/oauth";
+import { EmailSignInForm } from "./EmailSignInForm";
 import { Notice, Section } from "./SensitiveLayout";
 
 interface SignInPanelProps {
@@ -16,14 +17,16 @@ interface SignInPanelProps {
 }
 
 /**
- * Google, Kakao and Naver, each as an account's only sign-in method (plan §6). Google signs in in a popup on this
- * page; Kakao and Naver leave for the provider and come back through the callback page to `returnTo`. What the person
- * chose before signing in (the unpaid checkout, an activation request) stays in this tab.
+ * Google, Kakao, Naver and "Continue with email", each as an account's only sign-in method (plan §6). Google signs in
+ * in a popup on this page; Kakao and Naver leave for the provider and come back through the callback page to
+ * `returnTo`; the email link opens the email landing page (in a new tab, usually), which signs in and goes on to
+ * `returnTo`. What the person chose before signing in (the unpaid checkout, an activation request) stays in this tab.
  */
 export function SignInPanel({ lang, returnTo, title, intro }: SignInPanelProps) {
   const copy = COPY[lang];
   const [busy, setBusy] = useState<"google" | BrokeredProvider | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  const [emailOpen, setEmailOpen] = useState(false);
   const brokered = brokeredProvidersHere();
 
   const google = async () => {
@@ -67,7 +70,17 @@ export function SignInPanel({ lang, returnTo, title, intro }: SignInPanelProps) 
             {busy === provider ? copy.signInBusy : copy.continueWith(copy.providerNames[provider])}
           </Button>
         ))}
+        {CLEAN_SPACE.configured && !emailOpen && (
+          <Button type="button" variant="outline" onClick={() => setEmailOpen(true)} disabled={busy !== null}>
+            {copy.continueWithEmail}
+          </Button>
+        )}
       </div>
+      {CLEAN_SPACE.configured && emailOpen && (
+        <div className="mt-4 sm:max-w-sm">
+          <EmailSignInForm lang={lang} intent="signin" returnTo={returnTo} />
+        </div>
+      )}
       {problem && (
         <Notice tone="error" className="mt-4">
           {problem}

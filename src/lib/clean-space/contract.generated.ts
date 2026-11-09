@@ -1,7 +1,7 @@
 // GENERATED FILE: a pinned copy of the Clean Space licensing contract. Do not edit.
 // Source: mac-get-space services/licensing/contract/src/index.ts (node scripts/export.mjs <this file>).
 // contract-version: 1
-// sha256: 62be7dc32b9b9791056511da091f90a252d6cbcf5fe41ce74a2345f1445d320f
+// sha256: 01c5c41841d0945662824b7fd08554e1f791a520197df81d1fbd8e20bd9f30c8
 // Clean Space licensing contract, version 1 (docs/plans/364-days-option.md §5.2, §7, §8).
 //
 // The one description of what the Clean Space licensing service, the cultureand.tech pages and the website build of the
@@ -74,8 +74,13 @@ export const OFFER_PRICES: Readonly<Record<Currency, Money>> = {
   USD: { currency: 'USD', amountMinor: 249 },
 };
 
-/** Sign-in providers. All three are required and each works as an account's only sign-in method (plan §6). */
-export const PROVIDERS = ['google', 'kakao', 'naver'] as const;
+/**
+ * Sign-in methods. Each works as an account's only sign-in method (plan §6). `email` is the passwordless email link
+ * ("Continue with email", owner's decision 2026-11-09): a sign-in method of its own, keyed by its address, never the
+ * account's contact email and never matched with any other account's addresses. Added within contract v1: the app keeps
+ * providers as the service names them and shows only the ones it knows.
+ */
+export const PROVIDERS = ['google', 'kakao', 'naver', 'email'] as const;
 export type Provider = (typeof PROVIDERS)[number];
 /** Providers whose OAuth code the service exchanges itself (the broker); Google signs in through Firebase Auth. */
 export const BROKERED_PROVIDERS = ['kakao', 'naver'] as const;
@@ -238,6 +243,10 @@ export const ERROR_CODE = {
   providerDenied: 'PROVIDER_DENIED',
   providerUnreachable: 'PROVIDER_UNREACHABLE',
   oauthStateInvalid: 'OAUTH_STATE_INVALID',
+  /** An email sign-in link that was used, expired, replaced or isn't Firebase's: request a new one. */
+  emailLinkInvalid: 'EMAIL_LINK_INVALID',
+  /** The address given is not the one the email sign-in link was sent to. */
+  emailMismatch: 'EMAIL_MISMATCH',
   identityInUse: 'IDENTITY_IN_USE',
   providerAlreadyLinked: 'PROVIDER_ALREADY_LINKED',
   lastSignInMethod: 'LAST_SIGN_IN_METHOD',
@@ -582,6 +591,10 @@ export const NATIVE_CLAIM = { channel: 'cs', channelValue: 'native', nativeSessi
 export const CALLABLE = {
   getOffer: 'getOffer',
   signInWithProvider: 'signInWithProvider',
+  /** Binds an email sign-in link that adds the email method to the signed-in account (BeginEmailLinkRequest). */
+  beginEmailLink: 'beginEmailLink',
+  /** "Continue with email": redeems Firebase's emailed link server-side (CompleteEmailSignInRequest). */
+  completeEmailSignIn: 'completeEmailSignIn',
   getAccount: 'getAccount',
   beginContactVerification: 'beginContactVerification',
   confirmContactVerification: 'confirmContactVerification',
@@ -622,13 +635,15 @@ export interface ReturnTarget {
 }
 
 /** The exact path of each page (trailing slash included), English and Korean. */
-export const PAGE_PATH: Readonly<Record<ReturnRoute | 'callback' | 'success' | 'fail' | 'product', Readonly<Record<PageLang, string>>>> = {
+export const PAGE_PATH: Readonly<Record<ReturnRoute | 'callback' | 'emailLink' | 'success' | 'fail' | 'product', Readonly<Record<PageLang, string>>>> = {
   product: { en: '/apps/clean-space/', ko: '/ko/apps/clean-space/' },
   checkout: { en: '/checkout/clean-space/', ko: '/ko/checkout/clean-space/' },
   success: { en: '/checkout/clean-space/success/', ko: '/ko/checkout/clean-space/success/' },
   fail: { en: '/checkout/clean-space/fail/', ko: '/ko/checkout/clean-space/fail/' },
   account: { en: '/apps/clean-space/account/', ko: '/ko/apps/clean-space/account/' },
   callback: { en: '/apps/clean-space/auth/callback/', ko: '/ko/apps/clean-space/auth/callback/' },
+  /** Where an email sign-in link lands (the continue URL given to Firebase, with its own query; see EMAIL_LINK). */
+  emailLink: { en: '/apps/clean-space/auth/email/', ko: '/ko/apps/clean-space/auth/email/' },
   activate: { en: '/apps/clean-space/activate/', ko: '/ko/apps/clean-space/activate/' },
 };
 
@@ -665,6 +680,63 @@ export interface LinkProviderResponse {
   account: AccountSummary;
 }
 
+/**
+ * "Continue with email" (passwordless email link). The page has Firebase Auth email a sign-in link
+ * (sendSignInLinkToEmail, handleCodeInApp) whose continue URL is PAGE_PATH.emailLink with `intent`, `return` and, for
+ * `link`, `action`; Firebase appends its one-time code. The page sends the code here: the service redeems it with
+ * Firebase itself, checks the session Firebase answers with (this project, this address, verified), throws that session
+ * away and answers with its own custom token (claim `sgen`), as for Kakao and Naver. Firebase's own email-link and
+ * password sessions are never accepted. The address is matched with nothing but the email sign-in identity it keys:
+ * not a Google account's email, a Kakao or Naver email, or any account's contact email.
+ */
+export const EMAIL_LINK = {
+  /** A link-binding (beginEmailLink) can complete for this long, by the session that began it. */
+  actionTTLSeconds: 1800,
+  /** Query parameters of the continue URL the page writes (Firebase adds mode, oobCode, apiKey, lang). */
+  intentParam: 'intent',
+  returnParam: 'return',
+  actionParam: 'action',
+} as const;
+export type EmailSignInIntent = 'signin' | 'reauth' | 'link';
+export const EMAIL_SIGN_IN_INTENTS: readonly EmailSignInIntent[] = ['signin', 'reauth', 'link'];
+
+/** Before the page has Firebase email a link that adds the email method: binds it to this account and session. */
+export interface BeginEmailLinkRequest {
+  email: string;
+  lang: PageLang;
+}
+export interface BeginEmailLinkResponse {
+  /** Goes into the continue URL as `action`; completing needs the same account and sign-in. */
+  actionID: string;
+  expiresAt: number;
+}
+
+/**
+ * The link opened. `signin` signs in to the address's email account, creating one if it has none; `reauth` proves the
+ * signed-in account again (the address must be its email method); `link` adds the email method to the signed-in
+ * account that began `actionID`.
+ */
+export interface CompleteEmailSignInRequest {
+  intent: EmailSignInIntent;
+  email: string;
+  /** Firebase's one-time code from the link (`oobCode`). */
+  oobCode: string;
+  /** For `link` only. */
+  actionID?: string;
+}
+export interface CompleteEmailSignInResponse {
+  /** For `signin` and `reauth`. Absent for `link`. */
+  customToken?: string;
+  account: AccountSummary;
+  created: boolean;
+}
+
+/** The account's email sign-in method, as its owner is shown it (never the contact email). */
+export interface EmailSignInSummary {
+  email: string;
+  linkedAt: number;
+}
+
 export interface UnlinkProviderRequest {
   provider: Provider;
 }
@@ -680,6 +752,8 @@ export interface GetAccountResponse {
   deletionRequestedAt: number | null;
   /** The policy versions this account last accepted at checkout, if any. */
   acceptedPolicies: PolicyVersions | null;
+  /** The email sign-in method's address, if the account has one (shown to its owner only). */
+  emailSignIn: EmailSignInSummary | null;
   /** Installations signed in with this account (no hardware details; the app version and when it was approved). */
   nativeSessions: Array<{ nativeSessionID: string; appVersion: string; approvedAt: number; lastSeenAt: number | null }>;
   serverTime: number;
@@ -951,6 +1025,37 @@ export function parseBeginContactVerification(value: unknown): Parsed<BeginConta
   if (!isEmailAddress(value.email)) return invalid('Enter a valid email address.');
   if (value.lang !== 'en' && value.lang !== 'ko') return invalid('Bad language.');
   return { ok: true, value: { email: value.email.trim(), lang: value.lang } };
+}
+
+/** The form an address is kept and compared in (Firebase lower-cases them too). */
+export function canonicalEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+/** Firebase's one-time code of an emailed link: bounded, no whitespace or control characters. */
+export function isOobCode(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0 && value.length <= 1024 && !/[\s\u0000-\u001f\u007f]/.test(value);
+}
+
+export function parseBeginEmailLink(value: unknown): Parsed<BeginEmailLinkRequest> {
+  if (!isRecord(value) || !exactKeys(value, ['email', 'lang'])) return invalid('Unexpected request.');
+  if (typeof value.email !== 'string' || !isEmailAddress(value.email.trim())) return invalid('Enter a valid email address.');
+  if (value.lang !== 'en' && value.lang !== 'ko') return invalid('Bad language.');
+  return { ok: true, value: { email: canonicalEmail(value.email), lang: value.lang } };
+}
+
+export function parseCompleteEmailSignIn(value: unknown): Parsed<CompleteEmailSignInRequest> {
+  if (!isRecord(value) || !exactKeys(value, ['intent', 'email', 'oobCode', 'actionID'])) return invalid('Unexpected request.');
+  const intent = value.intent;
+  if (intent !== 'signin' && intent !== 'reauth' && intent !== 'link') return invalid('Unknown intent.');
+  if (typeof value.email !== 'string' || !isEmailAddress(value.email.trim())) return invalid('Enter a valid email address.');
+  if (!isOobCode(value.oobCode)) return { ok: false, code: ERROR_CODE.emailLinkInvalid, message: 'This page needs the link from the email, as it came.' };
+  if (intent === 'link') {
+    if (!isId22(value.actionID)) return { ok: false, code: ERROR_CODE.emailLinkInvalid, message: 'This link is not for this page. Request a new one.' };
+    return { ok: true, value: { intent, email: canonicalEmail(value.email), oobCode: value.oobCode, actionID: value.actionID } };
+  }
+  if (value.actionID !== undefined) return invalid('Unexpected request.');
+  return { ok: true, value: { intent, email: canonicalEmail(value.email), oobCode: value.oobCode } };
 }
 
 export function parseConfirmContactVerification(value: unknown): Parsed<ConfirmContactVerificationRequest> {

@@ -16,7 +16,7 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/robots.txt`, `/sitemap.xml`, `/llms.txt` | `public/` (hand-written) | see `docs/seo.md` |
 | `/culture/thai-learn/{index,terms,privacy,privacy-consent}.html`, `styles.css` | `public/culture/thai-learn/` (generated, committed) | `scripts/sync-thai-legal.sh` from `toss-in-app-thai-phrase` |
 | `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
-| `/apps/clean-space/account/`, `/apps/clean-space/auth/callback/`, `/apps/clean-space/activate/`, each also under `/ko/` (Clean Space's account, sign-in callback and app activation) | `src/pages/apps/clean-space/`, `src/pages/ko/apps/clean-space/`, `src/components/clean-space/`, `src/lib/clean-space/` | `npm run build`; see "Clean Space" under "The central checkout" below |
+| `/apps/clean-space/account/`, `/apps/clean-space/auth/callback/`, `/apps/clean-space/auth/email/`, `/apps/clean-space/activate/`, each also under `/ko/` (Clean Space's account, sign-in callback, email sign-in link and app activation) | `src/pages/apps/clean-space/`, `src/pages/ko/apps/clean-space/`, `src/components/clean-space/`, `src/lib/clean-space/` | `npm run build`; see "Clean Space" under "The central checkout" below |
 | `/culture/clean-space/direct-terms.html`, `direct-refunds.html`, `direct-privacy.html` (the website edition's Terms of Service, Refund Policy and Privacy Policy, Korean authoritative with the English translation; published 2026-11-10) | `public/culture/clean-space/` once published (all three or none) | `scripts/sync-mac-get-space-legal.sh --direct` from `mac-get-space` (`docs/13-direct-sale/`, `scripts/build-direct-sale-pages.py --release`); see "Publishing Clean Space's direct-sale policies" |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
@@ -218,7 +218,8 @@ whatever a page shows.
 How it differs from the other products:
 
 - **Its site is this one.** Clean Space has no site of its own: its product page, its account page
-  (`/apps/clean-space/account/`, sign-in with Google, Kakao or Naver), its sign-in callback and its app activation page
+  (`/apps/clean-space/account/`, sign-in with Google, Kakao, Naver or a passwordless email link), its sign-in callback,
+  its email link page (`/apps/clean-space/auth/email/`) and its app activation page
   are here (`src/components/clean-space/`, `src/lib/clean-space/`), and its checkout links back to them (its `origin` is
   `https://cultureand.tech`). Those pages call its licensing service's Firebase project through a pinned copy of its
   contract (`src/lib/clean-space/contract.generated.ts`, checked by `scripts/check-clean-space-contract.mjs`); this
@@ -237,7 +238,8 @@ How it differs from the other products:
   page path that starts with `/` is linked as it is, without `/ko`). They are drafted in `mac-get-space`
   (`docs/13-direct-sale/`) and published like its privacy page; the predeploy check requires them once its sales open.
 - **Its account email is a contact email.** It receives Toss Payments' receipts, support and notices, and is never a
-  way to sign in or recover the account: its checkout says "Receipt and contact email" (`receiptEmail` in its wording)
+  way to sign in or recover the account (its "Continue with email" address is a separate sign-in method, which receives
+  only sign-in links and never matches another account by address): its checkout says "Receipt and contact email" (`receiptEmail` in its wording)
   where the others say "Receipt and recovery email". Refunds are requested by email from its account page (a `mailto:`
   link with the order number), as on Chord to MIDI's.
 - **Test payments.** While a currency is on Toss's test keys (before its launch, for Toss's review), its checkout says

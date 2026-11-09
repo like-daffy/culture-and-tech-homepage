@@ -15,15 +15,17 @@ interface ContactVerificationProps {
   currentSession: () => string | null;
   onVerified: (account: AccountSummary) => void;
   title?: string;
+  /** A suggestion for the field (the account's sign-in email); it still needs the 6-digit code to become the contact. */
+  initialEmail?: string;
 }
 
 /**
  * Confirms a receipt and support address on the signed-in account with a 6-digit code (plan §6.2). It is contact
  * verification only: the address never becomes a way to sign in, and nothing is merged by email.
  */
-export function ContactVerification({ lang, api, sessionKey, currentSession, onVerified, title }: ContactVerificationProps) {
+export function ContactVerification({ lang, api, sessionKey, currentSession, onVerified, title, initialEmail }: ContactVerificationProps) {
   const copy = COPY[lang];
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail ?? "");
   const [pending, setPending] = useState<{ pendingID: string; email: string } | null>(null);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);

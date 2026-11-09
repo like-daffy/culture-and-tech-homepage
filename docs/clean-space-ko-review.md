@@ -23,6 +23,11 @@ activation page and the account page's Macs section (`docs/clean-space-direct-sa
 Rows 114–160 (added 2026-11-09, the owner's approval to draft them): the account page's sign-in, contact email, sign-in
 methods and account deletion, and the sign-in callback page (`COPY.ko`).
 
+Rows 161–197 (added 2026-11-09 with "Continue with email", the owner's decision of that day): the email sign-in in the
+sign-in panel, the email link page (`/ko/apps/clean-space/auth/email/`) and the email method on the account page
+(`COPY.ko`). They follow Chord to MIDI's reviewed `auth.email.*` and `auth.link.*` Korean where the meaning is the same
+(the note says which key); rows marked "New" have no reviewed counterpart. Row 161 replaces row 122's wording.
+
 When each row shows: the checkout rows (`CLEAN_SPACE_COPY`) only in a build that opens Clean Space's checkout, except
 `backToProduct`, which the closed checkout pages show now; the product page rows (`COPY (product page)`) only with
 `NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1`; the account page rows (`PURCHASE_COPY`) on `/ko/apps/clean-space/account/`
@@ -190,3 +195,40 @@ once the account pages are configured. `{name}` parts are filled in by the page.
 | 158 | `COPY.ko.deleteConfirm` (clean-space/copy.ts) | 계정을 삭제해도 환불되지 않는다는 것을 이해했습니다. | I understand that deleting my account is not a refund. | pending review |  |
 | 159 | `COPY.ko.deleteRequested` (clean-space/copy.ts) | {date}에 삭제를 요청했습니다. 삭제는 자동으로 끝납니다. | Deletion was requested on {date}. It finishes by itself. | pending review |  |
 | 160 | `COPY.ko.providerNames` (clean-space/copy.ts) | Google / 카카오 / 네이버 | Google / Kakao / Naver | pending review | Chord to MIDI's reviewed provider names |
+| 161 | `COPY.ko.signInIntro` (clean-space/copy.ts) | Google, 카카오, 네이버 계정 또는 이메일 주소로 로그인하세요. 구매는 로그인한 계정에 적용됩니다. | Sign in with Google, Kakao, Naver or your email address. A purchase belongs to the account you sign in with. | pending review | Replaces row 122's wording (email sign-in added) |
+| 162 | `COPY.ko.continueWithEmail` (clean-space/copy.ts) | 이메일로 계속하기 | Continue with email | pending review | Chord to MIDI's reviewed `auth.buttons.email` |
+| 163 | `COPY.ko.emailLabel` (clean-space/copy.ts) | 이메일 주소 | Email address | pending review | Chord to MIDI's reviewed `auth.email.label` |
+| 164 | `COPY.ko.emailSend` (clean-space/copy.ts) | 로그인 링크 보내기 | Send sign-in link | pending review | Chord to MIDI's reviewed `auth.email.send` |
+| 165 | `COPY.ko.emailSending` (clean-space/copy.ts) | 보내는 중… | Sending… | pending review | Chord to MIDI's reviewed `auth.email.sending` |
+| 166 | `COPY.ko.emailSent` (clean-space/copy.ts) | {email}(으)로 로그인 링크를 보냈습니다. 이 기기나 다른 기기에서 링크를 열면 로그인됩니다. 도착까지 1분쯤 걸릴 수 있으니 스팸함도 확인해 주세요. | We sent a sign-in link to {email}. Open it on this device or another to sign in. It can take a minute to arrive; check the spam folder too. | pending review | Chord to MIDI's reviewed `auth.email.sent` |
+| 167 | `COPY.ko.emailSentHere` (clean-space/copy.ts) | {email}(으)로 로그인 링크를 보냈습니다. 이 브라우저에서 링크를 열면 계속됩니다. | We sent a sign-in link to {email}. Open it in this browser to continue. | pending review | Chord to MIDI's reviewed `auth.reauth.emailSent` |
+| 168 | `COPY.ko.emailResend` (clean-space/copy.ts) | 다시 보내기 | Send again | pending review | Chord to MIDI's reviewed `auth.email.resend` |
+| 169 | `COPY.ko.emailWait` (clean-space/copy.ts) | 1분 뒤에 다시 보낼 수 있습니다. | You can send it again in a minute. | pending review | Chord to MIDI's reviewed `auth.email.wait` |
+| 170 | `COPY.ko.emailOtherAddress` (clean-space/copy.ts) | 다른 주소 사용 | Use another address | pending review | Chord to MIDI's reviewed `auth.email.otherAddress` |
+| 171 | `COPY.ko.emailNote` (clean-space/copy.ts) | 비밀번호는 없습니다. 새 브라우저에서 로그인할 때마다 이메일로 링크를 보내 드립니다. 처음 쓰는 주소로는 새 계정이 만들어집니다. | No password: we email you a link whenever you sign in on a new browser. A new address makes a new account. | pending review | Chord to MIDI's reviewed `auth.email.note` |
+| 172 | `COPY.ko.emailSeparate` (clean-space/copy.ts) | 이 주소는 로그인에만 쓰입니다. 영수증은 계정 페이지에서 확인한 연락용 이메일로 받습니다. | This address only signs you in. Receipts go to the contact email you confirm on your account page. | pending review | New: the sign-in email is not the contact email |
+| 173 | `COPY.ko.emailTooMany` (clean-space/copy.ts) | 이메일을 너무 많이 보냈습니다. 몇 분 뒤에 다시 시도해 주세요. | Too many emails were sent. Wait a few minutes, then try again. | pending review | Chord to MIDI's reviewed `auth.email.tooMany` |
+| 174 | `COPY.ko.emailNotAllowed` (clean-space/copy.ts) | 지금은 이메일로 로그인할 수 없습니다. | Signing in by email is not available right now. | pending review | Chord to MIDI's reviewed `auth.email.notAllowed` |
+| 175 | `COPY.ko.emailLinkTitle` (clean-space/copy.ts) | 이메일 링크 | Email link | pending review | Chord to MIDI's reviewed `auth.link.title` |
+| 176 | `COPY.ko.emailLinkWorking` (clean-space/copy.ts) | 링크를 확인하는 중… | Checking the link… | pending review | Chord to MIDI's reviewed `auth.link.working` |
+| 177 | `COPY.ko.emailLinkNeedEmail` (clean-space/copy.ts) | 링크를 받은 이메일 주소를 입력해 주세요. | Enter the email address the link was sent to. | pending review | Chord to MIDI's reviewed `auth.link.needEmail` |
+| 178 | `COPY.ko.emailLinkNeedEmailMismatch` (clean-space/copy.ts) | 이 링크는 다른 주소로 보낸 것입니다. 링크를 받은 주소를 입력해 주세요. | This link was sent to another address. Enter the address it was sent to. | pending review | Chord to MIDI's reviewed `auth.link.needEmailMismatch` |
+| 179 | `COPY.ko.emailLinkContinue` (clean-space/copy.ts) | 계속 | Continue | pending review | Chord to MIDI's reviewed `auth.link.continue` |
+| 180 | `COPY.ko.emailLinkSwitch` (clean-space/copy.ts) | 이 브라우저에는 다른 계정으로 로그인되어 있습니다. 대신 {email}(으)로 로그인할까요? | You are signed in to another account here. Sign in as {email} instead? | pending review | After Chord to MIDI's `auth.link.switch`, without `({current})` (the page doesn't know the other account's address) |
+| 181 | `COPY.ko.emailLinkSwitchConfirm` (clean-space/copy.ts) | {email}(으)로 로그인 | Sign in as {email} | pending review | Chord to MIDI's reviewed `auth.link.switchConfirm` |
+| 182 | `COPY.ko.emailLinkStay` (clean-space/copy.ts) | 지금 계정 유지 | Keep the current account | pending review | Chord to MIDI's reviewed `auth.link.stay` |
+| 183 | `COPY.ko.emailLinkNeedAccount` (clean-space/copy.ts) | 이 링크를 요청한 계정으로 이 브라우저에서 로그인한 뒤, 이메일의 링크를 다시 열어 주세요. | Sign in in this browser to the account that asked for this link, then open the link from the email again. | pending review | New, after Chord to MIDI's `auth.link.needAccount` |
+| 184 | `COPY.ko.emailLinkWrongAccount` (clean-space/copy.ts) | 이 링크는 지금 로그인된 계정이 아닌 다른 계정의 것입니다. 로그아웃한 뒤 요청한 계정으로 로그인해 주세요. | This link belongs to another account than the one signed in here. Sign out, then sign in to the account that asked for it. | pending review | Chord to MIDI's reviewed `auth.link.wrongAccount` |
+| 185 | `COPY.ko.emailLinkExpired` (clean-space/copy.ts) | 이 링크는 만료되었거나, 이미 사용되었거나, 새 링크로 대체되었습니다. 새 링크를 요청해 주세요. | This link has expired, was used already, or a newer one replaced it. Request a new one. | pending review | Chord to MIDI's reviewed `auth.link.expired` |
+| 186 | `COPY.ko.emailLinkInvalid` (clean-space/copy.ts) | 이 페이지는 이메일에 있는 링크 그대로 열어야 합니다. | This page needs the link from the email, as it came. | pending review | Chord to MIDI's reviewed `auth.link.invalid` |
+| 187 | `COPY.ko.emailLinkBusy` (clean-space/copy.ts) | 지금은 로그인이 너무 많습니다. 몇 분 뒤에 다시 시도해 주세요. | Too many sign-ins right now. Wait a few minutes, then try again. | pending review | Chord to MIDI's reviewed `auth.link.busy` |
+| 188 | `COPY.ko.emailLinkConflict` (clean-space/copy.ts) | {email}은(는) 이미 다른 Clean Space 계정의 로그인 방법이라 이 계정에 추가할 수 없습니다. 옮겨진 것은 없습니다. | {email} already signs in to another Clean Space account, so it can't be added to this one. Nothing was moved. | pending review | New, after Chord to MIDI's `auth.link.conflict` and `auth.errors.identityInUse` |
+| 189 | `COPY.ko.emailLinkAlreadyLinked` (clean-space/copy.ts) | 이 계정에는 이미 이메일 로그인이 있습니다. 다른 주소를 쓰려면 먼저 해제해 주세요. | This account has an email sign-in already. Remove it first to use another address. | pending review | New |
+| 190 | `COPY.ko.emailLinkDeleted` (clean-space/copy.ts) | 삭제 중인 계정입니다. | This account is being deleted. | pending review | Chord to MIDI's reviewed `auth.errors.accountDeleted` |
+| 191 | `COPY.ko.emailLinkRequestAgain` (clean-space/copy.ts) | 새 링크 요청 | Request a new link | pending review | Chord to MIDI's reviewed `auth.link.requestAgain` |
+| 192 | `COPY.ko.emailLinkLinked` (clean-space/copy.ts) | 이 계정에 이메일 로그인을 추가했습니다. | Email sign-in was added to this account. | pending review | New |
+| 193 | `COPY.ko.emailLinkDoneElsewhere` (clean-space/copy.ts) | 로그인되었습니다. 처음 시작한 탭으로 돌아가면 그곳에서 이어집니다. | You are signed in. Go back to the tab where you started: it continues there. | pending review | New (a link opened in a new tab while the activation page waits in the first) |
+| 194 | `COPY.ko.providerNames.email` (clean-space/copy.ts) | 이메일 | Email | pending review | Chord to MIDI's reviewed `auth.providers.email` ("email" in English there; capitalised here as a list label) |
+| 195 | `COPY.ko.methodEmailAddress` (clean-space/copy.ts) | 로그인 이메일: {email} | Sign-in email: {email} | pending review | New |
+| 196 | `COPY.ko.methodEmailNote` (clean-space/copy.ts) | 이 주소로 보내는 링크로 로그인합니다. 연락용 이메일과는 별개입니다. | Signs in with a link sent to this address. It is separate from your contact email. | pending review | New |
+| 197 | `COPY.ko.linkEmailIntro` (clean-space/copy.ts) | 로그인에 쓸 주소를 입력해 주세요. 그 주소로 링크를 보내 드리며, 이 브라우저에서 링크를 열면 이 계정에 추가됩니다. | Enter the address to sign in with. We send it a link; open it in this browser to add it to this account. | pending review | New |

@@ -14,7 +14,9 @@
  *
  * The terms are the direct sale's (mac-get-space docs/13): "364 days Unlock" / "364일 잠금 해제", "access period" /
  * "이용 기간", "basic features" / "기본 기능", and "contact email" / "연락용 이메일", which receives Toss Payments'
- * receipts, support and notices and is never a way to sign in or recover the account.
+ * receipts, support and notices and is never a way to sign in or recover the account. "Continue with email" /
+ * "이메일로 계속하기" is a separate sign-in method (its address only signs in); its Korean follows Chord to MIDI's
+ * reviewed `auth.email.*` and `auth.link.*` wording where the meaning is the same (rows 161+ of the review sheet).
  */
 import type { PageLang, Provider, PurchaseStatus } from "./contract.generated";
 import type { ProviderSignInFailure } from "./oauth";
@@ -49,7 +51,7 @@ export const EN = {
 
   // Sign-in
   signInTitle: "Sign in",
-  signInIntro: "Sign in with Google, Kakao or Naver. A purchase belongs to the account you sign in with.",
+  signInIntro: "Sign in with Google, Kakao, Naver or your email address. A purchase belongs to the account you sign in with.",
   continueWith: (provider: string) => `Continue with ${provider}`,
   signInBusy: "Signing in…",
   signInFailures: {
@@ -66,6 +68,41 @@ export const EN = {
   popupFailed: "The Google window could not open. Allow pop-ups for cultureand.tech and try again.",
   callbackTitle: "Signing in",
   callbackWorking: "Finishing sign-in…",
+
+  // Continue with email (a sign-in method of its own; never the contact email)
+  continueWithEmail: "Continue with email",
+  emailLabel: "Email address",
+  emailSend: "Send sign-in link",
+  emailSending: "Sending…",
+  emailSent: (email: string) =>
+    `We sent a sign-in link to ${email}. Open it on this device or another to sign in. It can take a minute to arrive; check the spam folder too.`,
+  emailSentHere: (email: string) => `We sent a sign-in link to ${email}. Open it in this browser to continue.`,
+  emailResend: "Send again",
+  emailWait: "You can send it again in a minute.",
+  emailOtherAddress: "Use another address",
+  emailNote: "No password: we email you a link whenever you sign in on a new browser. A new address makes a new account.",
+  emailSeparate: "This address only signs you in. Receipts go to the contact email you confirm on your account page.",
+  emailTooMany: "Too many emails were sent. Wait a few minutes, then try again.",
+  emailNotAllowed: "Signing in by email is not available right now.",
+  emailLinkTitle: "Email link",
+  emailLinkWorking: "Checking the link…",
+  emailLinkNeedEmail: "Enter the email address the link was sent to.",
+  emailLinkNeedEmailMismatch: "This link was sent to another address. Enter the address it was sent to.",
+  emailLinkContinue: "Continue",
+  emailLinkSwitch: (email: string) => `You are signed in to another account here. Sign in as ${email} instead?`,
+  emailLinkSwitchConfirm: (email: string) => `Sign in as ${email}`,
+  emailLinkStay: "Keep the current account",
+  emailLinkNeedAccount: "Sign in in this browser to the account that asked for this link, then open the link from the email again.",
+  emailLinkWrongAccount: "This link belongs to another account than the one signed in here. Sign out, then sign in to the account that asked for it.",
+  emailLinkExpired: "This link has expired, was used already, or a newer one replaced it. Request a new one.",
+  emailLinkInvalid: "This page needs the link from the email, as it came.",
+  emailLinkBusy: "Too many sign-ins right now. Wait a few minutes, then try again.",
+  emailLinkConflict: (email: string) => `${email} already signs in to another Clean Space account, so it can't be added to this one. Nothing was moved.`,
+  emailLinkAlreadyLinked: "This account has an email sign-in already. Remove it first to use another address.",
+  emailLinkDeleted: "This account is being deleted.",
+  emailLinkRequestAgain: "Request a new link",
+  emailLinkLinked: "Email sign-in was added to this account.",
+  emailLinkDoneElsewhere: "You are signed in. Go back to the tab where you started: it continues there.",
 
   // Contact verification (the contact email: Toss Payments' receipts, support and notices; never a way to sign in)
   contactHeading: "Contact email",
@@ -120,7 +157,10 @@ export const EN = {
   deleteConfirm: "I understand that deleting my account is not a refund.",
   deleteButton: "Delete account",
   deleteRequested: (date: string) => `Deletion was requested on ${date}. It finishes by itself.`,
-  providerNames: { google: "Google", kakao: "Kakao", naver: "Naver" } satisfies Record<Provider, string>,
+  providerNames: { google: "Google", kakao: "Kakao", naver: "Naver", email: "Email" } satisfies Record<Provider, string>,
+  methodEmailAddress: (email: string) => `Sign-in email: ${email}`,
+  methodEmailNote: "Signs in with a link sent to this address. It is separate from your contact email.",
+  linkEmailIntro: "Enter the address to sign in with. We send it a link; open it in this browser to add it to this account.",
 };
 
 export type Copy = typeof EN;
@@ -146,7 +186,7 @@ export const KO: Copy = {
   support: "문의",
 
   signInTitle: "로그인",
-  signInIntro: "Google, 카카오 또는 네이버 계정으로 로그인하세요. 구매는 로그인한 계정에 적용됩니다.",
+  signInIntro: "Google, 카카오, 네이버 계정 또는 이메일 주소로 로그인하세요. 구매는 로그인한 계정에 적용됩니다.",
   continueWith: (provider: string) => (provider === "Google" ? "Google로 계속하기" : `${provider} 로그인`),
   signInBusy: "로그인하는 중…",
   signInFailures: {
@@ -163,6 +203,40 @@ export const KO: Copy = {
   popupFailed: "Google 창을 열지 못했습니다. cultureand.tech의 팝업을 허용한 뒤 다시 시도해 주세요.",
   callbackTitle: "로그인",
   callbackWorking: "로그인하는 중…",
+
+  continueWithEmail: "이메일로 계속하기",
+  emailLabel: "이메일 주소",
+  emailSend: "로그인 링크 보내기",
+  emailSending: "보내는 중…",
+  emailSent: (email: string) =>
+    `${email}(으)로 로그인 링크를 보냈습니다. 이 기기나 다른 기기에서 링크를 열면 로그인됩니다. 도착까지 1분쯤 걸릴 수 있으니 스팸함도 확인해 주세요.`,
+  emailSentHere: (email: string) => `${email}(으)로 로그인 링크를 보냈습니다. 이 브라우저에서 링크를 열면 계속됩니다.`,
+  emailResend: "다시 보내기",
+  emailWait: "1분 뒤에 다시 보낼 수 있습니다.",
+  emailOtherAddress: "다른 주소 사용",
+  emailNote: "비밀번호는 없습니다. 새 브라우저에서 로그인할 때마다 이메일로 링크를 보내 드립니다. 처음 쓰는 주소로는 새 계정이 만들어집니다.",
+  emailSeparate: "이 주소는 로그인에만 쓰입니다. 영수증은 계정 페이지에서 확인한 연락용 이메일로 받습니다.",
+  emailTooMany: "이메일을 너무 많이 보냈습니다. 몇 분 뒤에 다시 시도해 주세요.",
+  emailNotAllowed: "지금은 이메일로 로그인할 수 없습니다.",
+  emailLinkTitle: "이메일 링크",
+  emailLinkWorking: "링크를 확인하는 중…",
+  emailLinkNeedEmail: "링크를 받은 이메일 주소를 입력해 주세요.",
+  emailLinkNeedEmailMismatch: "이 링크는 다른 주소로 보낸 것입니다. 링크를 받은 주소를 입력해 주세요.",
+  emailLinkContinue: "계속",
+  emailLinkSwitch: (email: string) => `이 브라우저에는 다른 계정으로 로그인되어 있습니다. 대신 ${email}(으)로 로그인할까요?`,
+  emailLinkSwitchConfirm: (email: string) => `${email}(으)로 로그인`,
+  emailLinkStay: "지금 계정 유지",
+  emailLinkNeedAccount: "이 링크를 요청한 계정으로 이 브라우저에서 로그인한 뒤, 이메일의 링크를 다시 열어 주세요.",
+  emailLinkWrongAccount: "이 링크는 지금 로그인된 계정이 아닌 다른 계정의 것입니다. 로그아웃한 뒤 요청한 계정으로 로그인해 주세요.",
+  emailLinkExpired: "이 링크는 만료되었거나, 이미 사용되었거나, 새 링크로 대체되었습니다. 새 링크를 요청해 주세요.",
+  emailLinkInvalid: "이 페이지는 이메일에 있는 링크 그대로 열어야 합니다.",
+  emailLinkBusy: "지금은 로그인이 너무 많습니다. 몇 분 뒤에 다시 시도해 주세요.",
+  emailLinkConflict: (email: string) => `${email}은(는) 이미 다른 Clean Space 계정의 로그인 방법이라 이 계정에 추가할 수 없습니다. 옮겨진 것은 없습니다.`,
+  emailLinkAlreadyLinked: "이 계정에는 이미 이메일 로그인이 있습니다. 다른 주소를 쓰려면 먼저 해제해 주세요.",
+  emailLinkDeleted: "삭제 중인 계정입니다.",
+  emailLinkRequestAgain: "새 링크 요청",
+  emailLinkLinked: "이 계정에 이메일 로그인을 추가했습니다.",
+  emailLinkDoneElsewhere: "로그인되었습니다. 처음 시작한 탭으로 돌아가면 그곳에서 이어집니다.",
 
   contactHeading: "연락용 이메일",
   contactIntro:
@@ -194,7 +268,10 @@ export const KO: Copy = {
   deleteConfirm: "계정을 삭제해도 환불되지 않는다는 것을 이해했습니다.",
   deleteButton: "계정 삭제",
   deleteRequested: (date: string) => `${date}에 삭제를 요청했습니다. 삭제는 자동으로 끝납니다.`,
-  providerNames: { google: "Google", kakao: "카카오", naver: "네이버" } satisfies Record<Provider, string>,
+  providerNames: { google: "Google", kakao: "카카오", naver: "네이버", email: "이메일" } satisfies Record<Provider, string>,
+  methodEmailAddress: (email: string) => `로그인 이메일: ${email}`,
+  methodEmailNote: "이 주소로 보내는 링크로 로그인합니다. 연락용 이메일과는 별개입니다.",
+  linkEmailIntro: "로그인에 쓸 주소를 입력해 주세요. 그 주소로 링크를 보내 드리며, 이 브라우저에서 링크를 열면 이 계정에 추가됩니다.",
 };
 
 export const COPY: Record<PageLang, Copy> = { en: EN, ko: KO };

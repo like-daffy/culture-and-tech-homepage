@@ -55,6 +55,7 @@ export function account(overrides: Partial<GetAccountResponse> = {}): GetAccount
     license: { productID: PRODUCT_ID, status: "none", startsAt: null, expiresAt: null, revision: 0 },
     deletionRequestedAt: null,
     acceptedPolicies: null,
+    emailSignIn: null,
     nativeSessions: [],
     serverTime: NOW,
     ...overrides,
@@ -75,7 +76,7 @@ export function fakeApi(answers: Partial<Record<keyof CleanSpaceApi, unknown>> =
     return answer;
   };
   const methods = [
-    "getOffer", "signInWithProvider", "getAccount", "beginContactVerification", "confirmContactVerification", "linkProvider",
+    "getOffer", "signInWithProvider", "beginEmailLink", "completeEmailSignIn", "getAccount", "beginContactVerification", "confirmContactVerification", "linkProvider",
     "unlinkProvider", "requestAccountDeletion", "endNativeSessions", "beginCheckout", "confirmPayment",
     "getAccountPurchases", "inspectActivation", "approveActivation", "denyActivation",
   ] as const satisfies readonly (keyof CleanSpaceApi)[];
