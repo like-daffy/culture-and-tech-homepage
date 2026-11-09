@@ -144,6 +144,11 @@ export type EmailLinkFailure =
   | "already-linked"
   /** The link belongs to another account than the one signed in here (link, reauth). */
   | "wrong-account"
+  /**
+   * The account signed in here changed (another account signed in, or this one signed out, in this or another tab)
+   * while the service answered: nothing was applied to it, and the spent link is not tried again.
+   */
+  | "changed"
   | "busy"
   | "deleted"
   | "unavailable"
@@ -172,7 +177,7 @@ export interface CompleteEmailLinkDeps {
   now: () => number;
 }
 
-const FINAL: ReadonlySet<EmailLinkFailure> = new Set(["invalid", "expired", "conflict", "already-linked", "deleted"]);
+const FINAL: ReadonlySet<EmailLinkFailure> = new Set(["invalid", "expired", "conflict", "already-linked", "deleted", "changed"]);
 
 function refusal(error: unknown, email: string): EmailLinkOutcome {
   const info = describeError(error);
@@ -220,6 +225,15 @@ export async function completeEmailLink(link: EmailLink, options: { email?: stri
   return outcome;
 }
 
+/**
+ * The service's answer belongs to the sign-in state this attempt started from (`expected`, the uid signed in here then,
+ * or null). Before applying a token or reporting success, the attempt checks that state again: a newer sign-in, an
+ * account switch or a sign-out that happened meanwhile (in this or another tab) wins, and the answer is dropped.
+ */
+async function stillCurrent(deps: CompleteEmailLinkDeps, expected: string | null): Promise<boolean> {
+  return (await deps.currentUid()) === expected;
+}
+
 async function complete(link: EmailLink, options: { email?: string; switchAccount?: boolean }, deps: CompleteEmailLinkDeps): Promise<EmailLinkOutcome> {
   const typed = options.email !== undefined ? canonicalEmail(options.email) : null;
   if (typed !== null && !isEmailAddress(typed)) return { kind: "need-email", mismatch: false };
@@ -236,6 +250,8 @@ async function complete(link: EmailLink, options: { email?: string; switchAccoun
       return refusal(error, email);
     }
     if (!token) return { kind: "failed", reason: "error" };
+    // Signed out before, or the account the person agreed to switch away from: anything else is newer than this answer.
+    if (!(await stillCurrent(deps, current))) return { kind: "failed", reason: "changed" };
     await deps.signInWithCustomToken(token);
     removeKey(deps.local, STORAGE_KEYS.emailSignIn);
     return { kind: "done", returnTo: link.returnTo, linked: false };
@@ -251,10 +267,13 @@ async function complete(link: EmailLink, options: { email?: string; switchAccoun
     if (link.intent === "link") {
       if (!link.actionID) return { kind: "failed", reason: "invalid" };
       await deps.api.completeEmailSignIn({ intent: "link", email, oobCode: link.oobCode, actionID: link.actionID });
+      // The method went to the account that asked (the service binds it); don't report it for whoever is here now.
+      if (!(await stillCurrent(deps, current))) return { kind: "failed", reason: "changed" };
       return { kind: "done", returnTo: link.returnTo, linked: true };
     }
     const { customToken } = await deps.api.completeEmailSignIn({ intent: "reauth", email, oobCode: link.oobCode });
     if (!customToken) return { kind: "failed", reason: "error" };
+    if (!(await stillCurrent(deps, current))) return { kind: "failed", reason: "changed" };
     await deps.signInWithCustomToken(customToken);
     removeKey(deps.local, STORAGE_KEYS.emailSignIn);
     return { kind: "done", returnTo: link.returnTo, linked: false };
