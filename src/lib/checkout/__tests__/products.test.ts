@@ -198,3 +198,14 @@ describe("All-in-one's checkout", () => {
     expect(ALL_IN_ONE_COPY.en.includes.at(-1)).toBe(CHORD_TO_MIDI_COPY.en.includes.at(-1));
   });
 });
+
+describe("DJ Duplicate Guard's checkout, open (portal accounts)", () => {
+  it("starts and resumes on the portal's DJ page; its legal pages stay on its own site", async () => {
+    const { PRODUCTS: built } = await productsWith({ NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT: "on" });
+    const dj = built["dj-duplicate-guard"] as OpenProduct;
+    expect(productUrl(dj, "ko", "account")).toBe("https://portal.cultureand.tech/ko/products/dj-duplicate-guard");
+    expect(productResumeUrl(dj, "en", RESUME)).toBe(`https://portal.cultureand.tech/products/dj-duplicate-guard?resume=${RESUME}`);
+    expect(productUrl(dj, "en", "terms")).toBe("https://dj-duplicate-guard.app/terms");
+    expect(dj.functionsEmulator).toBeUndefined();
+  });
+});

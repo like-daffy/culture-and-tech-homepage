@@ -146,13 +146,25 @@ function djDuplicateGuardOpen(): OpenProduct {
     },
     recaptchaSiteKey: process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_RECAPTCHA_SITE_KEY ?? "",
     emulators: process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_EMULATORS === "1",
+    // Test builds only: the shared portal suite runs DJ's Functions emulator on another port (t1g's serve-dj: 5601).
+    ...(process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_FUNCTIONS_EMULATOR_PORT
+      ? { functionsEmulator: { host: "127.0.0.1", port: Number(process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_FUNCTIONS_EMULATOR_PORT) } }
+      : {}),
     // Its account service runs in Seoul (its DL-45).
     region: "asia-northeast3",
-    // Its site has clean URLs, English at the root and Korean under /ko/ (its apps/web/src/pages.ts). The account page
-    // comes with its accounts (its M4a and M6), and its legal pages are published, before this checkout can open.
-    pages: { home: "", account: "account", help: "help", terms: "terms", refund: "refund", privacy: "privacy" },
+    // Its site has clean URLs, English at the root and Korean under /ko/ (its apps/web/src/pages.ts); its legal pages
+    // are published there before this checkout can open. Its account page is the shared portal's (the owner's choice A,
+    // t1g's portal adapter): buyers start, resume (resumeCheckoutPayment) and see their pass there.
+    pages: {
+      home: "",
+      account: { origin: PORTAL_ORIGIN, path: "products/dj-duplicate-guard" },
+      help: "help",
+      terms: "terms",
+      refund: "refund",
+      privacy: "privacy",
+    },
     startPage: "account",
-    resumePath: "account",
+    resumePath: { origin: PORTAL_ORIGIN, path: "products/dj-duplicate-guard" },
     footerPages: ["terms", "refund", "privacy", "help"],
     storageKey: "cultureandtech.checkout.dj-duplicate-guard",
     paypalDescription:

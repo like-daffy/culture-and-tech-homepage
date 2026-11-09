@@ -185,8 +185,8 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
     accountDeleted: "This account is being deleted, so it cannot buy Expert.",
     emailNotConfirmed: "Confirm the email of your DJ Duplicate Guard account before paying.",
     accountUnavailable: "This DJ Duplicate Guard account is not available.",
-    noCheckout: "Start your purchase on DJ Duplicate Guard: sign in on its account page, then continue to the checkout.",
-    ended: "This checkout has ended, or was opened in another tab. Start again from DJ Duplicate Guard.",
+    noCheckout: "Start your purchase on the DJ Duplicate Guard page of your Culture & Tech account: sign in there, then continue to the checkout.",
+    ended: "This checkout has ended, or was opened in another tab. Start again from the DJ Duplicate Guard page of your Culture & Tech account.",
     backToProduct: "Back to DJ Duplicate Guard",
     successBody: "Expert is now on your account. The pass doesn't renew.",
     passTerm: "Expert pass: from {start} to {end}",
@@ -194,8 +194,8 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
     accountDeletedResult:
       "The account was deleted while the payment was being confirmed, so Expert could not be added to it.",
     finishOnProduct:
-      "This tab no longer holds the checkout. To finish the payment, sign in on DJ Duplicate Guard to the account you paid with.",
-    finishButton: "Finish on DJ Duplicate Guard",
+      "This tab no longer holds the checkout. To finish the payment, sign in on the DJ Duplicate Guard page of your Culture & Tech account with the account you paid with.",
+    finishButton: "Finish on your Culture & Tech account",
   },
   ko: {
     pageTitle: "결제: DJ Duplicate Guard Expert | 컬처앤테크",
@@ -221,16 +221,16 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
     accountDeleted: "삭제 중인 계정이라 Expert를 구매할 수 없습니다.",
     emailNotConfirmed: "결제하기 전에 DJ Duplicate Guard 계정의 이메일을 확인해 주세요.",
     accountUnavailable: "이 DJ Duplicate Guard 계정은 사용할 수 없습니다.",
-    noCheckout: "DJ Duplicate Guard의 계정 페이지에서 로그인한 뒤 결제 페이지로 이동해 주세요.",
-    ended: "이 결제 페이지는 끝났거나 다른 탭에서 열렸습니다. DJ Duplicate Guard에서 다시 시작해 주세요.",
+    noCheckout: "컬처앤테크 계정의 DJ Duplicate Guard 페이지에서 로그인한 뒤 결제 페이지로 이동해 주세요.",
+    ended: "이 결제 페이지는 끝났거나 다른 탭에서 열렸습니다. 컬처앤테크 계정의 DJ Duplicate Guard 페이지에서 다시 시작해 주세요.",
     backToProduct: "DJ Duplicate Guard로 돌아가기",
     successBody: "Expert가 계정에 적용되었습니다. 이용권은 자동으로 갱신되지 않습니다.",
     passTerm: "Expert 이용권: {start}부터 {end}까지",
     alreadyOwned: "이 계정에는 이미 유효한 Expert 이용권이 있어 이번 결제는 진행하지 않았습니다. 청구된 금액은 없습니다.",
     accountDeletedResult: "결제를 확인하는 동안 계정이 삭제되어 Expert를 적용하지 못했습니다.",
     finishOnProduct:
-      "이 탭에는 결제 정보가 남아 있지 않습니다. DJ Duplicate Guard에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
-    finishButton: "DJ Duplicate Guard에서 마무리하기",
+      "이 탭에는 결제 정보가 남아 있지 않습니다. 컬처앤테크 계정의 DJ Duplicate Guard 페이지에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
+    finishButton: "컬처앤테크 계정에서 마무리하기",
   },
 };
 
