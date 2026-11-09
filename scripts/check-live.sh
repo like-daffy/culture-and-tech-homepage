@@ -69,6 +69,7 @@ checkout_pages() {
 }
 checkout_pages chord-to-midi
 checkout_pages dj-duplicate-guard
+checkout_pages clean-space
 # DJ Duplicate Guard's checkout stays closed until its owner opens Expert's sales (DJ_DUPLICATE_GUARD_SALES_OPEN in
 # scripts/check-checkout-config.mjs): its pages say so, and publish nothing of the offer.
 if ! grep -q '^const DJ_DUPLICATE_GUARD_SALES_OPEN = true;' "$(dirname "$0")/check-checkout-config.mjs"; then
@@ -76,6 +77,16 @@ if ! grep -q '^const DJ_DUPLICATE_GUARD_SALES_OPEN = true;' "$(dirname "$0")/che
            ko/checkout/dj-duplicate-guard/ ko/checkout/dj-duplicate-guard/success/ ko/checkout/dj-duplicate-guard/fail/; do
     body=$(curl -s -m 20 "https://$host/$p")
     if echo "$body" | grep -q 'data-checkout="closed"' && ! echo "$body" | grep -q 'Expert'; then echo "ok   https://$host/$p is closed"
+    else echo "FAIL https://$host/$p isn't closed, or names the offer"; fail=1; fi
+  done
+fi
+# Clean Space's checkout stays closed until its owner opens the 364 days Unlock's sales (CLEAN_SPACE_SALES_OPEN in
+# scripts/check-checkout-config.mjs): its pages say so, and publish nothing of the offer.
+if ! grep -q '^const CLEAN_SPACE_SALES_OPEN = true;' "$(dirname "$0")/check-checkout-config.mjs"; then
+  for p in checkout/clean-space/ checkout/clean-space/success/ checkout/clean-space/fail/ \
+           ko/checkout/clean-space/ ko/checkout/clean-space/success/ ko/checkout/clean-space/fail/; do
+    body=$(curl -s -m 20 "https://$host/$p")
+    if echo "$body" | grep -q 'data-checkout="closed"' && ! echo "$body" | grep -qE 'Unlock|잠금 해제'; then echo "ok   https://$host/$p is closed"
     else echo "FAIL https://$host/$p isn't closed, or names the offer"; fail=1; fi
   done
 fi
@@ -99,6 +110,25 @@ for p in privacy support; do
   if echo "$body" | grep -q 'class="draft"'; then echo "FAIL draft banner in english-thai-learn/$p.html"; fail=1; fi
   if echo "$body" | grep -o '<link[^>]*>' | grep -vE 'styles\.css|rel="canonical"' | grep -q .; then echo "FAIL external link in english-thai-learn/$p.html"; fail=1; fi
   if echo "$body" | grep -q "<link rel=\"canonical\" href=\"https://cultureand.tech/culture/english-thai-learn/$p.html\">"; then echo "ok   english-thai-learn/$p.html canonical"; else echo "FAIL english-thai-learn/$p.html canonical"; fail=1; fi
+done
+# Clean Space's account, sign-in callback and activation pages (docs/clean-space-direct-sale.md; its checkout pages are
+# the central checkout's, above): every page in both languages is 200, never stored, never framed, out of search
+# results, sends no referrer beyond the origin, and loads no font, monitoring script or embed.
+for p in apps/clean-space/account/ apps/clean-space/auth/callback/ apps/clean-space/activate/; do
+  for l in "" ko/; do
+    url="https://$host/$l$p"
+    headers=$(curl -s -o /dev/null -D - -m 20 "$url" | tr -d '\r')
+    status=$(echo "$headers" | awk 'NR==1{print $2}')
+    hval() { echo "$headers" | awk -v name="$1" 'tolower($1)==name{ $1=""; sub(/^ /, ""); print }'; }
+    if [ "$status" != 200 ]; then echo "FAIL $status (want 200) $url"; fail=1; continue; fi
+    if [ "$(hval cache-control:)" = no-store ] && [ "$(hval x-frame-options:)" = DENY ] && [ "$(hval referrer-policy:)" = strict-origin ] \
+       && hval content-security-policy: | grep -q "frame-ancestors 'none'" && hval x-robots-tag: | grep -q noindex; then
+      echo "ok   200 $url (no-store, no framing, origin-only referrer, noindex)"
+    else echo "FAIL headers of $url"; fail=1; fi
+    body=$(curl -s -m 20 "$url")
+    if echo "$body" | grep -qE 'cdn\.softgen\.ai|fonts\.googleapis\.com|youtube'; then echo "FAIL $url loads another host"; fail=1; fi
+    if ! echo "$body" | grep -q '<meta name="robots" content="noindex, nofollow"'; then echo "FAIL $url has no noindex"; fail=1; fi
+  done
 done
 if [ -n "$version" ]; then
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/privacy.html")

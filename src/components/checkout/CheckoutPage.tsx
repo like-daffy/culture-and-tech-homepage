@@ -532,7 +532,9 @@ function Payment({
   };
 
   const shownEmail = step.kind === "paying" ? step.order.receiptEmail : receiptEmail;
-  const receipt = <p className="text-sm text-muted-foreground">{fill(copy.receiptEmail, { email: shownEmail })}</p>;
+  // The product's own label where its account email isn't a recovery address (Clean Space's contact email).
+  const receiptLabel = productCopy.receiptEmail ?? copy.receiptEmail;
+  const receipt = <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail })}</p>;
 
   if (step.kind === "agree" || step.kind === "preparing") {
     return (

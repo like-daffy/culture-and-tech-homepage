@@ -1,4 +1,5 @@
-/* Quicksand and Noto Sans KR come from Google Fonts by a <link> in src/pages/_document.tsx, on every page but the checkout's. */
+/* Quicksand and Noto Sans KR come from Google Fonts by a <link> in src/pages/_document.tsx, on every page but the sensitive
+   ones: the checkout's, and Clean Space's account, sign-in callback and activation pages. */
 
 @tailwind base;
 @tailwind components;

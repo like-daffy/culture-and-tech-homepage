@@ -11,13 +11,16 @@
  *   Review before that. Its pages, images and privacy page moved to clean-space addresses the same day (firebase.json
  *   301s the old mac-get-space ones); its repository keeps the name mac-get-space.
  *   Protection is described as what the default rules exclude from removal, with its limits, never as a guarantee.
- *   Its screenshots come from a development build with sample data and say so on the page.
+ *   Its screenshots come from a development build with sample data and say so on the page. Its website edition and
+ *   the 364 days Unlock (with its price) appear only behind their release flag, from mac-get-space
+ *   docs/13-direct-sale/facts.md (src/lib/clean-space/channel-copy.ts).
  * Not introduced here: MIDI Utility (not public) and the Thai app (not a music app).
  */
 
 import type { LucideIcon } from "lucide-react";
 import { HardDrive, KeyboardMusic } from "lucide-react";
 import type { SupportedLanguage } from "./language-detection";
+import { websiteDownloadUrl, withWebsiteChannel } from "./clean-space/channel-copy";
 
 export type AppSlug = "chord-to-midi" | "clean-space";
 
@@ -41,6 +44,13 @@ export interface AppSection {
   style?: "cards" | "steps";
   items: { title: string; text: string }[];
   note?: string;
+  /**
+   * Buttons under the section: pages of this site, opened as full page loads, or a download (`download`). Absent on
+   * every section unless a flag adds one (Clean Space's website edition, src/lib/clean-space/channel-copy.ts).
+   */
+  links?: { label: string; href: string; download?: boolean }[];
+  /** A line under the buttons whose `{name}` parts are links of the same name (the policies a purchase is under) */
+  linkLine?: { text: string; links: Record<string, { label: string; href: string }> };
 }
 
 export interface AppContent {
@@ -626,7 +636,13 @@ const cleanSpace: AppInfo = {
 
 export const APPS: Record<AppSlug, AppInfo> = {
   "chord-to-midi": chordToMidi,
-  "clean-space": cleanSpace,
+  // Once the website edition is released (NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1, off by default), the page presents
+  // its download and the 364 days Unlock, apart from the App Store app (src/lib/clean-space/channel-copy.ts). The
+  // switch is written into the pages either way (next.config.mjs), so a build without it leaves that copy out.
+  "clean-space":
+    process.env.NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE === "1"
+      ? withWebsiteChannel(cleanSpace, websiteDownloadUrl(process.env.NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL))
+      : cleanSpace,
 };
 
 /** The homepage's Apps section */

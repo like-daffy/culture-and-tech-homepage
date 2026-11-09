@@ -9,12 +9,21 @@
  * open, call nothing, and the build carries none of its offer (its copy, settings or price terms), so nothing about a
  * product is published here before its owner opens its sales.
  */
+import {
+  ALREADY_OWNED_CODE as CLEAN_SPACE_ALREADY_OWNED,
+  CLEAN_SPACE_PAGES,
+  CLEAN_SPACE_SITE_ORIGIN,
+  DIRECT_SALE_POLICY_PATHS,
+} from "@/lib/clean-space/site";
 import { APP_ERROR, type Lang } from "./contract";
-import { CHORD_TO_MIDI_COPY, DJ_DUPLICATE_GUARD_COPY, type ProductCopy } from "./product-copy";
+import { CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY, type ProductCopy } from "./product-copy";
 
-export type ProductSlug = "chord-to-midi" | "dj-duplicate-guard";
+export type ProductSlug = "chord-to-midi" | "dj-duplicate-guard" | "clean-space";
 
-/** The product's pages a checkout may link to, by their path below the language's root; nothing from an address. */
+/**
+ * The product's pages a checkout may link to, by their path below the language's root, or from the site's root for a
+ * page that exists once for both languages (it then starts with "/"); nothing from an address.
+ */
 export type ProductPage = "home" | "purchase" | "account" | "help" | "terms" | "refund" | "privacy" | "business";
 
 interface ProductIdentity {
@@ -23,6 +32,8 @@ interface ProductIdentity {
   origin: string;
   /** What its closed pages say of it: its public name. */
   name: Record<Lang, { productName: string; backToProduct: string }>;
+  /** Its home page below the language's root, when that isn't its site's root (Clean Space's pages are on this site). */
+  home?: string;
 }
 
 /** A product whose checkout this build keeps closed. */
@@ -36,8 +47,10 @@ export interface OpenProduct extends ProductIdentity {
   firebase: { apiKey: string; projectId: string; appId: string };
   /** App Check's reCAPTCHA Enterprise key of that web app: its domains must list cultureand.tech. */
   recaptchaSiteKey: string;
-  /** Test builds only: the product's Firebase emulators (Functions on 127.0.0.1:5001). */
+  /** Test builds only: the product's Firebase emulators (Functions on 127.0.0.1:5001 unless functionsEmulator says). */
   emulators: boolean;
+  /** Where its emulator suite's Functions listen, when not on 127.0.0.1:5001. */
+  functionsEmulator?: { host: string; port: number };
   /** Region of the product's Cloud Functions. */
   region: string;
   /** Its pages the checkout links, by path. */
@@ -139,6 +152,59 @@ function djDuplicateGuardOpen(): OpenProduct {
   };
 }
 
+/**
+ * Clean Space has no site of its own: its product page, its account page (where its buyers sign in and start a
+ * checkout) and its legal pages are on this site, so its checkout links back here (another origin only in test builds).
+ */
+const CLEAN_SPACE_ORIGIN = process.env.NEXT_PUBLIC_CLEAN_SPACE_ORIGIN || CLEAN_SPACE_SITE_ORIGIN;
+const CLEAN_SPACE_NAME: ProductIdentity["name"] = {
+  en: { productName: "Clean Space", backToProduct: "Back to Clean Space" },
+  ko: { productName: "Clean Space", backToProduct: "Clean Space로 돌아가기" },
+};
+
+/** Clean Space's 364 days Unlock, once its owner opens the sales (README, "Opening Clean Space's checkout"). */
+function cleanSpaceOpen(): OpenProduct {
+  return {
+    slug: "clean-space",
+    enabled: true,
+    origin: CLEAN_SPACE_ORIGIN,
+    name: CLEAN_SPACE_NAME,
+    home: CLEAN_SPACE_PAGES.home,
+    // The Clean Space licensing project's web app: the same settings as its account pages (src/lib/clean-space/config.ts).
+    firebase: {
+      apiKey: process.env.NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_API_KEY ?? "",
+      projectId: process.env.NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_PROJECT_ID ?? "",
+      appId: process.env.NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_APP_ID ?? "",
+    },
+    recaptchaSiteKey: process.env.NEXT_PUBLIC_CLEAN_SPACE_RECAPTCHA_SITE_KEY ?? "",
+    // One switch for its test builds, the one its account pages read; its emulator suite's Functions listen on port 5101
+    // (mac-get-space services/licensing/firebase.json), apart from Chord to MIDI's.
+    emulators: process.env.NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT === "emulator",
+    functionsEmulator: { host: process.env.NEXT_PUBLIC_CLEAN_SPACE_EMULATOR_HOST || "127.0.0.1", port: 5101 },
+    // Its licensing service runs in Seoul (its contract's DEFAULT_FUNCTIONS_REGION).
+    region: "asia-northeast3",
+    // Its legal pages exist once for both languages, from the site's root.
+    pages: {
+      home: CLEAN_SPACE_PAGES.home,
+      account: CLEAN_SPACE_PAGES.account,
+      terms: DIRECT_SALE_POLICY_PATHS.terms,
+      refund: DIRECT_SALE_POLICY_PATHS.refund,
+      privacy: DIRECT_SALE_POLICY_PATHS.privacy,
+    },
+    startPage: "account",
+    resumePath: CLEAN_SPACE_PAGES.account,
+    footerPages: ["terms", "refund", "privacy"],
+    storageKey: "cultureandtech.checkout.clean-space",
+    paypalDescription:
+      "Digital service, no shipping: the 364 days Unlock of the Clean Space Mac app for the buyer's account for 364 days from payment. One payment; it doesn't renew.",
+    // A 364 days Unlock that hasn't ended: another can be bought only after it ends (a provisional code, site.ts).
+    alreadyOwnedCode: CLEAN_SPACE_ALREADY_OWNED,
+    // 364 days (31,449,600 seconds) from the payment's approval (its contract's DURATION_DAYS).
+    passDays: 364,
+    copy: CLEAN_SPACE_COPY,
+  };
+}
+
 export const PRODUCTS: Record<ProductSlug, CheckoutProduct> = {
   "chord-to-midi": chordToMidi,
   // Closed unless a build turns it on: Expert's sales are closed (DJ Duplicate Guard's DL-52), and the predeploy check
@@ -147,6 +213,13 @@ export const PRODUCTS: Record<ProductSlug, CheckoutProduct> = {
     process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT === "on"
       ? djDuplicateGuardOpen()
       : { slug: "dj-duplicate-guard", enabled: false, origin: DJ_DUPLICATE_GUARD_ORIGIN, name: DJ_DUPLICATE_GUARD_NAME },
+  // Closed unless a build turns it on: the 364 days Unlock isn't on sale until its owner opens it (on Toss's test keys
+  // first, for Toss's review), and the predeploy check refuses the switch until then. Closed, the build leaves
+  // cleanSpaceOpen() and its copy out.
+  "clean-space":
+    process.env.NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT === "on"
+      ? cleanSpaceOpen()
+      : { slug: "clean-space", enabled: false, origin: CLEAN_SPACE_ORIGIN, name: CLEAN_SPACE_NAME, home: CLEAN_SPACE_PAGES.home },
 };
 
 /** With its backend's settings: only then is the product's backend ever called. */
@@ -160,9 +233,13 @@ export function checkoutPath(product: CheckoutProduct, lang: Lang, page: "" | "s
   return `${lang === "ko" ? "/ko" : ""}/checkout/${product.slug}/${page ? `${page}/` : ""}`;
 }
 
-/** A page of the product's own site in the checkout's language (a closed product's: its home page only). */
+/**
+ * A page of the product's own site in the checkout's language (a closed product's: its home page only). A page given
+ * from the site's root (it starts with "/") exists once for both languages, and is linked as it is.
+ */
 export function productUrl(product: CheckoutProduct, lang: Lang, page: ProductPage): string {
-  const path = product.enabled ? (product.pages[page] ?? "") : "";
+  const path = product.enabled ? (product.pages[page] ?? "") : (product.home ?? "");
+  if (path.startsWith("/")) return `${product.origin}${path}`;
   return `${product.origin}${lang === "ko" ? "/ko" : ""}/${path}`;
 }
 
