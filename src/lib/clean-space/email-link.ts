@@ -146,7 +146,8 @@ export type EmailLinkFailure =
   | "wrong-account"
   /**
    * The account signed in here changed (another account signed in, or this one signed out, in this or another tab)
-   * while the service answered: nothing was applied to it, and the spent link is not tried again.
+   * while the service answered: this browser's sign-in is kept as it is now (for a link, the service may already have added
+   * the method to the account that asked), and the spent link is not tried again.
    */
   | "changed"
   | "busy"
