@@ -33,6 +33,8 @@ function failureMessage(reason: EmailLinkFailure, copy: Copy, email?: string, me
       return copy.emailLinkAlreadyLinked;
     case "wrong-account":
       return copy.emailLinkWrongAccount;
+    case "changed":
+      return copy.emailLinkChanged;
     case "busy":
       return copy.emailLinkBusy;
     case "deleted":

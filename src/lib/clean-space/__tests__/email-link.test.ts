@@ -166,3 +166,85 @@ describe("completing a link", () => {
     expect(calls.map(([name]) => name)).toEqual([CALLABLE.beginEmailLink, CALLABLE.completeEmailSignIn]);
   });
 });
+
+describe("an answer that arrives after the sign-in state changed", () => {
+  const link = (intent: EmailLink["intent"], actionID: string | null = null): EmailLink => ({
+    intent,
+    oobCode: "oob-code-123",
+    actionID,
+    returnTo: { route: "account", lang: "en" },
+  });
+
+  /** The service's answer waits until `release`; `uid` is what this browser has signed in at each moment. */
+  function delayed(initialUid: string | null) {
+    const state = { uid: initialUid };
+    const applied: string[] = [];
+    let release!: () => void;
+    let entered!: () => void;
+    const answered = new Promise<void>((resolve) => (release = resolve));
+    const started = new Promise<void>((resolve) => (entered = resolve));
+    const session = memoryStore();
+    const testDeps: CompleteEmailLinkDeps = {
+      api: {
+        completeEmailSignIn: async () => {
+          entered();
+          await answered;
+          return { customToken: "old-answer-token", account: {} as never, created: false };
+        },
+      },
+      currentUid: async () => state.uid,
+      signInWithCustomToken: async (token) => {
+        applied.push(token);
+        state.uid = "email-account";
+      },
+      session,
+      local: memoryStore(),
+      now: () => T,
+    };
+    return { state, applied, release: () => release(), started, deps: testDeps, session };
+  }
+
+  it.each([
+    ["signin, signed out, then another account signs in", "signin" as const, null, "newer-account"],
+    ["signin after agreeing to switch, then a third account signs in", "signin" as const, "first-account", "newer-account"],
+    ["reauth, then another account signs in", "reauth" as const, "email-account", "newer-account"],
+    ["reauth, then sign-out", "reauth" as const, "email-account", null],
+  ])("%s: the old answer is dropped", async (_name, intent, before, after) => {
+    const run = delayed(before);
+    const pending = completeEmailLink(link(intent), { email: "reviewer@example.test", switchAccount: true }, run.deps);
+    await run.started;
+    run.state.uid = after;
+    run.release();
+    const outcome = await pending;
+    expect(run.applied).toEqual([]);
+    expect(run.state.uid).toBe(after);
+    expect(outcome).toEqual({ kind: "failed", reason: "changed" });
+  });
+
+  it("link: never reports the method added for an account that is no longer signed in here", async () => {
+    const run = delayed("asking-account");
+    rememberLinkAction(run.deps.local, ACTION, "reviewer@example.test", "asking-account", T);
+    const pending = completeEmailLink(link("link", ACTION), {}, run.deps);
+    await run.started;
+    run.state.uid = "newer-account";
+    run.release();
+    expect(await pending).toEqual({ kind: "failed", reason: "changed" });
+    expect(run.applied).toEqual([]);
+  });
+
+  it("the same account throughout: the answer applies as before", async () => {
+    const run = delayed(null);
+    const pending = completeEmailLink(link("signin"), { email: "reviewer@example.test" }, run.deps);
+    await run.started;
+    run.release();
+    expect(await pending).toMatchObject({ kind: "done", linked: false });
+    expect(run.applied).toEqual(["old-answer-token"]);
+  });
+
+  it("an explicit switch is still asked for before anything is sent", async () => {
+    const run = delayed("first-account");
+    const outcome = await completeEmailLink(link("signin"), { email: "reviewer@example.test" }, run.deps);
+    expect(outcome).toEqual({ kind: "switch", email: "reviewer@example.test" });
+    expect(run.applied).toEqual([]);
+  });
+});
