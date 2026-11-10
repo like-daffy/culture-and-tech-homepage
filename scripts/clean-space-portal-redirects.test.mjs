@@ -14,6 +14,10 @@ describe("Clean Space portal redirect deployment gate", () => {
     expect(hasCleanSpacePortalRedirects(modified)).toBe(false);
     const wrongCode = clone(); wrongCode.hosting.redirects[18].type = 302;
     expect(hasCleanSpacePortalRedirects(wrongCode)).toBe(false);
+    for (const path of ["/apps/clean-space/account/index.html", "/ko/apps/clean-space/account/index.html", "/apps/clean-space/activate/index.html", "/ko/apps/clean-space/activate/index.html"]) {
+      const removed = clone(); removed.hosting.redirects = removed.hosting.redirects.filter((r) => r.source !== path);
+      expect(hasCleanSpacePortalRedirects(removed), path).toBe(false);
+    }
     expect(hasCleanSpacePortalRedirects({})).toBe(false);
   });
 });

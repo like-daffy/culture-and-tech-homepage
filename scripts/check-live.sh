@@ -128,10 +128,16 @@ movedto() { local got; got=$(curl -s -o /dev/null -m 20 -w '%{http_code} %{redir
   if [ "$got" = "301 $2" ]; then echo "ok   301 $1 -> $2"; else echo "FAIL $got (want 301 $2) https://$host$1"; fail=1; fi; }
 for l in "" ko/; do
   portal="https://portal.cultureand.tech/${l}products/clean-space"; portal="${portal%/}"
+  movedto "/${l}apps/clean-space/account" "$portal"
   movedto "/${l}apps/clean-space/account/" "$portal"
+  movedto "/${l}apps/clean-space/account/index.html" "$portal"
+  movedto "/${l}apps/clean-space/activate" "$portal/activate"
   movedto "/${l}apps/clean-space/activate/" "$portal/activate"
+  movedto "/${l}apps/clean-space/activate/index.html" "$portal/activate"
   movedto "/${l}apps/clean-space/auth/callback/" "$portal"
+  movedto "/${l}apps/clean-space/auth/callback/index.html" "$portal"
   movedto "/${l}apps/clean-space/auth/email/" "$portal"
+  movedto "/${l}apps/clean-space/auth/email/index.html" "$portal"
 done
 if [ -n "$version" ]; then
   body=$(curl -s -m 20 "https://$host/culture/thai-learn/privacy.html")

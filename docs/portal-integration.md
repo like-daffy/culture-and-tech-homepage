@@ -44,7 +44,7 @@ every item below passes, the files stay.
 | G2 | Clean Space product session from the portal (`exchangePortalSession`) and its status on `/products/clean-space` | Portal journey with Clean Space's licensing emulator: signed-in portal account shows the normalized license summary | t1f, t1b |
 | G3 | Mac activation on the portal (`/products/clean-space/activate#request=`) | Journey: native or fixture request → `inspectActivation` shows the code → `approveActivation` / `denyActivation`, error cases reload; the old address 301s with the fragment kept | t1f, t1b |
 | G4 | Purchase from the portal | Journey: portal → Clean Space `beginCheckout` → `/checkout/clean-space/` (test keys) → success → account link and `?resume=` on the portal | t1f, t1b |
-| G5 | Redirects | `scripts/check-live.sh` on a preview channel: every old address 301s to its portal page | t1f |
+| G5 | Redirects | `scripts/check-live.sh` on a preview channel: slashless, slash and direct `index.html` account, activation and auth addresses 301 to their portal pages | t1f |
 
 When G1–G5 pass, remove in one commit on this branch: `src/pages/{,ko/}apps/clean-space/{account,activate}.tsx`,
 `src/pages/{,ko/}apps/clean-space/auth/`, the components in `src/components/clean-space/` and the modules and tests in

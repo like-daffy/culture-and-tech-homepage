@@ -19,6 +19,10 @@ const ROUTES = [
   ["/ko/apps/clean-space/activate/", "/ko/products/clean-space/activate"],
   ["/apps/clean-space/auth/**", "/products/clean-space"],
   ["/ko/apps/clean-space/auth/**", "/ko/products/clean-space"],
+  ["/apps/clean-space/account/index.html", "/products/clean-space"],
+  ["/ko/apps/clean-space/account/index.html", "/ko/products/clean-space"],
+  ["/apps/clean-space/activate/index.html", "/products/clean-space/activate"],
+  ["/ko/apps/clean-space/activate/index.html", "/ko/products/clean-space/activate"],
 ].map(([source, destination]) => [source, PORTAL + destination]);
 
 export function hasCleanSpacePortalRedirects(config) {
