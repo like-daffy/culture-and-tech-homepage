@@ -96,3 +96,13 @@ describe("the product page's website edition", () => {
     expect(channel?.items.map((item) => item.text).join(" ")).not.toMatch(/free features/);
   });
 });
+
+
+it("labels the reviewed versioned fallback without changing other download labels", () => {
+  const url = "https://clean-space-cultureandtech.web.app/clean-space/1.0-7/Clean-Space-1.0.zip";
+  const app = withWebsiteChannel(APPS["clean-space"], url);
+  for (const language of ["en", "ko"] as const) {
+    const link = app.content[language].sections.flatMap((section) => section.links ?? []).find((item) => item.href === url);
+    expect(link?.label).toBe(language === "en" ? "Download for Mac — 1.0 (build 7)" : "Mac용 다운로드 — 1.0 (빌드 7)");
+  }
+});

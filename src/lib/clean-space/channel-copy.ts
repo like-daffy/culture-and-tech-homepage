@@ -140,6 +140,9 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
   },
 };
 
+/** Reviewed versioned fallback for the notarized website edition; update the label with each release. */
+const REVIEWED_DOWNLOAD_1_0_7 = "https://clean-space-cultureandtech.web.app/clean-space/1.0-7/Clean-Space-1.0.zip";
+
 function channelSection(language: SupportedLanguage, downloadUrl: string): AppSection {
   const copy = COPY[language];
   const labels = CHECKOUT_COPY[language];
@@ -155,7 +158,7 @@ function channelSection(language: SupportedLanguage, downloadUrl: string): AppSe
     note: copy.note,
     // The account page is where the purchase starts: a full page load, so that nothing this page loads goes along.
     links: [
-      ...(downloadUrl ? [{ label: copy.download, href: downloadUrl, download: true }] : []),
+      ...(downloadUrl ? [{ label: downloadUrl === REVIEWED_DOWNLOAD_1_0_7 ? (language === "en" ? "Download for Mac — 1.0 (build 7)" : "Mac용 다운로드 — 1.0 (빌드 7)") : copy.download, href: downloadUrl, download: true }] : []),
       { label: copy.buy, href: `${CLEAN_SPACE_PORTAL.origin}${PORTAL_PAGE_PATH.account[language]}` },
     ],
     linkLine: {
