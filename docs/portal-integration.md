@@ -14,6 +14,24 @@ Owner decisions of 2026-11-09, relayed by the Codex orchestrator.
 - **Redirects** (`firebase.json`): the old Clean Space account, activation and sign-in addresses 301 to the portal.
   Do not deploy them before the portal's replacement pages work (owner).
 
+## Clean Space test checkout: atomic release (owner rule, path A; 2026-11-10)
+
+The homepage's Clean Space checkout and its old account pages read the same `NEXT_PUBLIC_CLEAN_SPACE_*` settings
+(`src/lib/clean-space/config.ts`). The backend runs with `IDENTITY_MODE=portal` and refuses the old pages' direct
+provider paths, so with production settings those pages would be a broken duplicate sign-in surface. Therefore:
+
+1. Clean Space's functions are deployed, and the portal's Clean Space entry has its production config and App Check
+   key (portal `dad908f`).
+2. The portal's Clean Space flow works on portal.cultureand.tech (owner-led real check: connect, status, checkout
+   start).
+3. Only then, in ONE homepage release: the Clean Space checkout env (`NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=production`,
+   `_FIREBASE_PROJECT_ID`, `_FIREBASE_APP_ID`, `_FIREBASE_API_KEY`, `_FIREBASE_AUTH_DOMAIN`, `_RECAPTCHA_SITE_KEY`; the
+   emulator, provider-emulator, Kakao and Naver variables stay unset) together with the `firebase.json` 301s from the
+   old account, activation and sign-in routes to the portal. Never deploy that env without the 301s.
+4. The checkout switch (`NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT`, `CLEAN_SPACE_SALES_OPEN`) is a separate owner-go commit,
+   with Toss test keys only.
+5. The old source stays until G1-G5 pass, then is removed as below.
+
 ## Removal gate for the old Clean Space account source
 
 The owner approved removing the homepage's duplicate Clean Space login, account and activation source only after the
