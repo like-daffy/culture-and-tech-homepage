@@ -41,7 +41,7 @@ const safeLink = (product: OpenProduct, url: string | null): string | null =>
  */
 function PassTerm({ product, lang, pass, environment }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined; environment?: "test" | "live" }) {
   if (environment === "test") {
-    const testText = product.copy[lang].testKeys ?? product.copy[lang].testMode;
+    const testText = product.copy[lang].testPassTerm ?? product.copy[lang].testKeys;
     return testText ? <p className="text-sm font-medium" data-pass-term="test">{testText}</p> : null;
   }
   const text = product.copy[lang].passTerm;

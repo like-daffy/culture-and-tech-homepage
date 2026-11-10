@@ -24,6 +24,16 @@ export interface ProductCopy {
   periodTerms?: { text: string; link: string; anchor: string };
   includes: string[];
   testMode: string;
+  /**
+   * For a product sold on Toss's test keys before its launch: shown while a currency's client key is a test key (and
+   * it isn't the PayPal TEST checkout, which testMode covers). Products without it show nothing for that.
+   */
+  testKeys?: string;
+  /**
+   * The success page's line for a payment taken on Toss's test keys (confirm answer environment 'test'), in place of
+   * the pass's dates. Falls back to testKeys; testMode (PayPal Sandbox, with {price}) is never used there.
+   */
+  testPassTerm?: string;
   currencyNotes: Record<Currency, string>;
   /** The product's server says its sales are closed (SALES_CLOSED). */
   salesClosed: string;
@@ -70,6 +80,8 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     ],
     testMode:
       "Test checkout: dollar payments go to PayPal's Sandbox on test keys, and nothing real is charged. {price} matches the planned dollar price, but dollars aren't sold for real yet.",
+    // chord-to-midi-web purchaseResult.testPayments, word for word.
+    testPassTerm: "Test payments: checkout runs in Toss Payments' test environment for now, and nothing is charged. You don't need to pay.",
     currencyNotes: { KRW: "For Korean cards and easy-pay services. VAT included.", USD: "Pay with PayPal." },
     salesClosed: "Remove ADs isn't on sale now. Nothing was charged.",
     already: "This account has Remove ADs until its period ends. Another period can be bought after that.",
@@ -115,6 +127,7 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     ],
     testMode:
       "테스트 결제: 달러 결제는 테스트 키로 PayPal 샌드박스에서 처리되며 실제로 청구되지 않습니다. {price}는 예정된 달러 가격과 같지만, 달러 결제는 아직 실제로 판매하지 않습니다.",
+    testPassTerm: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 결제하지 않으셔도 됩니다.",
     currencyNotes: { KRW: "국내 카드·간편결제로 결제, 부가세 포함", USD: "PayPal로 결제" },
     salesClosed: "지금은 광고 제거를 판매하지 않습니다. 청구된 금액은 없습니다.",
     already: "이 계정에는 이용 기간이 남은 광고 제거가 있습니다. 다음 이용 기간은 지금 기간이 끝난 뒤에 구매할 수 있습니다.",
