@@ -233,8 +233,13 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
         <>
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
-            <br />
-            {productCopy.successBody}
+            {/* A test payment creates no paid pass: the 364-day body is left out; PassTerm shows the test wording. */}
+            {state.paid.environment !== "test" && (
+              <>
+                <br />
+                {productCopy.successBody}
+              </>
+            )}
           </Notice>
           <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />
           <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: state.paid.orderId })}</p>
@@ -249,8 +254,12 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
         <>
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
-            <br />
-            {productCopy.successBody}
+            {result.environment !== "test" && (
+              <>
+                <br />
+                {productCopy.successBody}
+              </>
+            )}
             {result.receiptEmail && (
               <>
                 <br />
