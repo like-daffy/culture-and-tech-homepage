@@ -238,7 +238,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
             {/* A test payment creates no paid pass: the 364-day body is left out; PassTerm shows the test wording. */}
-            {state.paid.environment !== "test" && (
+            {state.paid.environment === "live" && (
               <>
                 <br />
                 {productCopy.successBody}
@@ -258,7 +258,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
         <>
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
-            {result.environment !== "test" && (
+            {result.environment === "live" && (
               <>
                 <br />
                 {productCopy.successBody}
