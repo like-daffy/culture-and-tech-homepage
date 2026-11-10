@@ -359,7 +359,7 @@ export const ALL_IN_ONE_COPY: Record<Lang, ProductCopy> = {
     account: "For the Culture & Tech account whose contact email is {email}.",
     receiptEmail: "Receipt and contact email: {email}",
     notYou: "Not your account? Back to your Culture & Tech account",
-    lead: "One payment gives your Culture & Tech account every current Culture & Tech service, and every new one launched while it is active, for 364 days.",
+    lead: "One payment gives your Culture & Tech account connected services, including new services connected while it is active, for 364 days. Chord to MIDI joins when its portal integration opens; the switch is scheduled for 12 December 2026 at 23:00 KST.",
     priceTerms: "It doesn't renew, and nothing is charged again.",
     period:
       "Access period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. Your account page shows the exact start and end.",
@@ -400,7 +400,7 @@ export const ALL_IN_ONE_COPY: Record<Lang, ProductCopy> = {
     account: "연락용 이메일이 {email}인 컬처앤테크 계정에 적용됩니다.",
     receiptEmail: "영수증 및 연락용 이메일: {email}",
     notYou: "내 계정이 아닌가요? 컬처앤테크 계정으로 돌아가기",
-    lead: "한 번 결제하면 364일 동안, 컬처앤테크 계정으로 현재의 모든 컬처앤테크 서비스와 이용 기간 중 새로 출시되는 서비스를 이용할 수 있습니다.",
+    lead: "한 번 결제하면 364일 동안 컬처앤테크 계정으로 연결된 서비스와 이용 기간 중 새로 연결되는 서비스를 이용할 수 있습니다. Chord to MIDI는 포털 연동이 열리면 포함되며, 전환 예정 시각은 2026년 12월 12일 23:00(한국 시간)입니다.",
     priceTerms: "자동으로 갱신되거나 다시 결제되지 않습니다.",
     period:
       "이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 정확한 시작과 만료 일시는 계정 페이지에 표시됩니다.",
