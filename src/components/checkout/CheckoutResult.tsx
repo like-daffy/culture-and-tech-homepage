@@ -36,14 +36,18 @@ const safeLink = (product: OpenProduct, url: string | null): string | null =>
   url && (/^https:\/\//.test(url) || (product.emulators && /^http:\/\//.test(url))) ? url : null;
 
 /**
- * A pass's start and end with their time zone, for a product sold as a pass. A test payment (review phase) shows the
- * product's test-payment wording instead: its access ends when paid sales open, on a date not set yet.
+ * A pass's start and end with their time zone, for a product sold as a pass, when the confirmation says live. A test
+ * payment (review phase) shows the product's test-payment wording instead: its access ends when paid sales open, on a
+ * date not set yet. Without environment (older functions) neither is shown.
  */
 function PassTerm({ product, lang, pass, environment }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined; environment?: "test" | "live" }) {
   if (environment === "test") {
     const testText = product.copy[lang].testPassTerm ?? product.copy[lang].testKeys;
     return testText ? <p className="text-sm font-medium" data-pass-term="test">{testText}</p> : null;
   }
+  // Dates only when the confirmation says live; an answer without environment (older functions) is unknown, never
+  // shown as a live 364-day pass.
+  if (environment !== "live") return null;
   const text = product.copy[lang].passTerm;
   if (!pass || !text) return null;
   const start = new Date(pass.start);
