@@ -80,7 +80,9 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     ],
     testMode:
       "Test checkout: dollar payments go to PayPal's Sandbox on test keys, and nothing real is charged. {price} matches the planned dollar price, but dollars aren't sold for real yet.",
-    // chord-to-midi-web purchaseResult.testPayments, word for word.
+    // chord-to-midi-web purchaseResult.testPayments, word for word: the checkout's notice while a currency is on
+    // Toss's test keys, and the success page's line for a test payment.
+    testKeys: "Test payments: checkout runs in Toss Payments' test environment for now, and nothing is charged. You don't need to pay.",
     testPassTerm: "Test payments: checkout runs in Toss Payments' test environment for now, and nothing is charged. You don't need to pay.",
     currencyNotes: { KRW: "For Korean cards and easy-pay services. VAT included.", USD: "Pay with PayPal." },
     salesClosed: "Remove ADs isn't on sale now. Nothing was charged.",
@@ -127,6 +129,7 @@ export const CHORD_TO_MIDI_COPY: Record<Lang, ProductCopy> = {
     ],
     testMode:
       "테스트 결제: 달러 결제는 테스트 키로 PayPal 샌드박스에서 처리되며 실제로 청구되지 않습니다. {price}는 예정된 달러 가격과 같지만, 달러 결제는 아직 실제로 판매하지 않습니다.",
+    testKeys: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 결제하지 않으셔도 됩니다.",
     testPassTerm: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 결제하지 않으셔도 됩니다.",
     currencyNotes: { KRW: "국내 카드·간편결제로 결제, 부가세 포함", USD: "PayPal로 결제" },
     salesClosed: "지금은 광고 제거를 판매하지 않습니다. 청구된 금액은 없습니다.",
