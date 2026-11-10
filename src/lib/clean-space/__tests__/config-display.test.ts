@@ -43,6 +43,16 @@ describe("build settings", () => {
     for (const value of Object.values(production)) if (value && value.length > 9) expect(problems.join("\n")).not.toContain(value);
   });
 
+  it("only permits absent legacy provider clients for a deploy with verified portal redirects", () => {
+    const portal = { ...production, NEXT_PUBLIC_CLEAN_SPACE_KAKAO_CLIENT_ID: "", NEXT_PUBLIC_CLEAN_SPACE_NAVER_CLIENT_ID: "" };
+    expect(configProblems(portal, { deploy: true, ...defaults }).join(" ")).toMatch(/KAKAO_CLIENT_ID/);
+    expect(configProblems(portal, { deploy: true, portalRedirects: true, ...defaults })).toEqual([]);
+    expect(configProblems(production, { deploy: true, portalRedirects: true, ...defaults }).join(" ")).toMatch(/must be unset/);
+    expect(configProblems(portal, { deploy: false, portalRedirects: true, ...defaults }).join(" ")).toMatch(/KAKAO_CLIENT_ID/);
+    expect(configProblems(production, { deploy: true, portalMigration: true, ...defaults }).join(" ")).toMatch(/portal 301 redirects are incomplete/);
+    expect(configProblems(portal, { deploy: true, portalMigration: true, portalRedirects: true, ...defaults })).toEqual([]);
+  });
+
   it("refuses emulator and staging builds, demo projects and emulator settings in a deployment", () => {
     const emulator: CleanSpaceEnv = { ...production, NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT: "emulator", NEXT_PUBLIC_CLEAN_SPACE_FIREBASE_PROJECT_ID: "demo-clean-space-local" };
     expect(configProblems(emulator, { deploy: false, ...defaults })).toEqual([]);

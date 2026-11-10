@@ -42,6 +42,7 @@ describe("the product page's website edition", () => {
       expect(text).toContain(language === "en" ? "It doesn't renew, and nothing is charged again." : "자동으로 갱신되거나 다시 결제되지 않습니다.");
       expect(text).toContain(language === "en" ? "Full refund on request within 7 days of payment." : "결제 후 7일 이내에 요청하면 전액 환불됩니다.");
       expect(text).toContain(language === "en" ? "basic features" : "기본 기능");
+      expect(channel?.note).toContain(language === "en" ? "Test payment:" : "테스트 결제:");
       // Korean pages sell in won only.
       if (language === "ko") expect(text).not.toContain("US$");
       expect(channel?.links).toEqual([

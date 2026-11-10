@@ -8,27 +8,22 @@ import { existsSync } from "node:fs";
 import nextEnv from "@next/env";
 
 /**
- * DJ Duplicate Guard's Expert sales are closed (its DL-52): a deployment refuses to open its checkout. Its owner opens
- * them by changing this line in a commit of its own, after the steps in the README ("Opening DJ Duplicate Guard's
- * checkout"); the deployment then needs its settings instead.
+ * Candidate for coordinated TEST review. This frontend switch does not enforce the payment environment: DJ's backend
+ * must be verified as TEST-only and ready before the candidate is deployed.
  */
-const DJ_DUPLICATE_GUARD_SALES_OPEN = false;
+const DJ_DUPLICATE_GUARD_SALES_OPEN = true;
 
 /**
- * Clean Space's 364 days Unlock isn't on sale yet (mac-get-space docs/plans/364-days-option.md §0): a deployment refuses
- * to open its checkout. Its owner opens it (on Toss's test keys first, for Toss's review) by changing this line in a
- * commit of its own, after the steps in the README ("Opening Clean Space's checkout"); the deployment then needs its
- * settings and its published policies instead.
+ * Candidate for coordinated TEST review after the owner verifies portal connect/status and the CS env and 301s can
+ * ship atomically. The backend must independently enforce TEST-only sales.
  */
-const CLEAN_SPACE_SALES_OPEN = false;
+const CLEAN_SPACE_SALES_OPEN = true;
 
 /**
- * All-in-one — 364 Days isn't on sale yet: a deployment refuses to open its checkout. Its owner opens it (on Toss's test
- * keys first, for Toss's review) by changing this line in a commit of its own, once the portal's All-in-one page, its
- * published policies (portal.cultureand.tech/terms, /refund, /privacy) and the commerce callables (services/commerce)
- * are live; the deployment then needs the portal project's web app settings for cultureand.tech.
+ * Candidate for coordinated TEST review only after commerce and policy version readiness. The commerce backend must
+ * independently enforce TEST-only sales.
  */
-const ALL_IN_ONE_SALES_OPEN = false;
+const ALL_IN_ONE_SALES_OPEN = true;
 
 /** Clean Space's Terms of Service, Refund Policy and Privacy Policy, which its checkout links (src/lib/clean-space/site.ts). */
 const CLEAN_SPACE_POLICIES = [
@@ -76,7 +71,7 @@ function refuseTestSettings(prefix, origin, emulators = { on: value(`${prefix}_E
 requireSettings("NEXT_PUBLIC_CHORD_TO_MIDI", "chord-to-midi-web's production web app settings", "chord-to-midi");
 refuseTestSettings("NEXT_PUBLIC_CHORD_TO_MIDI", "https://chord-to-midi.app");
 
-// DJ Duplicate Guard: closed until its owner opens Expert's sales.
+// DJ Duplicate Guard: configured candidate, subject to backend TEST readiness.
 const djSwitch = value("NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT");
 if (!DJ_DUPLICATE_GUARD_SALES_OPEN) {
   if (djSwitch) {
@@ -90,7 +85,7 @@ if (!DJ_DUPLICATE_GUARD_SALES_OPEN) {
 }
 refuseTestSettings("NEXT_PUBLIC_DJ_DUPLICATE_GUARD", "https://dj-duplicate-guard.app");
 
-// Clean Space: closed until its owner opens the 364 days Unlock's sales.
+// Clean Space: configured candidate, subject to portal and backend readiness.
 const csSwitch = value("NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT");
 if (!CLEAN_SPACE_SALES_OPEN) {
   if (csSwitch) {
@@ -114,7 +109,7 @@ refuseTestSettings("NEXT_PUBLIC_CLEAN_SPACE", "https://cultureand.tech", {
   name: "NEXT_PUBLIC_CLEAN_SPACE_ENVIRONMENT=emulator",
 });
 
-// All-in-one: closed until its owner opens its sales.
+// All-in-one: configured candidate, subject to commerce readiness.
 const aioSwitch = value("NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT");
 if (!ALL_IN_ONE_SALES_OPEN) {
   if (aioSwitch) {

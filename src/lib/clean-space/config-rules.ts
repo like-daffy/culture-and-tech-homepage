@@ -117,7 +117,7 @@ export function readConfig(env: CleanSpaceEnv, defaults: { functionsRegion: stri
  * The checkout switch and the test origin are checked again by scripts/check-checkout-config.mjs, with the central
  * checkout's other products.
  */
-export function configProblems(env: CleanSpaceEnv, options: { deploy: boolean; functionsRegion: string; siteOrigin: string }): string[] {
+export function configProblems(env: CleanSpaceEnv, options: { deploy: boolean; functionsRegion: string; siteOrigin: string; portalRedirects?: boolean; portalMigration?: boolean }): string[] {
   const anySet = CLEAN_SPACE_SETTINGS.some((name) => trimmed(env[name]) !== "");
   if (!anySet) return [];
   const problems: string[] = [];
@@ -159,9 +159,15 @@ export function configProblems(env: CleanSpaceEnv, options: { deploy: boolean; f
 
   if (config.environment === "production") {
     if (config.recaptchaSiteKey === "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_RECAPTCHA_SITE_KEY is empty (App Check on the callables)");
-    // All three sign-in methods are required (plan §2.1): Google comes with the Firebase settings.
-    if (config.providerClientIds.kakao === "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_KAKAO_CLIENT_ID is empty (Kakao Login is required)");
-    if (config.providerClientIds.naver === "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_NAVER_CLIENT_ID is empty (Naver Login is required)");
+    if (options.deploy && options.portalMigration && !options.portalRedirects) problems.push("Clean Space portal 301 redirects are incomplete or preceded by unreviewed rules");
+    // Direct sign-in needs provider clients. Verified portal redirects must not configure the legacy surface.
+    if (options.deploy && options.portalRedirects) {
+      if (config.providerClientIds.kakao !== "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_KAKAO_CLIENT_ID must be unset with portal redirects");
+      if (config.providerClientIds.naver !== "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_NAVER_CLIENT_ID must be unset with portal redirects");
+    } else {
+      if (config.providerClientIds.kakao === "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_KAKAO_CLIENT_ID is empty (Kakao Login is required)");
+      if (config.providerClientIds.naver === "") problems.push("NEXT_PUBLIC_CLEAN_SPACE_NAVER_CLIENT_ID is empty (Naver Login is required)");
+    }
   }
   if (trimmed(env.NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL) !== "" && config.downloadUrl === "") {
     problems.push("NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL is not an https address");

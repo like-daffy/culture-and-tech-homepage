@@ -71,11 +71,12 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
       "Every feature: the items the app marks as needing the Unlock, a deeper scan, duplicate verification and permanent removal, hidden-folder review and Plugin Cleaner, Docker and simulator management, the administrator helper and Spotlight maintenance.",
     priceTitle: "Price and access period",
     priceText:
-      "{krw} (VAT included), or {usd} with PayPal: one payment on this site through Toss Payments, signed in with Google, Kakao or Naver. Access period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. It doesn't renew, and nothing is charged again.",
+      "{krw} (VAT included), or {usd} with PayPal: one payment on this site through Toss Payments, signed in to your Culture & Tech account. Access period: 364 days from the moment the payment is approved (shorter than 12 months), ending at the same time of day. It doesn't renew, and nothing is charged again.",
     refundTitle: "Refunds, and after the access period",
     refundText:
       "Full refund on request within 7 days of payment. When the access period ends, the basic features stay, and so do your settings, history, reports and Put Back.",
-    note: "The two editions are separate products: Expert bought in the Mac App Store doesn't unlock the website edition, and the 364 days Unlock doesn't unlock the Mac App Store app.",
+    // TEST review candidate: remove this test notice only with the coordinated paid-sales release.
+    note: "Test payment: payments run in Toss Payments' test environment for now, and nothing is actually charged. An access period received through a test payment ends when sales start for real. The two editions are separate products: Expert bought in the Mac App Store doesn't unlock the website edition, and the 364 days Unlock doesn't unlock the Mac App Store app.",
     download: "Download for Mac",
     buy: "Buy the 364 days Unlock",
     policies: "The website edition's {terms}, {refund} and {privacy}: please read them before you buy.",
@@ -111,11 +112,11 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
       "모든 기능: 앱에서 잠금 해제가 필요하다고 표시하는 항목, 심층 검사, 중복 검증과 영구 삭제, 숨김 폴더 검토와 플러그인 클리너, Docker와 시뮬레이터 관리, 관리자 도우미와 Spotlight 유지 관리.",
     priceTitle: "가격과 이용 기간",
     priceText:
-      "{krw}(부가세 포함). 이 사이트에서 Google, Kakao 또는 Naver로 로그인한 뒤 토스페이먼츠로 한 번 결제합니다. 이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 자동으로 갱신되거나 다시 결제되지 않습니다.",
+      "{krw}(부가세 포함). 컬처앤테크 계정에 로그인한 뒤 이 사이트에서 토스페이먼츠로 한 번 결제합니다. 이용 기간: 결제가 승인된 때부터 364일(12개월보다 짧음)이며, 같은 시각에 끝납니다. 자동으로 갱신되거나 다시 결제되지 않습니다.",
     refundTitle: "환불과 이용 기간이 끝난 뒤",
     refundText:
       "결제 후 7일 이내에 요청하면 전액 환불됩니다. 이용 기간이 끝나도 기본 기능은 그대로 쓸 수 있고, 설정, 기록, 보고서, 복구하기도 그대로 남습니다.",
-    note: "두 버전은 서로 다른 상품입니다. Mac App Store에서 구매한 Expert는 웹사이트 버전에 적용되지 않고, 364일 잠금 해제는 Mac App Store 버전에 적용되지 않습니다.",
+    note: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 테스트 결제로 받은 이용 기간은 정식 판매가 시작되면 끝납니다. 두 버전은 서로 다른 상품입니다. Mac App Store에서 구매한 Expert는 웹사이트 버전에 적용되지 않고, 364일 잠금 해제는 Mac App Store 버전에 적용되지 않습니다.",
     download: "Mac용 다운로드",
     buy: "364일 잠금 해제 구매하기",
     policies: "구매하기 전에 웹사이트 버전의 {terms}, {refund}, {privacy}을 확인해 주세요.",

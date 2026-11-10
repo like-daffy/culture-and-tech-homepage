@@ -10,6 +10,8 @@
 //
 //   node scripts/check-clean-space-config.mjs [--deploy]
 import nextEnv from "@next/env";
+import { readFileSync } from "node:fs";
+import { hasCleanSpacePortalRedirects } from "./clean-space-portal-redirects.mjs";
 import { configProblems, readConfig } from "../src/lib/clean-space/config-rules.ts";
 import { DEFAULT_FUNCTIONS_REGION } from "../src/lib/clean-space/contract.generated.ts";
 import { CLEAN_SPACE_SITE_ORIGIN } from "../src/lib/clean-space/site.ts";
@@ -17,7 +19,11 @@ import { CLEAN_SPACE_SITE_ORIGIN } from "../src/lib/clean-space/site.ts";
 const deploy = process.argv.includes("--deploy");
 const defaults = { functionsRegion: DEFAULT_FUNCTIONS_REGION, siteOrigin: CLEAN_SPACE_SITE_ORIGIN };
 const { combinedEnv: env } = nextEnv.loadEnvConfig(process.cwd(), false, { info() {}, error: console.error });
-const problems = configProblems(env, { deploy, ...defaults });
+let portalRedirects = false;
+if (deploy) {
+  try { portalRedirects = hasCleanSpacePortalRedirects(JSON.parse(readFileSync(new URL("../firebase.json", import.meta.url), "utf8"))); } catch {}
+}
+const problems = configProblems(env, { deploy, ...defaults, portalRedirects, portalMigration: true });
 
 if (problems.length > 0) {
   console.error(`Clean Space's account pages can't be ${deploy ? "deployed" : "built"} with these settings:`);

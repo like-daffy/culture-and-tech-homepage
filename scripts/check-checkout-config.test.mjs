@@ -2,14 +2,20 @@
 // folder (no .env files) with only the settings given: Clean Space's checkout is refused while its sales are closed,
 // and so are its test settings; the values are never printed.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 
-const script = fileURLToPath(new URL("./check-checkout-config.mjs", import.meta.url));
 const empty = mkdtempSync(join(tmpdir(), "checkout-config-"));
+// Keep closed-gate regression coverage against an isolated copy even while this release candidate opens the switches.
+const source = readFileSync(fileURLToPath(new URL("./check-checkout-config.mjs", import.meta.url)), "utf8");
+const closed = source.replace(/^const (DJ_DUPLICATE_GUARD|CLEAN_SPACE|ALL_IN_ONE)_SALES_OPEN = true;$/gm, "const $1_SALES_OPEN = false;");
+if ((source.match(/^const (DJ_DUPLICATE_GUARD|CLEAN_SPACE|ALL_IN_ONE)_SALES_OPEN = true;$/gm) ?? []).length !== 3) throw new Error("candidate switches changed");
+const script = join(empty, "check-checkout-config.mjs");
+writeFileSync(script, closed);
+symlinkSync(fileURLToPath(new URL("../node_modules", import.meta.url)), join(empty, "node_modules"), "dir");
 afterAll(() => rmSync(empty, { recursive: true, force: true }));
 
 /** Chord to MIDI's settings, which every deployment needs. */
