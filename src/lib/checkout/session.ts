@@ -19,6 +19,8 @@ const SECRET = /^[A-Za-z0-9_-]{43}$/;
 const paidKey = (product: OpenProduct) => `${product.storageKey}.paid`;
 /** That order's pass, for a product sold as a pass: its start and end (no key, nothing personal). */
 const passKey = (product: OpenProduct) => `${product.storageKey}.pass`;
+/** Environment is bound to the order: absent or invalid values must never imply a live payment. */
+const environmentKey = (product: OpenProduct) => `${product.storageKey}.environment`;
 
 /** What the tab holds: the session's credential, and the handoff code until the session was opened with it. */
 export interface CheckoutHold extends CheckoutCredential {
@@ -109,7 +111,11 @@ export interface PaidOrder {
 export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
   forgetHold(product);
   try {
+    window.sessionStorage.removeItem(environmentKey(product));
     window.sessionStorage.setItem(paidKey(product), paid.orderId);
+    if (paid.environment === "test" || paid.environment === "live") {
+      window.sessionStorage.setItem(environmentKey(product), JSON.stringify({ orderId: paid.orderId, environment: paid.environment }));
+    }
     if (paid.pass) {
       window.sessionStorage.setItem(passKey(product), JSON.stringify({ orderId: paid.orderId, ...paid.pass }));
     } else {
@@ -127,7 +133,18 @@ export function paidOrder(product: OpenProduct): PaidOrder | null {
   } catch {
     return null;
   }
-  return orderId === null ? null : { orderId, pass: paidPass(product, orderId) };
+  return orderId === null ? null : { orderId, pass: paidPass(product, orderId), environment: paidEnvironment(product, orderId) };
+}
+
+function paidEnvironment(product: OpenProduct, orderId: string): PaidOrder["environment"] {
+  try {
+    const value: unknown = JSON.parse(window.sessionStorage.getItem(environmentKey(product)) ?? "null");
+    if (typeof value !== "object" || value === null) return undefined;
+    const saved = value as Record<string, unknown>;
+    return saved.orderId === orderId && (saved.environment === "test" || saved.environment === "live") ? saved.environment : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function paidPass(product: OpenProduct, orderId: string): PaidOrder["pass"] {

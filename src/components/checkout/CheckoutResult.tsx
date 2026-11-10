@@ -40,7 +40,7 @@ const safeLink = (product: OpenProduct, url: string | null): string | null =>
  * payment (review phase) shows the product's test-payment wording instead: its access ends when paid sales open, on a
  * date not set yet. Without environment (older functions) neither is shown.
  */
-function PassTerm({ product, lang, pass, environment }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined; environment?: "test" | "live" }) {
+export function PassTerm({ product, lang, pass, environment }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined; environment?: "test" | "live" }) {
   if (environment === "test") {
     const testText = product.copy[lang].testPassTerm ?? product.copy[lang].testKeys;
     return testText ? <p className="text-sm font-medium" data-pass-term="test">{testText}</p> : null;
