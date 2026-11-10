@@ -179,6 +179,11 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
       "A full refund within 7 days of payment, even after use; after that, cancel at any time for a refund of the unused time, with no fee.",
     ],
     testMode: "Test checkout: payments go to Toss Payments' test environment, and nothing is charged.",
+    // t1g, 2026-11-10 (DJ's updated drafts; owner's review rule), word for word.
+    testKeys:
+      "Test payment: checkout runs in Toss Payments' test environment for now, and nothing is charged. Any access it gives is temporary and ends when paid sales open (no date is set yet).",
+    testPassTerm:
+      "Test payment complete: nothing was charged and no paid pass was created. Any access it gives ends when paid sales open (no date is set yet).",
     currencyNotes: { KRW: "Pay with a Korean card. VAT included.", USD: "Pay with PayPal." },
     salesClosed: "Expert isn't on sale yet. Nothing can be bought here, and nothing is charged.",
     already: "This account already has an active Expert pass.",
@@ -215,6 +220,10 @@ export const DJ_DUPLICATE_GUARD_COPY: Record<Lang, ProductCopy> = {
       "결제 후 7일 이내에는 사용했더라도 전액 환불되며, 그 뒤에는 언제든 해지하고 남은 기간만큼 수수료 없이 환불받을 수 있습니다.",
     ],
     testMode: "테스트 결제: 토스페이먼츠의 테스트 환경으로 처리되며 실제로 청구되지 않습니다.",
+    testKeys:
+      "테스트 결제: 지금은 토스페이먼츠 테스트 환경에서 결제가 진행되며 아무것도 결제되지 않습니다. 이로 주어지는 이용은 임시이며, 아직 날짜가 정해지지 않은 유료 판매 개시 때 끝납니다.",
+    testPassTerm:
+      "테스트 결제 완료: 아무것도 결제되지 않았으며 유료 이용권이 만들어지지 않았습니다. 이로 주어지는 이용은 아직 날짜가 정해지지 않은 유료 판매 개시 때 끝납니다.",
     currencyNotes: { KRW: "국내 카드로 결제, 부가세 포함", USD: "PayPal로 결제" },
     salesClosed: "Expert는 아직 판매하지 않습니다. 여기서는 아무것도 구매되거나 청구되지 않습니다.",
     already: "이 계정에는 이미 유효한 Expert 이용권이 있습니다.",

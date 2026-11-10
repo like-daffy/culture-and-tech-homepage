@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { PAGE_PATH, PORTAL_ORIGIN, PORTAL_PAGE_PATH } from "@/lib/clean-space/contract.generated";
 import { PURCHASE_COPY } from "@/lib/clean-space/copy";
 import { ALREADY_OWNED_CODE, CLEAN_SPACE_PAGES, CLEAN_SPACE_PORTAL } from "@/lib/clean-space/site";
-import { ALL_IN_ONE_COPY, CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY } from "../product-copy";
+import { ALL_IN_ONE_COPY, CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY } from "../product-copy";
 import { checkoutPath, PRODUCTS, productResumeUrl, productUrl, type OpenProduct } from "../products";
 
 const RESUME = "R".repeat(43);
@@ -216,5 +216,7 @@ describe("the success page's test-payment line", () => {
     expect(CHORD_TO_MIDI_COPY.ko.testPassTerm).not.toContain("{price}");
     expect(ALL_IN_ONE_COPY.en.testPassTerm ?? ALL_IN_ONE_COPY.en.testKeys).toContain("ends when sales start for real");
     expect(CLEAN_SPACE_COPY.ko.testPassTerm ?? CLEAN_SPACE_COPY.ko.testKeys).not.toContain("{price}");
+    expect(DJ_DUPLICATE_GUARD_COPY.en.testPassTerm).toContain("no paid pass was created");
+    expect(DJ_DUPLICATE_GUARD_COPY.ko.testKeys).toContain("유료 판매 개시 때 끝납니다");
   });
 });
