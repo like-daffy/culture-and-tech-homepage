@@ -134,6 +134,11 @@ export interface ConfirmPaymentResponse {
   receiptEmail: string | null;
   /** A pass's start and end (ISO 8601 instants), for a product sold as a pass: shown with their time zone. */
   pass?: { start: string; end: string };
+  /**
+   * Whether Toss's test or live keys took it (portal contract rev 4.13, every product). A test payment's access ends
+   * when paid sales open, so its 364-day dates are not shown.
+   */
+  environment?: "test" | "live";
 }
 
 export interface FailCheckoutOrderRequest extends CheckoutCredential {

@@ -98,6 +98,8 @@ export interface PaidOrder {
   orderId: string;
   /** The pass's start and end (ISO 8601), for a product sold as a pass. */
   pass: { start: string; end: string } | null;
+  /** From the confirm answer; a test payment's dates are not shown. */
+  environment?: "test" | "live";
 }
 
 /**

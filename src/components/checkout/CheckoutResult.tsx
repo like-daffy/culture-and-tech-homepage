@@ -35,8 +35,15 @@ function paymentDetails(search: string): PaymentDetails | null {
 const safeLink = (product: OpenProduct, url: string | null): string | null =>
   url && (/^https:\/\//.test(url) || (product.emulators && /^http:\/\//.test(url))) ? url : null;
 
-/** A pass's start and end with their time zone, for a product sold as a pass. */
-function PassTerm({ product, lang, pass }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined }) {
+/**
+ * A pass's start and end with their time zone, for a product sold as a pass. A test payment (review phase) shows the
+ * product's test-payment wording instead: its access ends when paid sales open, on a date not set yet.
+ */
+function PassTerm({ product, lang, pass, environment }: { product: OpenProduct; lang: Lang; pass: PaidOrder["pass"] | undefined; environment?: "test" | "live" }) {
+  if (environment === "test") {
+    const testText = product.copy[lang].testKeys ?? product.copy[lang].testMode;
+    return testText ? <p className="text-sm font-medium" data-pass-term="test">{testText}</p> : null;
+  }
   const text = product.copy[lang].passTerm;
   if (!pass || !text) return null;
   const start = new Date(pass.start);
@@ -101,7 +108,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     confirmCheckoutPayment(product, { checkoutId: hold.checkoutId, checkoutKey: hold.checkoutKey, ...details }).then(
       (result) => {
         // Its job is done: the tab keeps no key that opens the account's checkout any more.
-        rememberPaid(product, { orderId: result.orderId, pass: result.pass ?? null });
+        rememberPaid(product, { orderId: result.orderId, pass: result.pass ?? null, environment: result.environment });
         setState({ kind: "done", result });
       },
       (error: unknown) => {
@@ -229,7 +236,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
             <br />
             {productCopy.successBody}
           </Notice>
-          <PassTerm product={product} lang={lang} pass={state.paid.pass} />
+          <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />
           <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: state.paid.orderId })}</p>
           <div className="flex flex-wrap gap-3">{backLinks}</div>
         </>
@@ -251,7 +258,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
               </>
             )}
           </Notice>
-          <PassTerm product={product} lang={lang} pass={result.pass} />
+          <PassTerm product={product} lang={lang} pass={result.pass} environment={result.environment} />
           <p className="text-sm text-muted-foreground">
             {fill(copy.details, {
               orderId: result.orderId,
