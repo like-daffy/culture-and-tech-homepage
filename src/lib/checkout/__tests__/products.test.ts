@@ -209,3 +209,12 @@ describe("DJ Duplicate Guard's checkout, open (portal accounts)", () => {
     expect(dj.functionsEmulator).toBeUndefined();
   });
 });
+
+describe("the success page's test-payment line", () => {
+  it("uses a product's test wording, never the PayPal Sandbox testMode with its {price}", () => {
+    expect(CHORD_TO_MIDI_COPY.en.testPassTerm).toContain("Toss Payments' test environment");
+    expect(CHORD_TO_MIDI_COPY.ko.testPassTerm).not.toContain("{price}");
+    expect(ALL_IN_ONE_COPY.en.testPassTerm ?? ALL_IN_ONE_COPY.en.testKeys).toContain("ends when sales start for real");
+    expect(CLEAN_SPACE_COPY.ko.testPassTerm ?? CLEAN_SPACE_COPY.ko.testKeys).not.toContain("{price}");
+  });
+});
