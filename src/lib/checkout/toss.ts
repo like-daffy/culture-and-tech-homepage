@@ -107,7 +107,7 @@ export function renderPaymentWidget(options: PaymentWidgetOptions): Promise<Paym
             orderName: request.orderName,
             successUrl: request.successUrl,
             failUrl: request.failUrl,
-            customerEmail: request.customerEmail ?? null,
+            ...(request.customerEmail ? { customerEmail: request.customerEmail } : {}),
             customerName: null,
             ...paypal,
           });
