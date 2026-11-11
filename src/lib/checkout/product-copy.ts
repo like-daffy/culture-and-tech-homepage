@@ -290,7 +290,7 @@ export const CLEAN_SPACE_COPY: Record<Lang, ProductCopy> = {
     accountDeletedResult:
       "The account was deleted while the payment was being confirmed, so the 364 days Unlock could not be added to it.",
     finishOnProduct:
-      "This tab no longer holds the checkout. To finish the payment, sign in on your Clean Space account page to the account you paid with.",
+      "This tab no longer holds the checkout. To finish the payment, sign in on the Clean Space page of your Culture & Tech account with the account you paid with.",
     finishButton: "Finish on your Clean Space account",
   },
   ko: {
@@ -330,7 +330,7 @@ export const CLEAN_SPACE_COPY: Record<Lang, ProductCopy> = {
       "이 계정에는 아직 끝나지 않은 364일 잠금 해제 이용 기간이 있어 이번 결제는 진행하지 않았습니다. 청구된 금액은 없습니다.",
     accountDeletedResult: "결제를 확인하는 동안 계정이 삭제되어 364일 잠금 해제를 적용하지 못했습니다.",
     finishOnProduct:
-      "이 탭에는 결제 정보가 남아 있지 않습니다. Clean Space 계정 페이지에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
+      "이 탭에는 결제 정보가 남아 있지 않습니다. 컬처앤테크 계정의 Clean Space 페이지에서 결제한 계정으로 로그인하면 결제가 마무리됩니다.",
     finishButton: "Clean Space 계정에서 마무리하기",
   },
 };
