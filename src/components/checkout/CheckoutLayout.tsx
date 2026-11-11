@@ -54,7 +54,7 @@ export function CheckoutLayout({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-xl font-semibold text-primary"
             >
-              <Image src="/brand/logo-transparent-192.png" width={32} height={32} alt="Culture & Tech logo" />
+              <Image src="/brand/logo-transparent-192.png" width={32} height={32} alt="" />
               Culture &amp; Tech
             </a>
             <span className="text-sm text-muted-foreground">{copy.checkout}</span>
