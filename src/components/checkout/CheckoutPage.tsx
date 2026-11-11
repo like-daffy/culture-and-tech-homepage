@@ -200,9 +200,9 @@ function OpenCheckout({ product, lang }: { product: OpenProduct; lang: Lang }) {
           <Notice tone={owned ? "success" : "error"}>{state.message}</Notice>
           {owned ? (
             <div className="flex flex-wrap gap-3">
-              <LinkButton primary href={productUrl(product, lang, "account")}>
+              {product.slug !== "chord-to-midi" && <LinkButton primary href={productUrl(product, lang, "account")}>
                 {copy.seeAccount}
-              </LinkButton>
+              </LinkButton>}
               <LinkButton href={productUrl(product, lang, "home")}>{productCopy.backToProduct}</LinkButton>
             </div>
           ) : (

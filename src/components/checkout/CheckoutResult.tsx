@@ -72,6 +72,7 @@ type Confirmation =
   | { kind: "error"; info: CallableErrorInfo; details: PaymentDetails }
   /** This tab no longer holds the checkout: the payment is kept for its buyer to finish on the product's site. */
   | { kind: "keeping" }
+  | { kind: "chordLost" }
   | { kind: "kept"; resumeId: string }
   | { kind: "keepFailed"; message: string; details: PaymentDetails };
 
@@ -87,6 +88,12 @@ export function CheckoutSuccess({ product, lang }: { product: CheckoutProduct; l
   return <Success product={product} lang={lang} />;
 }
 
+/** Chord's temporary review purchaser cannot resume on the retired account pages. */
+export function recoverLostCheckout(product: OpenProduct, details: PaymentDetails, showChordLost: () => void, keep: (details: PaymentDetails) => void) {
+  if (product.slug === "chord-to-midi") showChordLost();
+  else keep(details);
+}
+
 function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
   const copy = CHECKOUT_COPY[lang];
   const productCopy = product.copy[lang];
@@ -94,11 +101,13 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
   const started = useRef(false);
 
   const keep = (details: PaymentDetails) => {
-    setState({ kind: "keeping" });
-    preparePaymentResume(product, details).then(
-      ({ resumeId }) => setState({ kind: "kept", resumeId }),
-      (error: unknown) => setState({ kind: "keepFailed", message: describeCallableError(error).message, details })
-    );
+    recoverLostCheckout(product, details, () => setState({ kind: "chordLost" }), (data) => {
+      setState({ kind: "keeping" });
+      preparePaymentResume(product, data).then(
+        ({ resumeId }) => setState({ kind: "kept", resumeId }),
+        (error: unknown) => setState({ kind: "keepFailed", message: describeCallableError(error).message, details: data })
+      );
+    });
   };
 
   const confirm = (details: PaymentDetails) => {
@@ -150,7 +159,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       <LinkButton primary href={productUrl(product, lang, "home")}>
         {productCopy.backToProduct}
       </LinkButton>
-      {!review && <LinkButton href={productUrl(product, lang, "account")}>{copy.seeAccount}</LinkButton>}
+      {!review && product.slug !== "chord-to-midi" && <LinkButton href={productUrl(product, lang, "account")}>{copy.seeAccount}</LinkButton>}
     </>
   );
 
@@ -168,6 +177,9 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       break;
     case "keeping":
       body = <Spinner label={copy.keeping} />;
+      break;
+    case "chordLost":
+      body = <><Notice>{copy.chordLost}</Notice><LinkButton primary href={productUrl(product, lang, "purchase")}>{copy.chordStartAgain}</LinkButton></>;
       break;
     case "kept":
       body = (
@@ -202,9 +214,9 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
           <>
             <Notice>{productCopy.alreadyOwned}</Notice>
             <div className="flex flex-wrap gap-3">
-              <LinkButton primary href={productUrl(product, lang, "account")}>
+              {product.slug !== "chord-to-midi" && <LinkButton primary href={productUrl(product, lang, "account")}>
                 {copy.seeAccount}
-              </LinkButton>
+              </LinkButton>}
               <LinkButton href={productUrl(product, lang, "home")}>{productCopy.backToProduct}</LinkButton>
             </div>
           </>
