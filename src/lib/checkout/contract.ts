@@ -89,7 +89,8 @@ export interface OpenCheckoutResponse extends OfferVersions {
   lang: Lang;
   orderName: string;
   /** The account's confirmed email: the receipt address of an order made now. */
-  receiptEmail: string;
+  receiptEmail: string | null;
+  review?: true;
   /** The currencies this checkout takes, won first. */
   options: CheckoutOption[];
   /** A pass's length in days, for a product sold as a pass (shown before payment); absent otherwise. */
@@ -112,7 +113,8 @@ export interface CreateOrderResponse {
   /** Random, opaque Toss customerKey of the account. */
   customerKey: string;
   /** The account's confirmed email, frozen on the order: Toss sends the receipt there. */
-  receiptEmail: string;
+  receiptEmail: string | null;
+  review?: true;
 }
 
 /** The query parameters Toss appends to the successUrl (`amount` as a number). */
@@ -132,6 +134,7 @@ export interface ConfirmPaymentResponse {
   approvedAt: string;
   receiptUrl: string | null;
   receiptEmail: string | null;
+  review?: true;
   /** A pass's start and end (ISO 8601 instants), for a product sold as a pass: shown with their time zone. */
   pass?: { start: string; end: string };
   /**

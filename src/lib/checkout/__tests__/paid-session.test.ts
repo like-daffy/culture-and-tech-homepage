@@ -43,6 +43,14 @@ describe("paid checkout cache", () => {
     entries.set("checkout.chord.paid", "order-one");
     expect(paidOrder(chord)).toEqual({ orderId: "order-one", pass: null, environment: undefined });
   });
+  it("retains only explicitly marked test-review receipt metadata for the same order", () => {
+    rememberPaid(chord, { orderId: "order-one", pass: null, environment: "test", review: true, receiptUrl: "https://example.invalid/receipt" });
+    expect(paidOrder(chord)).toMatchObject({ orderId: "order-one", environment: "test", review: true, receiptUrl: "https://example.invalid/receipt" });
+    entries.set("checkout.chord.paid", "other-order");
+    expect(paidOrder(chord)?.review).toBeUndefined();
+    rememberPaid(chord, { orderId: "order-two", pass: null, environment: "live", review: true });
+    expect(paidOrder(chord)?.review).toBeUndefined();
+  });
   it.each(["en", "ko"] as const)("renders the cached %s test, live, and unknown terms safely", (lang) => {
     const product = { ...chord, copy: CHORD_TO_MIDI_COPY } as OpenProduct;
     const render = () => { const paid = paidOrder(product)!; return renderToStaticMarkup(createElement(PassTerm, { product, lang, pass: paid.pass, environment: paid.environment })); };

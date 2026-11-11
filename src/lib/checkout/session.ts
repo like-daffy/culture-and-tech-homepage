@@ -21,6 +21,7 @@ const paidKey = (product: OpenProduct) => `${product.storageKey}.paid`;
 const passKey = (product: OpenProduct) => `${product.storageKey}.pass`;
 /** Environment is bound to the order: absent or invalid values must never imply a live payment. */
 const environmentKey = (product: OpenProduct) => `${product.storageKey}.environment`;
+const reviewKey = (product: OpenProduct) => `${product.storageKey}.review`;
 
 /** What the tab holds: the session's credential, and the handoff code until the session was opened with it. */
 export interface CheckoutHold extends CheckoutCredential {
@@ -102,6 +103,8 @@ export interface PaidOrder {
   pass: { start: string; end: string } | null;
   /** From the confirm answer; a test payment's dates are not shown. */
   environment?: "test" | "live";
+  review?: true;
+  receiptUrl?: string | null;
 }
 
 /**
@@ -112,9 +115,13 @@ export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
   forgetHold(product);
   try {
     window.sessionStorage.removeItem(environmentKey(product));
+    window.sessionStorage.removeItem(reviewKey(product));
     window.sessionStorage.setItem(paidKey(product), paid.orderId);
     if (paid.environment === "test" || paid.environment === "live") {
       window.sessionStorage.setItem(environmentKey(product), JSON.stringify({ orderId: paid.orderId, environment: paid.environment }));
+    }
+    if (paid.review === true && paid.environment === "test") {
+      window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null }));
     }
     if (paid.pass) {
       window.sessionStorage.setItem(passKey(product), JSON.stringify({ orderId: paid.orderId, ...paid.pass }));
@@ -133,7 +140,20 @@ export function paidOrder(product: OpenProduct): PaidOrder | null {
   } catch {
     return null;
   }
-  return orderId === null ? null : { orderId, pass: paidPass(product, orderId), environment: paidEnvironment(product, orderId) };
+  if (orderId === null) return null;
+  const environment = paidEnvironment(product, orderId);
+  const review = environment === "test" ? paidReview(product, orderId) : null;
+  return { orderId, pass: paidPass(product, orderId), environment, ...(review ? { review: true as const, receiptUrl: review.receiptUrl } : {}) };
+}
+
+function paidReview(product: OpenProduct, orderId: string): { receiptUrl: string | null } | null {
+  try {
+    const value: unknown = JSON.parse(window.sessionStorage.getItem(reviewKey(product)) ?? "null");
+    if (typeof value !== "object" || value === null) return null;
+    const saved = value as Record<string, unknown>;
+    if (saved.orderId !== orderId || (saved.receiptUrl !== null && typeof saved.receiptUrl !== "string")) return null;
+    return { receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null };
+  } catch { return null; }
 }
 
 function paidEnvironment(product: OpenProduct, orderId: string): PaidOrder["environment"] {

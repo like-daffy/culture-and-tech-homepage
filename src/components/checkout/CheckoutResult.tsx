@@ -21,6 +21,7 @@ import { forgetHold, paidOrder, readHold, rememberPaid, type PaidOrder } from "@
 import { paymentMethodLabel } from "@/lib/checkout/toss";
 import { ClosedCheckout } from "./CheckoutPage";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
+import { ReviewReceiptNotice } from "./ReviewPaymentNotices";
 
 /** Toss's success parameters, if the address has them. */
 function paymentDetails(search: string): PaymentDetails | null {
@@ -112,7 +113,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     confirmCheckoutPayment(product, { checkoutId: hold.checkoutId, checkoutKey: hold.checkoutKey, ...details }).then(
       (result) => {
         // Its job is done: the tab keeps no key that opens the account's checkout any more.
-        rememberPaid(product, { orderId: result.orderId, pass: result.pass ?? null, environment: result.environment });
+        rememberPaid(product, { orderId: result.orderId, pass: result.pass ?? null, environment: result.environment, review: result.review, receiptUrl: result.review === true ? safeLink(product, result.receiptUrl) : undefined });
         setState({ kind: "done", result });
       },
       (error: unknown) => {
@@ -144,12 +145,12 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const backLinks = (
+  const backLinks = (review: boolean) => (
     <>
       <LinkButton primary href={productUrl(product, lang, "home")}>
         {productCopy.backToProduct}
       </LinkButton>
-      <LinkButton href={productUrl(product, lang, "account")}>{copy.seeAccount}</LinkButton>
+      {!review && <LinkButton href={productUrl(product, lang, "account")}>{copy.seeAccount}</LinkButton>}
     </>
   );
 
@@ -232,25 +233,28 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       );
       break;
     }
-    case "paid":
+    case "paid": {
+      const receiptUrl = state.paid.review === true ? safeLink(product, state.paid.receiptUrl ?? null) : null;
       body = (
         <>
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
             {/* A test payment creates no paid pass: the 364-day body is left out; PassTerm shows the test wording. */}
-            {state.paid.environment === "live" && (
+            {state.paid.review !== true && state.paid.environment === "live" && (
               <>
                 <br />
                 {productCopy.successBody}
               </>
             )}
           </Notice>
+          {state.paid.review === true && <ReviewReceiptNotice lang={lang} />}
           <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />
           <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: state.paid.orderId })}</p>
-          <div className="flex flex-wrap gap-3">{backLinks}</div>
+          <div className="flex flex-wrap gap-3">{backLinks(state.paid.review === true)}{receiptUrl && <LinkButton href={receiptUrl} newTab>{copy.receipt}</LinkButton>}</div>
         </>
       );
       break;
+    }
     case "done": {
       const { result } = state;
       const receiptUrl = safeLink(product, result.receiptUrl);
@@ -258,20 +262,21 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
         <>
           <Notice tone="success">
             <strong>{copy.successTitle}</strong>
-            {result.environment === "live" && (
+            {result.review !== true && result.environment === "live" && (
               <>
                 <br />
                 {productCopy.successBody}
               </>
             )}
-            {result.receiptEmail && (
+            {result.review !== true && result.receiptEmail && (
               <>
                 <br />
                 {fill(copy.receiptSent, { email: result.receiptEmail })}
               </>
             )}
           </Notice>
-          <PassTerm product={product} lang={lang} pass={result.pass} environment={result.environment} />
+          {result.review === true && <ReviewReceiptNotice lang={lang} />}
+          <PassTerm product={product} lang={lang} pass={result.pass} environment={result.review === true && result.environment !== "test" ? undefined : result.environment} />
           <p className="text-sm text-muted-foreground">
             {fill(copy.details, {
               orderId: result.orderId,
@@ -280,7 +285,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
             })}
           </p>
           <div className="flex flex-wrap gap-3">
-            {backLinks}
+            {backLinks(result.review === true)}
             {receiptUrl && (
               <LinkButton href={receiptUrl} newTab>
                 {copy.receipt}

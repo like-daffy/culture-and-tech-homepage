@@ -23,7 +23,9 @@ import {
 } from "@/lib/checkout/products";
 import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type CheckoutHold } from "@/lib/checkout/session";
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
+import { sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
+import { ReviewEmailNotice } from "./ReviewPaymentNotices";
 
 /** `text` with each `{name}` replaced by a node (a link). */
 export function richText(text: string, nodes: Record<string, ReactNode>): ReactNode {
@@ -242,7 +244,7 @@ function suggestedCurrency(lang: Lang, options: CheckoutOption[]): Currency {
   return options.some((option) => option.currency === preferred) ? preferred : (options[0]?.currency ?? "KRW");
 }
 
-function Checkout({
+export function Checkout({
   product,
   lang,
   checkout,
@@ -266,6 +268,7 @@ function Checkout({
   const termOutOfDate = product.passDays !== undefined && checkout.passDays !== product.passDays;
   const terms = <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>;
   const refund = <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>;
+  if (!validCheckoutIdentity(checkout)) return <Notice tone="error">{copy.notConfigured}</Notice>;
 
   return (
     <>
@@ -273,12 +276,12 @@ function Checkout({
         <Notice>{fill(productCopy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>
       )}
       {!testOption && onTestKeys && <Notice>{productCopy.testKeys}</Notice>}
-      <Notice>
+      {checkout.review !== true && <Notice>
         {fill(productCopy.account, { email: checkout.receiptEmail })}{" "}
         <a className="underline" href={productUrl(product, lang, product.startPage)}>
           {productCopy.notYou}
         </a>
-      </Notice>
+      </Notice>}
       <section aria-labelledby="product" className="space-y-4 rounded-lg border border-border bg-card p-6">
         <h2 id="product" className="sr-only">
           {productCopy.productName}
@@ -346,6 +349,7 @@ function Checkout({
             versions={offerVersions(checkout)}
             orderName={checkout.orderName}
             receiptEmail={checkout.receiptEmail}
+            review={checkout.review}
           />
         </section>
       ) : (
@@ -416,6 +420,7 @@ function Payment({
   versions,
   orderName,
   receiptEmail,
+  review,
 }: {
   product: OpenProduct;
   lang: Lang;
@@ -424,7 +429,8 @@ function Payment({
   /** What the server gave with the checkout, sent back with the order. */
   versions: OfferVersions;
   orderName: string;
-  receiptEmail: string;
+  receiptEmail: string | null;
+  review?: true;
 }) {
   const copy = CHECKOUT_COPY[lang];
   const productCopy = product.copy[lang];
@@ -488,6 +494,10 @@ function Payment({
       currency: option.currency,
     }).then(
       (order) => {
+        if (!sameCheckoutIdentity({ review, receiptEmail }, order)) {
+          setStep({ kind: "error", message: copy.notConfigured, ended: false });
+          return;
+        }
         // What Toss charges must be what this page showed: a price changed since stops here, before anything reaches Toss.
         if (order.currency !== option.currency || order.amount !== option.price) {
           setStep({ kind: "error", message: copy.priceChanged, ended: false });
@@ -518,7 +528,7 @@ function Payment({
         successUrl: `${window.location.origin}${checkoutPath(product, lang, "success")}`,
         failUrl: `${window.location.origin}${checkoutPath(product, lang, "fail")}`,
         // The address frozen on the order: Toss sends the receipt there.
-        customerEmail: order.receiptEmail,
+        ...(order.review === true ? {} : { customerEmail: order.receiptEmail ?? undefined }),
         ...(paypal ? { country } : {}),
       })
       .catch((error: unknown) => {
@@ -534,7 +544,7 @@ function Payment({
   const shownEmail = step.kind === "paying" ? step.order.receiptEmail : receiptEmail;
   // The product's own label where its account email isn't a recovery address (Clean Space's contact email).
   const receiptLabel = productCopy.receiptEmail ?? copy.receiptEmail;
-  const receipt = <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail })}</p>;
+  const receipt = review === true ? <ReviewEmailNotice lang={lang} /> : <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail ?? "" })}</p>;
 
   if (step.kind === "agree" || step.kind === "preparing") {
     return (
