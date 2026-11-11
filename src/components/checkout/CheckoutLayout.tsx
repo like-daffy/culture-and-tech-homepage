@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BUSINESS } from "@/lib/checkout/config";
@@ -51,8 +52,9 @@ export function CheckoutLayout({
               href={lang === "ko" ? "/ko/" : "/"}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xl font-semibold text-primary"
+              className="inline-flex items-center gap-2 text-xl font-semibold text-primary"
             >
+              <Image src="/brand/logo-transparent-192.png" width={32} height={32} alt="Culture & Tech logo" />
               Culture &amp; Tech
             </a>
             <span className="text-sm text-muted-foreground">{copy.checkout}</span>
