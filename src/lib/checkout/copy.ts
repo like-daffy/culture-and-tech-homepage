@@ -96,7 +96,7 @@ const ko: CheckoutCopy = {
   testPrice: "테스트 금액",
   receiptEmail: "영수증 및 계정 복구 이메일: {email}",
   reviewReceiptEmail: "테스트 결제 모드입니다. 실제 운영 환경에서는 고객에게 영수증 이메일이 발송됩니다.",
-  reviewReceipt: "테스트 결제 영수증입니다.",
+  reviewReceipt: "테스트 결제입니다.",
   agreeTerms: "{terms}과 {refund}에 동의합니다.",
   agreeAge: "만 14세 이상입니다.",
   countryLabel: "현재 있는 국가 또는 지역",
