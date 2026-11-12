@@ -6,6 +6,16 @@ import { BUSINESS } from "@/lib/checkout/config";
 import type { Lang } from "@/lib/checkout/contract";
 import { CHECKOUT_COPY } from "@/lib/checkout/copy";
 import { productUrl, type CheckoutProduct, type ProductPage } from "@/lib/checkout/products";
+import { CLEAN_SPACE_PORTAL } from "@/lib/clean-space/site";
+
+/**
+ * Where the header's two links go, in the page's language (the owner, 2026-11-12): the logo to the account portal (the
+ * origin of the checkout's other portal links, src/lib/checkout/products.ts), "Official Page" to this site's homepage.
+ */
+const HEADER_LINKS: Record<Lang, { portal: string; officialPage: string }> = {
+  en: { portal: CLEAN_SPACE_PORTAL.origin, officialPage: "https://cultureand.tech/" },
+  ko: { portal: `${CLEAN_SPACE_PORTAL.origin}/ko`, officialPage: "https://cultureand.tech/ko/" },
+};
 
 /** The footer's label of each of a product's legal and help pages. */
 const FOOTER_LABELS: Partial<
@@ -47,9 +57,10 @@ export function CheckoutLayout({
       <div className="flex min-h-screen flex-col bg-background text-foreground">
         <header className="border-b border-border">
           <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-4">
-            {/* A new tab, with no opener or referrer: the homepage's other pages get none of this tab's checkout. */}
+            {/* Both links open a new tab, with no opener or referrer: the buyer keeps this checkout, and the other
+                pages get none of it. */}
             <a
-              href={lang === "ko" ? "/ko/" : "/"}
+              href={HEADER_LINKS[lang].portal}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-xl font-semibold text-primary"
@@ -57,7 +68,17 @@ export function CheckoutLayout({
               <Image src="/brand/logo-transparent-192.png" width={32} height={32} alt="" />
               Culture &amp; Tech
             </a>
-            <span className="text-sm text-muted-foreground">{copy.checkout}</span>
+            <div className="flex items-center gap-4 whitespace-nowrap">
+              <span className="text-sm text-muted-foreground">{copy.checkout}</span>
+              <a
+                href={HEADER_LINKS[lang].officialPage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-foreground transition-colors hover:text-accent"
+              >
+                {copy.officialPage}
+              </a>
+            </div>
           </div>
         </header>
         <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">

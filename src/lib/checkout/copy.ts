@@ -7,6 +7,8 @@ import type { Lang } from "./contract";
 
 const en = {
   checkout: "Checkout",
+  /** The header's link to the homepage (the owner's words, 2026-11-12). */
+  officialPage: "Official Page",
   policies: "Before paying, please read the {terms} and the {refund}.",
   termsLink: "Terms of Service",
   refundLink: "Refund Policy",
@@ -85,6 +87,7 @@ export type CheckoutCopy = typeof en;
 
 const ko: CheckoutCopy = {
   checkout: "결제",
+  officialPage: "공식 페이지",
   policies: "결제하기 전에 {terms}과 {refund}을 확인해 주세요.",
   termsLink: "이용약관",
   refundLink: "환불정책",
