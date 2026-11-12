@@ -650,6 +650,59 @@ export const APPS: Record<AppSlug, AppInfo> = {
       : cleanSpace,
 };
 
+/**
+ * An app on a site of its own, introduced in the homepage's Apps section after the apps above. It has no page on this
+ * site, so it is not in APP_SLUGS: not under "More apps" on the app pages, nor in their structured data or the
+ * sitemap. Its card links to its own site, opened as the other outside links are (a new tab).
+ */
+export interface SiteApp {
+  slug: string;
+  /** Square icon */
+  icon: string;
+  /** Its site, in each language */
+  site: Record<SupportedLanguage, string>;
+  content: Record<SupportedLanguage, Pick<AppContent, "name" | "status" | "tagline" | "summary" | "highlights">>;
+}
+
+// DJ Duplicate Guard. The card's text is the owner's, confirmed on 2026-11-12, word for word. The icon is the
+// product's own (dj-duplicate-guard apps/web/static/apple-touch-icon.png, e002e6b; the portal shows the same file).
+const djDuplicateGuard: SiteApp = {
+  slug: "dj-duplicate-guard",
+  icon: "/images/apps/dj-duplicate-guard/icon.png",
+  site: { en: "https://dj-duplicate-guard.app/", ko: "https://dj-duplicate-guard.app/ko/" },
+  content: {
+    en: {
+      name: "DJ Duplicate Guard",
+      status: "Chrome extension",
+      tagline: "Don't buy the same track twice.",
+      summary:
+        "A Chrome extension for DJs. On Beatport, it marks the tracks you already bought, and tells you when a preview is a recording you've already heard. The free features need no account.",
+      highlights: [
+        "Badges on search results, charts, label, release and track pages, and your cart",
+        "Says when only the version may differ, so you can compare before you buy",
+        "With listening history on, a quiet notice when you've already heard a preview",
+        "Purchases and listening history stay in your browser, never sent to us",
+      ],
+    },
+    ko: {
+      name: "DJ Duplicate Guard",
+      status: "Chrome 확장 프로그램",
+      tagline: "구매한 트랙을 또 구매했나요?",
+      summary:
+        "DJ를 위한 Chrome 확장 프로그램입니다. Beatport에서 이미 산 트랙을 표시하고, 미리 듣기가 이미 들어 본 녹음이면 알려 줍니다. 무료 기능은 계정 없이 쓸 수 있습니다.",
+      highlights: [
+        "검색 결과, 차트, 레이블·릴리스·트랙 페이지, Cart에서 이미 가진 트랙에 배지(Badge)가 붙습니다.",
+        "버전만 다를 수 있으면 그렇게 알려 주어, 사기 전에 비교할 수 있습니다.",
+        "청취 기록을 켜 두면, 이미 들은 녹음의 미리 듣기를 조용한 알림으로 알려 줍니다.",
+        "구매 기록과 청취 기록은 브라우저에 저장되며, 저희에게 전송되지 않습니다.",
+      ],
+    },
+  },
+};
+
+/** The apps on sites of their own, in the order of their cards after the apps above */
+export const SITE_APPS: SiteApp[] = [djDuplicateGuard];
+
 /** The homepage's Apps section */
 export const APPS_SECTION: Record<SupportedLanguage, { title: string; intro: string; learnMore: string }> = {
   en: {
