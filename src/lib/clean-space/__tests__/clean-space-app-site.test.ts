@@ -2,7 +2,7 @@
 // and the product page's links in its build, where __CLEAN_SPACE_APP_SITE__ is true; cultureand.tech's stay as they are.
 import { afterEach, describe, expect, it } from "vitest";
 import { APPS } from "@/lib/apps";
-import { CLEAN_SPACE_APP_ORIGIN, cleanSpaceAppJsonLd } from "@/lib/clean-space-app-site";
+import { CLEAN_SPACE_APP_ORIGIN, cleanSpaceAppJsonLd, withCleanSpaceAppWording } from "@/lib/clean-space-app-site";
 import { appJsonLd } from "@/lib/seo";
 import { withWebsiteChannel } from "../channel-copy";
 import { DIRECT_SALE_POLICY_PATHS } from "../site";
@@ -70,5 +70,42 @@ describe("the website-edition section's policy links", () => {
         "https://cultureand.tech/culture/clean-space/direct-privacy.html",
       ]);
     }
+  });
+});
+
+describe("clean-space.app's wording (the owner's approval of 2026-11-12)", () => {
+  const download = "https://clean-space-cultureandtech.web.app/clean-space/1.0-7/Clean-Space-1.0.zip";
+  const texts = (app: ReturnType<typeof withWebsiteChannel>, language: "en" | "ko") => [
+    ...app.content[language].sections.flatMap((s) => s.items.map((i) => i.text)),
+    ...app.content[language].faq.map((f) => f.answer),
+  ];
+
+  it("names cultureand.tech where the payment happens, in exactly the approved words, and changes nothing else", () => {
+    const before = withWebsiteChannel(APPS["clean-space"], download);
+    const after = withCleanSpaceAppWording(before);
+    const price = (app: typeof before, language: "en" | "ko") => app.content[language].sections.flatMap((s) => s.items).find((i) => /Toss Payments|토스페이먼츠/.test(i.text))?.text;
+    const unlock = (app: typeof before, language: "en" | "ko") => app.content[language].faq.find((f) => f.question === (language === "en" ? "What is the 364 days Unlock?" : "364일 잠금 해제는 무엇인가요?"))?.answer;
+    expect(price(after, "en")).toBe(price(before, "en")?.replace("one payment on this site through Toss Payments", "one payment on cultureand.tech through Toss Payments"));
+    expect(price(after, "en")).toContain("with PayPal: one payment on cultureand.tech through Toss Payments, signed in to your Culture & Tech account.");
+    expect(unlock(after, "en")).toMatch(/^One payment of ₩3,300 \(VAT included\) or US\$2\.49 on cultureand\.tech that unlocks every feature of the Clean Space website edition for 364 days/);
+    expect(price(after, "ko")).toContain("컬처앤테크 계정에 로그인한 뒤 cultureand.tech에서 토스페이먼츠로 한 번 결제합니다.");
+    expect(unlock(after, "ko")).toMatch(/^cultureand\.tech에서 한 번 결제\(₩3,300, 부가세 포함\)하면 결제가 승인된 때부터 364일 동안/);
+    for (const language of ["en", "ko"] as const) {
+      const [a, b] = [texts(before, language), texts(after, language)];
+      expect(b).toHaveLength(a.length);
+      // Exactly two texts change per language; the download sentences ("from this site", "이 사이트에서도") stay
+      expect(a.filter((t, i) => t !== b[i])).toHaveLength(2);
+      expect(JSON.stringify(after.content[language].sections.map((s) => s.intro))).toBe(JSON.stringify(before.content[language].sections.map((s) => s.intro)));
+    }
+    expect(texts(after, "en").join("\n")).not.toMatch(/(payment|of [^\n]*) on this site/);
+    expect(texts(after, "ko").join("\n")).not.toContain("이 사이트에서 토스페이먼츠");
+    expect(after.content.en.sections.find((s) => s.title === "The website edition and the 364 days Unlock")?.intro).toContain("Clean Space also comes as a download from this site");
+    expect(after.content.ko.sections.find((s) => s.title === "웹사이트 버전과 364일 잠금 해제")?.intro).toContain("Clean Space는 이 사이트에서도 내려받을 수 있습니다.");
+  });
+
+  it("is the same when applied twice, and stops the build when a sentence it changes is gone", () => {
+    const once = withCleanSpaceAppWording(withWebsiteChannel(APPS["clean-space"], download));
+    expect(withCleanSpaceAppWording(once)).toEqual(once);
+    expect(() => withCleanSpaceAppWording(APPS["clean-space"])).toThrow(/appears 0 times/);
   });
 });

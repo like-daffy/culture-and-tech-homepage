@@ -349,7 +349,9 @@ everything else stay here, on cultureand.tech; the portal stays the portal.
 - **On that site** the page's canonical, hreflang, `og:url`, images and structured data are on clean-space.app (its own
   WebSite, no breadcrumb); its links to cultureand.tech's pages (the homepage and its sections, Chord to MIDI, the policies,
   the App Store privacy page) are absolute; the language switch stays on the site; `/` does not adapt to the visitor's
-  language; cultureand.tech's keywords and Naver verification tags are left out.
+  language; cultureand.tech's keywords and Naver verification tags are left out. Its text is cultureand.tech's except
+  the two sentences per language that say where the payment happens: "on cultureand.tech" / "cultureand.tech에서" for
+  "on this site" / "이 사이트에서" (`CLEAN_SPACE_APP_WORDING`, approved by the owner on 2026-11-12).
 - **Staging.** `scripts/build-clean-space-app.mjs` (the predeploy of `firebase.clean-space-app.json`) builds the site,
   stages exactly what it serves into `dist/clean-space-app/` (the two pages, `404.html`, `_next/static/`, the images and
   icons the pages load, `favicon.ico`, and its own `robots.txt` and `sitemap.xml`) and checks it: every file a page loads
