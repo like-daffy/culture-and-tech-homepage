@@ -13,8 +13,10 @@ export function LanguageSwitch() {
 
   return (
     <Select value={language} onValueChange={setLanguage}>
-      <SelectTrigger className="w-[150px] h-9 bg-background border-border">
-        <Languages className="h-4 w-4 mr-2" />
+      {/* On phones (below md) only as wide as its icon, language and chevron, evenly spaced, so the name beside the logo
+          keeps to one line at 390 px; from md up a 150 px box as before */}
+      <SelectTrigger className="w-auto gap-1.5 px-2 md:w-[150px] md:gap-0 md:px-3 h-9 bg-background border-border">
+        <Languages className="h-4 w-4 md:mr-2" />
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
