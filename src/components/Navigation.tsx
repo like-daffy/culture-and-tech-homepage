@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,9 @@ export function Navigation({ homePath }: NavigationProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container flex items-center justify-between h-16">
-        <Link href={homePath ?? "#home"} className="text-xl font-semibold text-primary">
+        {/* The logo before the name, as in the checkout header (CheckoutLayout); the name says what it is */}
+        <Link href={homePath ?? "#home"} className="inline-flex items-center gap-2 text-xl font-semibold text-primary">
+          <Image src="/brand/logo-transparent-192.png" width={32} height={32} alt="" />
           {translations.navigation.brandName}
         </Link>
 
