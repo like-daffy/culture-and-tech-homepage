@@ -4,6 +4,9 @@ import { HOME_METADATA, OG_LOCALES, SITE_URL } from "@/lib/seo";
 
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
+/** In clean-space.app's build (__CLEAN_SPACE_APP_SITE__) its pages' canonical, hreflang, og:url and relative images are here. */
+const CLEAN_SPACE_APP_URL = "https://clean-space.app";
+
 interface SEOProps {
   title?: string;
   description?: string;
@@ -36,12 +39,12 @@ export function SEO({
   alternates,
   jsonLd,
 }: SEOProps) {
-  const url = `${SITE_URL}${path}`;
+  const url = `${__CLEAN_SPACE_APP_SITE__ ? CLEAN_SPACE_APP_URL : SITE_URL}${path}`;
 
   // Ensure image is always an absolute URL
   const absoluteImage = image.startsWith("http")
     ? image
-    : `${SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
+    : `${__CLEAN_SPACE_APP_SITE__ ? CLEAN_SPACE_APP_URL : SITE_URL}${image.startsWith("/") ? "" : "/"}${image}`;
 
   const alternateLanguages = Object.keys(alternates ?? {}) as SupportedLanguage[];
 
@@ -57,11 +60,11 @@ export function SEO({
           key={`alternate-${lang}`}
           rel="alternate"
           hrefLang={lang}
-          href={`${SITE_URL}${alternates?.[lang]}`}
+          href={`${__CLEAN_SPACE_APP_SITE__ ? CLEAN_SPACE_APP_URL : SITE_URL}${alternates?.[lang]}`}
         />
       ))}
       {alternates?.en && (
-        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${alternates.en}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${__CLEAN_SPACE_APP_SITE__ ? CLEAN_SPACE_APP_URL : SITE_URL}${alternates.en}`} />
       )}
 
       {/* Open Graph */}

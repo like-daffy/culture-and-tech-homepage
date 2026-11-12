@@ -14,6 +14,9 @@ import { browserPage, jumpWithinPage } from "@/lib/page-jump";
 import { APP_METADATA, LANGUAGE_PATHS, appJsonLd, appPaths } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
+/** cultureand.tech, where clean-space.app's copy of this page (__CLEAN_SPACE_APP_SITE__) links back to the other pages. */
+const HOMEPAGE_ORIGIN = "https://cultureand.tech";
+
 interface AppPageProps {
   slug: AppSlug;
   /** Language this page is pre-rendered in ("/apps/…" English, "/ko/apps/…" Korean) */
@@ -80,7 +83,10 @@ export function AppPage({ slug, language }: AppPageProps) {
   // An app page always shows the language of its address, like its title, description and structured data
   const content = app.content[language];
   const labels = APP_PAGE_LABELS[language];
-  const homePath = LANGUAGE_PATHS[language];
+  // On clean-space.app (__CLEAN_SPACE_APP_SITE__) this is Clean Space's page at "/" and "/ko/": its links to
+  // cultureand.tech's pages (home and its sections, the other app, the privacy policy) are absolute, so they load
+  // cultureand.tech itself
+  const homePath = __CLEAN_SPACE_APP_SITE__ ? `${HOMEPAGE_ORIGIN}${LANGUAGE_PATHS[language]}` : LANGUAGE_PATHS[language];
   const otherApps = APP_SLUGS.filter((other) => other !== slug);
   const [supportBefore, supportAfter] = content.support.split("{email}");
   const afterSections = content.sections.length;
@@ -92,10 +98,11 @@ export function AppPage({ slug, language }: AppPageProps) {
         title={title}
         description={description}
         image={app.ogImage[language]}
-        path={appPaths(slug)[language]}
+        path={__CLEAN_SPACE_APP_SITE__ ? LANGUAGE_PATHS[language] : appPaths(slug)[language]}
         language={language}
-        alternates={appPaths(slug)}
-        jsonLd={appJsonLd(app, language)}
+        alternates={__CLEAN_SPACE_APP_SITE__ ? LANGUAGE_PATHS : appPaths(slug)}
+        // clean-space.app's page adds its own structured data (src/components/CleanSpaceAppPage.tsx)
+        jsonLd={__CLEAN_SPACE_APP_SITE__ ? undefined : appJsonLd(app, language)}
       />
       <div className="min-h-screen">
         <Navigation homePath={homePath} />
@@ -266,7 +273,7 @@ export function AppPage({ slug, language }: AppPageProps) {
               {app.privacyPolicyPath && (
                 <p className="mt-2">
                   <a
-                    href={app.privacyPolicyPath}
+                    href={__CLEAN_SPACE_APP_SITE__ ? `${HOMEPAGE_ORIGIN}${app.privacyPolicyPath}` : app.privacyPolicyPath}
                     className="font-medium text-primary underline underline-offset-4 hover:text-accent"
                   >
                     {labels.privacyPolicy}
@@ -299,7 +306,7 @@ export function AppPage({ slug, language }: AppPageProps) {
                       </div>
                       <p className="flex-1 font-medium text-foreground">{otherContent.tagline}</p>
                       <Button asChild variant="outline" className="self-start">
-                        <Link href={appPaths(other)[language]}>
+                        <Link href={__CLEAN_SPACE_APP_SITE__ ? `${HOMEPAGE_ORIGIN}${appPaths(other)[language]}` : appPaths(other)[language]}>
                           {labels.learnMore}
                           <ArrowRight />
                         </Link>

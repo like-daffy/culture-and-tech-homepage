@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
     environment: "node",
+    setupFiles: ["./vitest.setup.ts"],
     include: ["src/lib/clean-space/**/*.test.ts", "src/lib/checkout/**/*.test.ts", "src/components/**/*.test.ts", "scripts/**/*.test.mjs"],
   },
 });

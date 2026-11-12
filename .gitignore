@@ -12,6 +12,9 @@
 # next.js
 /.next/
 /out/
+# clean-space.app's build and the site staged from it (scripts/build-clean-space-app.mjs)
+/out-clean-space-app/
+/dist/
 
 # production
 /build

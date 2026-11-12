@@ -331,6 +331,48 @@ scripts/check-live.sh cultureand.tech 1.1
 
 Rollback of content: Firebase console → Hosting → release history → roll back to the previous release.
 
+## clean-space.app
+
+Clean Space's product page has a site of its own, `https://clean-space.app/` (English) and `https://clean-space.app/ko/`
+(Korean): a second build of this repo, served by the Hosting site `clean-space-app` of Clean Space's own Firebase project,
+`clean-space-cultureandtech` (the owner's decision of 2026-11-12; the Rules below name it). The checkout, the policies and
+everything else stay here, on cultureand.tech; the portal stays the portal.
+
+- **The build.** With `NEXT_PUBLIC_SITE=clean-space-app` (`next.config.mjs`) the only pages are `src/pages/*.clean-space-app.js`:
+  the product page at `/` and `/ko/` (`src/components/CleanSpaceAppPage.tsx`) and the 404 page, exported into
+  `out-clean-space-app/`. Shared code tells the two builds apart by `__CLEAN_SPACE_APP_SITE__`
+  (`src/clean-space-app-site.d.ts`), which Next.js replaces with `false` or `true` at compile time. Write it at each use
+  (never through a variable or an import), and keep code only clean-space.app needs in the files only its pages import
+  (`src/lib/clean-space-app-site.ts`, the component): cultureand.tech's build is then byte for byte what it was without
+  them. To check that, build `out/` before and after a change with the same settings and compare every file apart from
+  the build id (`_next/static/<build id>/`).
+- **On that site** the page's canonical, hreflang, `og:url`, images and structured data are on clean-space.app (its own
+  WebSite, no breadcrumb); its links to cultureand.tech's pages (the homepage and its sections, Chord to MIDI, the policies,
+  the App Store privacy page) are absolute; the language switch stays on the site; `/` does not adapt to the visitor's
+  language; cultureand.tech's keywords and Naver verification tags are left out.
+- **Staging.** `scripts/build-clean-space-app.mjs` (the predeploy of `firebase.clean-space-app.json`) builds the site,
+  stages exactly what it serves into `dist/clean-space-app/` (the two pages, `404.html`, `_next/static/`, the images and
+  icons the pages load, `favicon.ico`, and its own `robots.txt` and `sitemap.xml`) and checks it: every file a page loads
+  is there, every link to a page of cultureand.tech's is absolute, the head is on clean-space.app, and the build has no
+  route but its own. It needs the website edition's settings, as the live build has them:
+  `NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1` and `NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL`.
+- **Upload**, from a clean, committed checkout, with the owner's go (the predeploy builds, stages and checks):
+
+  ```bash
+  NEXT_PUBLIC_CLEAN_SPACE_WEBSITE_RELEASE=1 \
+  NEXT_PUBLIC_CLEAN_SPACE_DOWNLOAD_URL=https://clean-space-cultureandtech.web.app/clean-space/1.0-7/Clean-Space-1.0.zip \
+  npx --yes firebase-tools@15.32.1 deploy --config firebase.clean-space-app.json \
+    --project clean-space-cultureandtech --only hosting:clean-space-app --non-interactive
+  ```
+
+- **Undo:** `npx --yes firebase-tools@15.32.1 hosting:disable --site clean-space-app --project clean-space-cultureandtech --force`
+  stops serving it (the site and its history stay); an earlier upload comes back with Firebase console → Hosting →
+  `clean-space-app` → release history → roll back. Never `hosting:sites:delete`: deleting is permanent, and the site id
+  can never be used again.
+- **The domain:** `clean-space.app`, with `www.clean-space.app` redirecting to it, is connected to the site
+  `clean-space-app` in the Firebase console (DNS at Porkbun). Until cultureand.tech's own Clean Space addresses redirect
+  there (a later change), `/apps/clean-space/` and `/ko/apps/clean-space/` stay as they are here too.
+
 ## Updating the Thai app's legal pages
 
 1. In `toss-in-app-thai-phrase`: edit `legal/publisher.json` or `legal/templates/`, run `npm run legal:draft`,
@@ -383,6 +425,11 @@ Never edit the copied HTML by hand.
   this site to another Firebase project. Each product's checkout pages call that product's own project (such as
   `chord-to-midi`) from the browser, and so do Clean Space's account, sign-in callback and activation pages; nothing
   of it runs in this one.
+- The one exception, by the owner's decision of 2026-11-12 (shown the shape "a new Hosting site in the Clean Space
+  project", the owner said: "now deploy all that I requested. include this request"): `firebase.clean-space-app.json`
+  deploys clean-space.app's build, Clean Space's product page alone, to the Hosting site `clean-space-app` of
+  `clean-space-cultureandtech` ("clean-space.app", above). `firebase.json`, this site, still goes nowhere else, and
+  nothing else goes to that project from here.
 - The checkout pages load no third-party script, font or embed beyond Toss Payments and the product's Firebase
   backend, and Clean Space's account, sign-in callback and activation pages nothing beyond its Firebase project ("The
   central checkout", above). Links into those pages are full page loads (never client-side navigation), so that nothing

@@ -151,6 +151,9 @@ const REVIEWED_DOWNLOAD_1_0_7 = "https://clean-space-cultureandtech.web.app/clea
 /** The download button's anchor: the "Download" button after the introduction moves the page to it. */
 export const DOWNLOAD_ANCHOR = "download";
 
+/** The policies stay on cultureand.tech: clean-space.app's build (__CLEAN_SPACE_APP_SITE__) links them there absolutely. */
+const POLICY_ORIGIN = "https://cultureand.tech";
+
 function channelSection(language: SupportedLanguage, downloadUrl: string): AppSection {
   const copy = COPY[language];
   const labels = CHECKOUT_COPY[language];
@@ -172,9 +175,9 @@ function channelSection(language: SupportedLanguage, downloadUrl: string): AppSe
     linkLine: {
       text: copy.policies,
       links: {
-        terms: { label: labels.termsLink, href: DIRECT_SALE_POLICY_PATHS.terms },
-        refund: { label: labels.refundLink, href: DIRECT_SALE_POLICY_PATHS.refund },
-        privacy: { label: labels.privacyLink, href: DIRECT_SALE_POLICY_PATHS.privacy },
+        terms: { label: labels.termsLink, href: __CLEAN_SPACE_APP_SITE__ ? `${POLICY_ORIGIN}${DIRECT_SALE_POLICY_PATHS.terms}` : DIRECT_SALE_POLICY_PATHS.terms },
+        refund: { label: labels.refundLink, href: __CLEAN_SPACE_APP_SITE__ ? `${POLICY_ORIGIN}${DIRECT_SALE_POLICY_PATHS.refund}` : DIRECT_SALE_POLICY_PATHS.refund },
+        privacy: { label: labels.privacyLink, href: __CLEAN_SPACE_APP_SITE__ ? `${POLICY_ORIGIN}${DIRECT_SALE_POLICY_PATHS.privacy}` : DIRECT_SALE_POLICY_PATHS.privacy },
       },
     },
   };

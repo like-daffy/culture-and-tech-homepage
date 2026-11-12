@@ -27,8 +27,19 @@ function getTurboRules() {
   };
 }
 
+// clean-space.app, Clean Space's own site, is a second build of this repo (NEXT_PUBLIC_SITE=clean-space-app; README,
+// "clean-space.app"): its pages are only the src/pages files named *.clean-space-app.js (Clean Space's product page at
+// "/" and "/ko/", and the 404 page), exported into out-clean-space-app/, never out/. Without the setting the build is
+// cultureand.tech's, from the .tsx pages alone, exactly as before. The code tells the two apart by
+// __CLEAN_SPACE_APP_SITE__ (src/clean-space-app-site.d.ts), replaced with false or true at compile time, so
+// cultureand.tech's build compiles every clean-space.app branch away and its output stays byte for byte the same.
+const SITE = process.env.NEXT_PUBLIC_SITE === "clean-space-app" ? "clean-space-app" : "";
+
 const nextConfig = {
   output: "export",
+  pageExtensions: SITE ? ["clean-space-app.js"] : ["tsx", "ts"],
+  ...(SITE ? { distDir: "out-clean-space-app" } : {}),
+  compiler: { define: { __CLEAN_SPACE_APP_SITE__: SITE === "clean-space-app" } },
   trailingSlash: true,
   reactStrictMode: true,
   turbopack: {

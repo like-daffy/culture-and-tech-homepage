@@ -26,8 +26,9 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   // Language the current page is pre-rendered in: "/" and "/apps/…" are English, "/ko/…" is Korean
   const pageLanguage = pageLanguageFromPath(router.pathname);
   // Only the English homepage adapts to the visitor. Every other page shows the language of its address, so that
-  // its text matches its title, description and structured data
-  const adaptsToVisitor = router.pathname === "/";
+  // its text matches its title, description and structured data. On clean-space.app "/" is the product page, which
+  // never adapts (as on cultureand.tech)
+  const adaptsToVisitor = __CLEAN_SPACE_APP_SITE__ ? false : router.pathname === "/";
 
   // Language the English homepage shows this visitor. Always starts as "en" to prevent
   // hydration mismatch; detection happens in useEffect after mount
