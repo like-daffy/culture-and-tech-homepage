@@ -5,7 +5,10 @@
  * Clean Space's account code.
  */
 
-/** Clean Space has no site of its own: its pages are on cultureand.tech (another origin only in test builds). */
+/**
+ * Where Clean Space's pages here are: its checkout and its policies are on cultureand.tech (another origin only in test
+ * builds). Its product page is on its own site, clean-space.app, since 2026-11-12; its former address here redirects there.
+ */
 export const CLEAN_SPACE_SITE_ORIGIN = "https://cultureand.tech";
 
 /** Its product page below the language's root ("" or "/ko"), with its trailing slash (the contract's PAGE_PATH too). */

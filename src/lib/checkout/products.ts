@@ -178,8 +178,9 @@ function djDuplicateGuardOpen(): OpenProduct {
 }
 
 /**
- * Clean Space has no site of its own: its product page, its account page (where its buyers sign in and start a
- * checkout) and its legal pages are on this site, so its checkout links back here (another origin only in test builds).
+ * Clean Space's checkout links back to this site (another origin only in test builds): its legal pages are here, its
+ * account page is on the portal, and its product page's former address here (CLEAN_SPACE_PAGES.home) redirects to its
+ * own site, clean-space.app, since 2026-11-12.
  */
 const CLEAN_SPACE_ORIGIN = process.env.NEXT_PUBLIC_CLEAN_SPACE_ORIGIN || CLEAN_SPACE_SITE_ORIGIN;
 const CLEAN_SPACE_NAME: ProductIdentity["name"] = {

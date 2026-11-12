@@ -90,4 +90,16 @@ describe("the homepage's Apps section", () => {
   it("gives it no page here: the apps with pages, their 'More apps' block, sitemap and structured data stay two", () => {
     expect(APP_SLUGS).toEqual(["chord-to-midi", "clean-space"]);
   });
+
+  it("links Clean Space, whose page moved to clean-space.app (2026-11-12), to that site in a new tab, as DJ Duplicate Guard", () => {
+    for (const language of ["en", "ko"] as const) {
+      const site = language === "ko" ? "https://clean-space.app/ko/" : "https://clean-space.app/";
+      const cleanSpace = cards(language)[1];
+      expect(cleanSpace.name).toBe("Clean Space");
+      expect(cleanSpace.links.map(({ href, target, rel }) => ({ href, target, rel }))).toEqual([
+        { href: site, target: "_blank", rel: "noopener" },
+        { href: site, target: "_blank", rel: "noopener" },
+      ]);
+    }
+  });
 });

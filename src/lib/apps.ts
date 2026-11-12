@@ -91,6 +91,12 @@ export interface AppInfo {
   supportEmail: string;
   /** The app's privacy policy on this site, once it is published there */
   privacyPolicyPath?: string;
+  /**
+   * Its page's address once it has moved to a site of its own (Clean Space: clean-space.app, README "clean-space.app"):
+   * the homepage's card and the other app pages link there instead of to /apps/<slug>/, whose address firebase.json
+   * redirects there. The page itself is still built here, so that undoing the move is removing the redirects.
+   */
+  site?: Record<SupportedLanguage, string>;
   /** schema.org facts for the app page's structured data */
   schema: {
     type: "WebApplication" | "SoftwareApplication";
@@ -293,6 +299,8 @@ const cleanSpace: AppInfo = {
   supportEmail: SUPPORT_EMAIL,
   // Published from mac-get-space's docs/12 by scripts/sync-mac-get-space-legal.sh
   privacyPolicyPath: "/culture/clean-space/privacy.html",
+  // Its page moved to its own site (the owner's decision of 2026-11-12)
+  site: { en: "https://clean-space.app/", ko: "https://clean-space.app/ko/" },
   schema: {
     type: "SoftwareApplication",
     applicationCategory: "UtilitiesApplication",

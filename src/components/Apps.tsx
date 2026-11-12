@@ -103,13 +103,14 @@ export function Apps() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {APP_SLUGS.map((slug, index) => {
             const app = APPS[slug];
+            // An app whose page moved to its own site (Clean Space) links there, as the apps on sites of their own do
             return (
               <AppCard
                 key={slug}
                 icon={<AppIcon app={app} size={64} />}
                 content={app.content[language]}
-                href={appPaths(slug)[language]}
-                outside={false}
+                href={app.site?.[language] ?? appPaths(slug)[language]}
+                outside={Boolean(app.site)}
                 learnMore={section.learnMore}
                 className={cn(lone(index))}
               />

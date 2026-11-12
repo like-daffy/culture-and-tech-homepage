@@ -36,7 +36,13 @@
       { "source": "/apps/clean-space/account/index.html", "destination": "https://portal.cultureand.tech/products/clean-space", "type": 301 },
       { "source": "/ko/apps/clean-space/account/index.html", "destination": "https://portal.cultureand.tech/ko/products/clean-space", "type": 301 },
       { "source": "/apps/clean-space/activate/index.html", "destination": "https://portal.cultureand.tech/products/clean-space/activate", "type": 301 },
-      { "source": "/ko/apps/clean-space/activate/index.html", "destination": "https://portal.cultureand.tech/ko/products/clean-space/activate", "type": 301 }
+      { "source": "/ko/apps/clean-space/activate/index.html", "destination": "https://portal.cultureand.tech/ko/products/clean-space/activate", "type": 301 },
+      { "source": "/apps/clean-space/", "destination": "https://clean-space.app/", "type": 301 },
+      { "source": "/apps/clean-space", "destination": "https://clean-space.app/", "type": 301 },
+      { "source": "/apps/clean-space/index.html", "destination": "https://clean-space.app/", "type": 301 },
+      { "source": "/ko/apps/clean-space/", "destination": "https://clean-space.app/ko/", "type": 301 },
+      { "source": "/ko/apps/clean-space", "destination": "https://clean-space.app/ko/", "type": 301 },
+      { "source": "/ko/apps/clean-space/index.html", "destination": "https://clean-space.app/ko/", "type": 301 }
     ],
     "headers": [
       { "source": "**", "headers": [

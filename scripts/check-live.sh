@@ -25,8 +25,9 @@ expect 200 "https://$host/culture/clean-space/privacy.html"
 expect 200 "https://$host/culture/clean-space/styles.css"
 for p in privacy support; do expect 200 "https://$host/culture/english-thai-learn/$p.html"; done
 expect 200 "https://$host/culture/english-thai-learn/styles.css"
-# Every page in both languages: 200, and no stale browser cache (firebase.json headers; the default is max-age=3600)
-for p in "" ko/ apps/chord-to-midi/ apps/clean-space/ ko/apps/chord-to-midi/ ko/apps/clean-space/; do
+# Every page in both languages: 200, and no stale browser cache (firebase.json headers; the default is max-age=3600).
+# Clean Space's page is on its own site since 2026-11-12 (README, "clean-space.app"; its 301s are checked below).
+for p in "" ko/ apps/chord-to-midi/ ko/apps/chord-to-midi/; do
   headers=$(curl -s -o /dev/null -D - -m 20 "https://$host/$p" | tr -d '\r')
   status=$(echo "$headers" | awk 'NR==1{print $2}')
   cc=$(echo "$headers" | awk 'tolower($1)=="cache-control:"{ $1=""; print }')
@@ -39,7 +40,7 @@ for p in chord-to-midi/og.png chord-to-midi/icon.png clean-space/og.png clean-sp
   expect 200 "https://$host/images/apps/$p"
 done
 # Every page calls the app Clean Space (renamed from Mac Get Space on 2026-11-05)
-for p in "" ko/ apps/chord-to-midi/ apps/clean-space/ ko/apps/chord-to-midi/ ko/apps/clean-space/; do
+for p in "" ko/ apps/chord-to-midi/ ko/apps/chord-to-midi/; do
   body=$(curl -s -m 20 "https://$host/$p")
   if echo "$body" | grep -q 'Clean Space' && ! echo "$body" | grep -q 'Mac Get Space'; then echo "ok   https://$host/$p names Clean Space"
   else echo "FAIL https://$host/$p does not name the app Clean Space only"; fail=1; fi
@@ -55,6 +56,17 @@ moved /ko/apps/mac-get-space/ /ko/apps/clean-space/
 moved /ko/apps/mac-get-space /ko/apps/clean-space/
 moved /culture/mac-get-space/privacy.html /culture/clean-space/privacy.html
 moved /images/apps/mac-get-space/og.png /images/apps/clean-space/og.png
+# Clean Space's page moved to its own site on 2026-11-12 (README, "clean-space.app"): its addresses here are a 301
+# there, in each language, and the site answers with the page and its own canonical address
+moved_to() { local got; got=$(curl -s -o /dev/null -m 20 -w '%{http_code} %{redirect_url}' "https://$host$1")
+  if [ "$got" = "301 $2" ]; then echo "ok   301 $1 -> $2"; else echo "FAIL $got (want 301 $2) https://$host$1"; fail=1; fi; }
+for p in /apps/clean-space/ /apps/clean-space /apps/clean-space/index.html; do moved_to "$p" https://clean-space.app/; done
+for p in /ko/apps/clean-space/ /ko/apps/clean-space /ko/apps/clean-space/index.html; do moved_to "$p" https://clean-space.app/ko/; done
+for u in https://clean-space.app/ https://clean-space.app/ko/; do
+  body=$(curl -s -m 20 "$u")
+  if echo "$body" | grep -q 'Clean Space' && echo "$body" | grep -q "<link rel=\"canonical\" href=\"$u\""; then echo "ok   $u is Clean Space's page"
+  else echo "FAIL $u isn't Clean Space's page with its own canonical address"; fail=1; fi
+done
 # The central checkout (README, "The central checkout"): every product's pages in both languages are 200, never cached
 # stale, never framed, out of search results, and load nothing from other hosts but what the payment needs.
 checkout_pages() {

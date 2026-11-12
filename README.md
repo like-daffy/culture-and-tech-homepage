@@ -18,6 +18,7 @@ of the old address `music.cafe24.com`, are in `cafe24/`.
 | `/culture/clean-space/privacy.html`, `styles.css` (Clean Space's privacy policy) | `public/culture/clean-space/` (generated, committed) | `scripts/sync-mac-get-space-legal.sh` from `mac-get-space` (`docs/12-privacy-policy-draft.md`); the app pages link it through `privacyPolicyPath` in `src/lib/apps.ts` |
 | `/apps/clean-space/account/`, `/apps/clean-space/activate/`, `/apps/clean-space/auth/…`, each also under `/ko/` (Clean Space's former account, activation and sign-in pages) | `firebase.json` redirects | 301 to the shared portal: account and sign-in to `https://portal.cultureand.tech/[ko/]products/clean-space`, activation to `…/products/clean-space/activate` (the browser keeps the `#request=` fragment). The old page sources stay until the removal gate in `docs/portal-integration.md` passes |
 | `/culture/clean-space/direct-terms.html`, `direct-refunds.html`, `direct-privacy.html` (the website edition's Terms of Service, Refund Policy and Privacy Policy, Korean authoritative with the English translation; published 2026-11-10) | `public/culture/clean-space/` once published (all three or none) | `scripts/sync-mac-get-space-legal.sh --direct` from `mac-get-space` (`docs/13-direct-sale/`, `scripts/build-direct-sale-pages.py --release`); see "Publishing Clean Space's direct-sale policies" |
+| `/apps/clean-space/`, `/ko/apps/clean-space/` (with or without the slash, and `index.html`) | `firebase.json` redirects | 301 to `https://clean-space.app/` and `https://clean-space.app/ko/`, Clean Space's own site (see "clean-space.app"). The page is still built here, behind the redirects, so undoing the move is removing the six rules |
 | `/culture`, `/culture/`, `/culture/index.html` | `firebase.json` redirects | 301 to `/` (the old homepage address) |
 | `/apps/mac-get-space/`, `/ko/apps/mac-get-space/` (with or without the slash), `/culture/mac-get-space/<file>`, `/images/apps/mac-get-space/<file>` | `firebase.json` redirects | 301 to the same address under `clean-space`: Clean Space's addresses until 2026-11-05, still used by installed builds, App Store Connect and search engines |
 | `/culture/_next/static/…` | `compat/cafe24/` (committed) | `scripts/add-compat-assets.sh` (predeploy): the last Cafe24 build's hashed assets, for old tabs and cached HTML |
@@ -372,8 +373,18 @@ everything else stay here, on cultureand.tech; the portal stays the portal.
   `clean-space-app` → release history → roll back. Never `hosting:sites:delete`: deleting is permanent, and the site id
   can never be used again.
 - **The domain:** `clean-space.app`, with `www.clean-space.app` redirecting to it, is connected to the site
-  `clean-space-app` in the Firebase console (DNS at Porkbun). Until cultureand.tech's own Clean Space addresses redirect
-  there (a later change), `/apps/clean-space/` and `/ko/apps/clean-space/` stay as they are here too.
+  `clean-space-app` in the Firebase console (DNS at Porkbun).
+- **Here:**
+  - `/apps/clean-space/` and `/ko/apps/clean-space/` (with or without the slash, and `index.html`) are 301s to
+    `https://clean-space.app/` and `/ko/` (`firebase.json`, after the rules `scripts/clean-space-portal-redirects.mjs` pins;
+    `scripts/clean-space-app-redirects.test.mjs`). The page is still built here, behind them.
+  - The homepage's card and Chord to MIDI's "More apps" link there (`site` in `src/lib/apps.ts`); the card opens it in a
+    new tab, as DJ Duplicate Guard's does.
+  - `public/sitemap.xml` no longer lists the page, and `public/llms.txt` names clean-space.app.
+  - `scripts/check-live.sh` checks the six 301s and the two pages there.
+  - The checkout's "Back to Clean Space" still links `/apps/clean-space/` and arrives through the 301: the checkout pages
+    stay as Toss Payments reviewed them.
+  - The account, activation and sign-in addresses still go to the portal, and the policies and images stay here.
 
 ## Updating the Thai app's legal pages
 

@@ -306,7 +306,8 @@ export function AppPage({ slug, language }: AppPageProps) {
                       </div>
                       <p className="flex-1 font-medium text-foreground">{otherContent.tagline}</p>
                       <Button asChild variant="outline" className="self-start">
-                        <Link href={__CLEAN_SPACE_APP_SITE__ ? `${HOMEPAGE_ORIGIN}${appPaths(other)[language]}` : appPaths(other)[language]}>
+                        {/* An app whose page moved to its own site (Clean Space) is linked there, a full page load */}
+                        <Link href={otherApp.site?.[language] ?? (__CLEAN_SPACE_APP_SITE__ ? `${HOMEPAGE_ORIGIN}${appPaths(other)[language]}` : appPaths(other)[language])}>
                           {labels.learnMore}
                           <ArrowRight />
                         </Link>

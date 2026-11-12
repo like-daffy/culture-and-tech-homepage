@@ -84,6 +84,26 @@ Next: submit `sitemap.xml` again in Search Console and Search Advisor and reques
 and `/ko/apps/clean-space/`; the 301s carry the old pages over. The app's own privacy link and the URLs in App Store
 Connect move separately; until they do, the 301 keeps the old privacy address working.
 
+## Clean Space's page on clean-space.app (the owner's decision of 2026-11-12)
+
+Clean Space's product page moved to its own site, `https://clean-space.app/` and `https://clean-space.app/ko/` (README,
+"clean-space.app").
+
+- **Its addresses here** (`/apps/clean-space/`, `/ko/apps/clean-space/`, with or without the slash, and `index.html`)
+  are 301s there; a `#fragment` such as `#download` carries over.
+- **The page there** has its own canonical, hreflang, `og:url`, images and structured data on clean-space.app: its own
+  WebSite node published by Culture & Tech's Organization, and no BreadcrumbList. It has its own `robots.txt` and
+  `sitemap.xml`.
+- **This site's files:** `public/sitemap.xml` no longer lists the page, and `public/llms.txt` names clean-space.app.
+- **Change of Address doesn't apply.** Search Console's Change of Address is for a whole site, not one page, so the 301s
+  and the canonical carry it.
+
+Next, the owner:
+- add `https://clean-space.app` as a property in Search Console (a DNS TXT record at Porkbun), and in Search Advisor if
+  wanted;
+- submit `https://clean-space.app/sitemap.xml` and request indexing of `/` and `/ko/`;
+- submit this site's `sitemap.xml` again.
+
 ## Baseline before the change (crawler view, 2026-10-22)
 
 - `robots.txt`, `sitemap.xml`, `llms.txt`: 404
