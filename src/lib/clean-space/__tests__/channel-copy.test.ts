@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { APPS } from "@/lib/apps";
+import { jumpWithinPage, type JumpClick } from "@/lib/page-jump";
 import { websiteDownloadUrl, withWebsiteChannel } from "../channel-copy";
 import { CLEAN_SPACE } from "../config";
 import { DIRECT_SALE_POLICY_PATHS } from "../site";
@@ -46,7 +47,7 @@ describe("the product page's website edition", () => {
       // Korean pages sell in won only.
       if (language === "ko") expect(text).not.toContain("US$");
       expect(channel?.links).toEqual([
-        { label: language === "en" ? "Download for Mac" : "Mac용 다운로드", href: DOWNLOAD, download: true },
+        { label: language === "en" ? "Download for Mac" : "Mac용 다운로드", href: DOWNLOAD, download: true, id: "download" },
         {
           label: language === "en" ? "Buy the 364 days Unlock" : "364일 잠금 해제 구매하기",
           href: language === "ko" ? "https://portal.cultureand.tech/ko/products/clean-space" : "https://portal.cultureand.tech/products/clean-space",
@@ -84,6 +85,28 @@ describe("the product page's website edition", () => {
         language === "ko" ? "https://portal.cultureand.tech/ko/products/clean-space" : "https://portal.cultureand.tech/products/clean-space",
       ]);
       expect(released.content[language].faq.at(-1)).toEqual(APPS["clean-space"].content[language].faq.at(-1));
+      // Nor a "Download" button after the introduction, with nothing to move to.
+      expect(released.content[language].jump).toBeUndefined();
+    }
+  });
+
+  it("puts a Download button right after the introduction that moves to the download button, only when there is one", () => {
+    const released = withWebsiteChannel(APPS["clean-space"], DOWNLOAD);
+    for (const language of ["en", "ko"] as const) {
+      const content = released.content[language];
+      // The owner's words: "Download"; in Korean the word the download button already uses.
+      expect(content.jump).toEqual({ label: language === "en" ? "Download" : "다운로드", target: "download" });
+      // Its target is the download button, and only that one: one element with that id on the page.
+      const anchored = content.sections.flatMap((section) => section.links ?? []).filter((link) => link.id);
+      expect(anchored).toEqual([expect.objectContaining({ id: content.jump?.target, href: DOWNLOAD, download: true })]);
+      // The introduction itself and the App Store link are as they were.
+      expect(content.intro).toBe(APPS["clean-space"].content[language].intro);
+      expect(content.cta).toBe(APPS["clean-space"].content[language].cta);
+    }
+    // Only Clean Space's page, and not in a build without the website edition (this one).
+    for (const language of ["en", "ko"] as const) {
+      expect(APPS["clean-space"].content[language].jump).toBeUndefined();
+      expect(APPS["chord-to-midi"].content[language].jump).toBeUndefined();
     }
   });
 
@@ -95,6 +118,48 @@ describe("the product page's website edition", () => {
     expect(unlock?.text).toMatch(/Docker and simulator management, the administrator helper and Spotlight maintenance/);
     expect(unlock?.text).not.toMatch(/Expert/);
     expect(channel?.items.map((item) => item.text).join(" ")).not.toMatch(/free features/);
+  });
+});
+
+describe("a jump to a place further down the page", () => {
+  const click = (over: Partial<JumpClick> = {}) => {
+    const event = { button: 0, metaKey: false, ctrlKey: false, shiftKey: false, altKey: false, defaultPrevented: false, prevented: 0, ...over };
+    return Object.assign(event, { preventDefault: () => { event.prevented += 1; } });
+  };
+  const page = (reduced: boolean, present = true) => {
+    const calls: unknown[] = [];
+    const target = { scrollIntoView: (options: unknown) => calls.push(["scroll", options]), focus: (options: unknown) => calls.push(["focus", options]) };
+    const ids: string[] = [];
+    return { calls, ids, page: { getElementById: (id: string) => (ids.push(id), present ? target : null), prefersReducedMotion: () => reduced } };
+  };
+
+  it("scrolls smoothly to the target, centred, then puts the focus on it without another scroll", () => {
+    const event = click();
+    const { calls, ids, page: browser } = page(false);
+    expect(jumpWithinPage(event, "download", browser)).toBe(true);
+    expect(event.prevented).toBe(1);
+    expect(ids).toEqual(["download"]);
+    expect(calls).toEqual([["scroll", { behavior: "smooth", block: "center" }], ["focus", { preventScroll: true }]]);
+  });
+
+  it("moves at once, with no animation, for a visitor who asked for reduced motion", () => {
+    const { calls, page: browser } = page(true);
+    expect(jumpWithinPage(click(), "download", browser)).toBe(true);
+    // "instant", not "auto": the site's stylesheet makes every scroll smooth.
+    expect(calls[0]).toEqual(["scroll", { behavior: "instant", block: "center" }]);
+  });
+
+  it("leaves a new-tab or new-window click, another button, a handled click or a missing target to the browser", () => {
+    for (const over of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+      const event = click(over);
+      const { calls, page: browser } = page(false);
+      expect(jumpWithinPage(event, "download", browser)).toBe(false);
+      expect(event.prevented).toBe(0);
+      expect(calls).toEqual([]);
+    }
+    const event = click();
+    expect(jumpWithinPage(event, "download", page(false, false).page)).toBe(false);
+    expect(event.prevented).toBe(0);
   });
 });
 

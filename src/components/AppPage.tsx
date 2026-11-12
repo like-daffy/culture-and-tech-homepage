@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Download, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowRight, ChevronRight, Download, ExternalLink } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { APPS, APP_PAGE_LABELS, APP_SLUGS, type AppSection, type AppSlug } from "@/lib/apps";
 import type { SupportedLanguage } from "@/lib/language-detection";
+import { browserPage, jumpWithinPage } from "@/lib/page-jump";
 import { APP_METADATA, LANGUAGE_PATHS, appJsonLd, appPaths } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +84,7 @@ export function AppPage({ slug, language }: AppPageProps) {
   const otherApps = APP_SLUGS.filter((other) => other !== slug);
   const [supportBefore, supportAfter] = content.support.split("{email}");
   const afterSections = content.sections.length;
+  const jump = content.jump;
 
   return (
     <>
@@ -151,6 +153,16 @@ export function AppPage({ slug, language }: AppPageProps) {
                   </a>
                 </Button>
               )}
+
+              {/* Moves the page to a button further down (src/lib/page-jump.ts); without JavaScript the #target jumps */}
+              {jump && (
+                <Button asChild size="lg" className="mt-8">
+                  <a href={`#${jump.target}`} onClick={(event) => jumpWithinPage(event, jump.target, browserPage())}>
+                    {jump.label}
+                    <ArrowDown />
+                  </a>
+                </Button>
+              )}
             </div>
           </section>
 
@@ -205,10 +217,11 @@ export function AppPage({ slug, language }: AppPageProps) {
                 )}
                 {section.links && section.links.length > 0 && (
                   <div className="mt-8 flex flex-wrap gap-3">
-                    {/* Full page loads (no client-side navigation): the account page loads nothing of this page's. */}
+                    {/* Full page loads (no client-side navigation): the account page loads nothing of this page's. A
+                        jump's target (id) gets a scroll margin that keeps it below the fixed navigation. */}
                     {section.links.map((link, index) => (
                       <Button key={link.href} asChild size="lg" variant={index === 0 ? "default" : "outline"}>
-                        <a href={link.href}>
+                        <a href={link.href} id={link.id} className={link.id ? "scroll-mt-24" : undefined}>
                           {link.label}
                           {link.download ? <Download /> : <ArrowRight />}
                         </a>

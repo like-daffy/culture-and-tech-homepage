@@ -48,7 +48,7 @@ export interface AppSection {
    * Buttons under the section: pages of this site, opened as full page loads, or a download (`download`). Absent on
    * every section unless a flag adds one (Clean Space's website edition, src/lib/clean-space/channel-copy.ts).
    */
-  links?: { label: string; href: string; download?: boolean }[];
+  links?: { label: string; href: string; download?: boolean; /** An anchor for a `jump` to this button */ id?: string }[];
   /** A line under the buttons whose `{name}` parts are links of the same name (the policies a purchase is under) */
   linkLine?: { text: string; links: Record<string, { label: string; href: string }> };
 }
@@ -68,6 +68,11 @@ export interface AppContent {
   intro: string[];
   /** Link to the app itself; absent while the app is not available */
   cta?: { label: string; href: string };
+  /**
+   * A button right after the introduction that moves the page to the element `target` names further down (Clean
+   * Space's download button), without starting anything itself
+   */
+  jump?: { label: string; target: string };
   screenshots: AppImage[];
   sections: AppSection[];
   /** Shown on the app page and repeated in its FAQPage structured data */

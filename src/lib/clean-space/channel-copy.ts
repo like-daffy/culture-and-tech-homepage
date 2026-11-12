@@ -48,6 +48,8 @@ interface ChannelCopy {
   refundText: string;
   note: string;
   download: string;
+  /** The button after the introduction that moves the page to the download button (the owner's word, 2026-11-12). */
+  jump: string;
   buy: string;
   /** `{terms}`, `{refund}`, `{privacy}`: the website edition's policies, linked. (`{krw}`/`{usd}` elsewhere: prices.) */
   policies: string;
@@ -78,6 +80,7 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
     // TEST review candidate: remove this test notice only with the coordinated paid-sales release.
     note: "Test payment: payments run in Toss Payments' test environment for now, and nothing is actually charged. An access period received through a test payment ends when sales start for real. The two editions are separate products: Expert bought in the Mac App Store doesn't unlock the website edition, and the 364 days Unlock doesn't unlock the Mac App Store app.",
     download: "Download for Mac",
+    jump: "Download",
     buy: "Buy the 364 days Unlock",
     policies: "The website edition's {terms}, {refund} and {privacy}: please read them before you buy.",
     privacyItem: {
@@ -118,6 +121,7 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
       "결제 후 7일 이내에 요청하면 전액 환불됩니다. 이용 기간이 끝나도 기본 기능은 그대로 쓸 수 있고, 설정, 기록, 보고서, 복구하기도 그대로 남습니다.",
     note: "테스트 결제: 지금은 토스페이먼츠의 테스트 환경에서 결제가 진행되어 실제로 청구되지 않습니다. 테스트 결제로 받은 이용 기간은 정식 판매가 시작되면 끝납니다. 두 버전은 서로 다른 상품입니다. Mac App Store에서 구매한 Expert는 웹사이트 버전에 적용되지 않고, 364일 잠금 해제는 Mac App Store 버전에 적용되지 않습니다.",
     download: "Mac용 다운로드",
+    jump: "다운로드",
     buy: "364일 잠금 해제 구매하기",
     policies: "구매하기 전에 웹사이트 버전의 {terms}, {refund}, {privacy}을 확인해 주세요.",
     privacyItem: {
@@ -144,6 +148,9 @@ const COPY: Record<SupportedLanguage, ChannelCopy> = {
 /** Reviewed versioned fallback for the notarized website edition; update the label with each release. */
 const REVIEWED_DOWNLOAD_1_0_7 = "https://clean-space-cultureandtech.web.app/clean-space/1.0-7/Clean-Space-1.0.zip";
 
+/** The download button's anchor: the "Download" button after the introduction moves the page to it. */
+export const DOWNLOAD_ANCHOR = "download";
+
 function channelSection(language: SupportedLanguage, downloadUrl: string): AppSection {
   const copy = COPY[language];
   const labels = CHECKOUT_COPY[language];
@@ -159,7 +166,7 @@ function channelSection(language: SupportedLanguage, downloadUrl: string): AppSe
     note: copy.note,
     // The account page is where the purchase starts: a full page load, so that nothing this page loads goes along.
     links: [
-      ...(downloadUrl ? [{ label: downloadUrl === REVIEWED_DOWNLOAD_1_0_7 ? (language === "en" ? "Download for Mac — 1.0 (build 7)" : "Mac용 다운로드 — 1.0 (빌드 7)") : copy.download, href: downloadUrl, download: true }] : []),
+      ...(downloadUrl ? [{ label: downloadUrl === REVIEWED_DOWNLOAD_1_0_7 ? (language === "en" ? "Download for Mac — 1.0 (build 7)" : "Mac용 다운로드 — 1.0 (빌드 7)") : copy.download, href: downloadUrl, download: true, id: DOWNLOAD_ANCHOR }] : []),
       { label: copy.buy, href: `${CLEAN_SPACE_PORTAL.origin}${PORTAL_PAGE_PATH.account[language]}` },
     ],
     linkLine: {
@@ -176,7 +183,8 @@ function channelSection(language: SupportedLanguage, downloadUrl: string): AppSe
 /**
  * The product page's content with the website edition: its section goes right before the privacy section (the last
  * one), whose first item then covers both editions; the file-processing answer (the fifth) does too, the 364 days
- * Unlock gets its own question after it, and, once there is a download, "Can I get it now?" (the last) says so.
+ * Unlock gets its own question after it, and, once there is a download, "Can I get it now?" (the last) says so and a
+ * "Download" button after the introduction moves the page to the download button.
  */
 export function withWebsiteChannel(app: AppInfo, downloadUrl: string): AppInfo {
   const content = Object.fromEntries(
@@ -195,7 +203,12 @@ export function withWebsiteChannel(app: AppInfo, downloadUrl: string): AppInfo {
         return item;
       });
       const unlockFaq = { question: copy.unlockFaq.question, answer: priced(copy.unlockFaq.answer) };
-      const next: AppContent = { ...base, sections, faq: [...faq.slice(0, 5), unlockFaq, ...faq.slice(5)] };
+      const next: AppContent = {
+        ...base,
+        ...(downloadUrl ? { jump: { label: copy.jump, target: DOWNLOAD_ANCHOR } } : {}),
+        sections,
+        faq: [...faq.slice(0, 5), unlockFaq, ...faq.slice(5)],
+      };
       return [language, next];
     }),
   ) as Record<SupportedLanguage, AppContent>;
