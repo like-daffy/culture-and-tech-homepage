@@ -27,10 +27,11 @@ describe("lost checkout recovery", () => {
 describe("Chord's lost checkout, in TEST and in LIVE", () => {
   it("says the page couldn't confirm the payment, to check Remove ADs before buying again, and how to go on", () => {
     expect(CHECKOUT_COPY.en.chordLost).toBe(
-      "This page couldn't confirm the payment: the checkout ended, or went on in another tab, before the payment was confirmed. Before buying again, check whether Remove ADs is on your Chord to MIDI account. If it is, the purchase went through and there's nothing more to do; if it isn't, start again from Chord to MIDI's purchase page."
+      "This page couldn't confirm the payment, for example because the checkout ended before the payment was confirmed. Before buying again, check whether Remove ADs is on your Chord to MIDI account. If it is, the purchase went through and you don't need to buy it again; if it isn't, start again from Chord to MIDI's purchase page."
     );
+    // The owner's own Korean, exactly as typed (sheet row G7, option B), punctuation included.
     expect(CHECKOUT_COPY.ko.chordLost).toBe(
-      "결제가 확인되기 전에 결제 페이지가 종료되었거나 다른 탭에서 이어져, 이 페이지에서는 결제를 확인하지 못했습니다. 다시 구매하기 전에 Chord to MIDI 계정에 광고 제거가 적용되어 있는지 확인해 주세요. 적용되어 있다면 구매가 완료된 것이므로 더 하실 일은 없고, 적용되어 있지 않다면 Chord to MIDI 구매 페이지에서 다시 시작해 주세요."
+      "결제가 확인되기 전에 결제 페이지가 종료되는 사유 등의 이유로 이 페이지에서는 결제를 확인하지 못했습니다. 다시 구매하기 전에 Chord to MIDI 계정에 광고 제거가 적용되어 있는지 확인해 주세요. 적용되어 있다면 구매가 완료된 것이므로 다시 구매하실 필요는 없습니다, 적용되어 있지 않다면 Chord to MIDI 구매 페이지에서 다시 시작해 주세요."
     );
     // Nothing that holds only in TEST.
     for (const text of [CHECKOUT_COPY.en.chordLost, CHECKOUT_COPY.ko.chordLost]) {
