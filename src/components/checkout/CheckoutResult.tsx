@@ -72,7 +72,8 @@ type Confirmation =
   | { kind: "error"; info: CallableErrorInfo; details: PaymentDetails }
   /** This tab no longer holds the checkout: the payment is kept for its buyer to finish on the product's site. */
   | { kind: "keeping" }
-  | { kind: "chordLost" }
+  /** Chord's payment that this tab no longer holds: not confirmed here, with its order number for a question. */
+  | { kind: "chordLost"; orderId: string }
   | { kind: "kept"; resumeId: string }
   | { kind: "keepFailed"; message: string; details: PaymentDetails };
 
@@ -101,7 +102,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
   const started = useRef(false);
 
   const keep = (details: PaymentDetails) => {
-    recoverLostCheckout(product, details, () => setState({ kind: "chordLost" }), (data) => {
+    recoverLostCheckout(product, details, () => setState({ kind: "chordLost", orderId: details.orderId }), (data) => {
       setState({ kind: "keeping" });
       preparePaymentResume(product, data).then(
         ({ resumeId }) => setState({ kind: "kept", resumeId }),
@@ -179,7 +180,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       body = <Spinner label={copy.keeping} />;
       break;
     case "chordLost":
-      body = <><Notice>{copy.chordLost}</Notice><LinkButton primary href={productUrl(product, lang, "purchase")}>{copy.chordStartAgain}</LinkButton></>;
+      body = <ChordLost product={product} lang={lang} orderId={state.orderId} />;
       break;
     case "kept":
       body = (
@@ -315,6 +316,21 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       <h1 className="text-2xl font-semibold">{productCopy.productName}</h1>
       <div className="mt-6 space-y-6">{body}</div>
     </CheckoutLayout>
+  );
+}
+
+/**
+ * Chord's payment that this tab no longer holds, so it wasn't confirmed here (decision 14): check Remove ADs before
+ * buying again, start again if it isn't there, and the order number for a question. True in TEST and in LIVE.
+ */
+export function ChordLost({ product, lang, orderId }: { product: OpenProduct; lang: Lang; orderId: string }) {
+  const copy = CHECKOUT_COPY[lang];
+  return (
+    <>
+      <Notice>{copy.chordLost}</Notice>
+      <LinkButton primary href={productUrl(product, lang, "purchase")}>{copy.chordStartAgain}</LinkButton>
+      <ContactLine lang={lang} orderId={orderId} />
+    </>
   );
 }
 

@@ -59,7 +59,11 @@ const en = {
   missing: "This page needs the payment details that Toss Payments sends.",
   inProgressResult: "Another payment of this account is still being confirmed. Wait a few minutes, then press Try again.",
   keeping: "Keeping your payment for your account…",
-  chordLost: "The checkout ended before the payment was confirmed. A test payment charges nothing. Start again from Chord to MIDI's purchase page.",
+  // True in TEST and once Chord sells for real (the owner's decision 14, 17 Nov): it no longer says a test payment
+  // charges nothing. The Korean is the owner's own wording (sheet row G7, option B) and prevails; this English matches
+  // it. The contact line with the order number follows it (CheckoutResult, ContactLine).
+  chordLost:
+    "This page couldn't confirm the payment, for example because the checkout ended before the payment was confirmed. Before buying again, check whether Remove ADs is on your Chord to MIDI account. If it is, the purchase went through and you don't need to buy it again; if it isn't, start again from Chord to MIDI's purchase page.",
   chordStartAgain: "Start again on Chord to MIDI",
   keepFailed: "We could not keep the payment for your account: {message}",
   failTitle: "The payment did not go through",
@@ -135,7 +139,9 @@ const ko: CheckoutCopy = {
   missing: "Toss Payments가 보내는 결제 정보가 없습니다.",
   inProgressResult: "이 계정의 다른 결제를 아직 확인하고 있습니다. 몇 분 뒤에 '다시 시도'를 눌러 주세요.",
   keeping: "계정을 위해 결제 정보를 보관하는 중…",
-  chordLost: "결제가 확인되기 전에 결제 페이지가 종료되었습니다. 테스트 결제는 실제로 청구되지 않습니다. Chord to MIDI 구매 페이지에서 다시 시작해 주세요.",
+  // The owner's own wording, exactly as typed (decision 14, sheet row G7, option B).
+  chordLost:
+    "결제가 확인되기 전에 결제 페이지가 종료되는 사유 등의 이유로 이 페이지에서는 결제를 확인하지 못했습니다. 다시 구매하기 전에 Chord to MIDI 계정에 광고 제거가 적용되어 있는지 확인해 주세요. 적용되어 있다면 구매가 완료된 것이므로 다시 구매하실 필요는 없습니다, 적용되어 있지 않다면 Chord to MIDI 구매 페이지에서 다시 시작해 주세요.",
   chordStartAgain: "Chord to MIDI에서 다시 시작",
   keepFailed: "계정을 위해 결제 정보를 보관하지 못했습니다: {message}",
   failTitle: "결제가 완료되지 않았습니다",
