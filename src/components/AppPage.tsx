@@ -1,3 +1,4 @@
+import { RefundAmendmentLink } from "@/components/RefundAmendmentLink";
 import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -107,6 +108,7 @@ export function AppPage({ slug, language }: AppPageProps) {
       <div className="min-h-screen">
         <Navigation homePath={homePath} />
         <main>
+          {__CLEAN_SPACE_APP_SITE__ && <div className="container max-w-5xl"><RefundAmendmentLink lang={language} productNotice /></div>}
           {/* Header */}
           <section className="pt-28 pb-16 md:pt-32 md:pb-20 bg-muted/30">
             <div className="container max-w-5xl">

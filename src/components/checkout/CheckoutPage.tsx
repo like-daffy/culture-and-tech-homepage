@@ -25,6 +25,8 @@ import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type Check
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
 import { sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
+import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
+import { useRefundPhase } from "@/components/RefundAmendmentLink";
 import { ReviewEmailNotice } from "./ReviewPaymentNotices";
 
 /** `text` with each `{name}` replaced by a node (a link). */
@@ -258,6 +260,7 @@ export function Checkout({
   const copy = CHECKOUT_COPY[lang];
   const productCopy = product.copy[lang];
   const { options } = checkout;
+  const refundPhase = useRefundPhase();
   const testOption = options.find((option) => option.test) ?? null;
   // A product sold on Toss's test keys before its launch says so while a currency's client key is a test key.
   const onTestKeys =
@@ -329,7 +332,7 @@ export function Checkout({
           </p>
         )}
         <ul className="list-disc space-y-1 pl-5 text-sm">
-          {productCopy.includes.map((line) => (
+          {checkoutRefundSummary(productCopy.includes, lang, refundPhase).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>

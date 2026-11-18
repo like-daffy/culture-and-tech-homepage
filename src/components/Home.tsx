@@ -1,3 +1,4 @@
+import { RefundAmendmentLink } from "./RefundAmendmentLink";
 import { SEO } from "@/components/SEO";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
@@ -35,6 +36,7 @@ export function Home({ language }: HomeProps) {
           <Apps />
           <Services />
           <MusicDetails />
+          <div className="mx-auto max-w-6xl px-4"><RefundAmendmentLink lang={language} /></div>
         </main>
         <Footer />
       </div>
