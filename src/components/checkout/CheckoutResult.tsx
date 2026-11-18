@@ -18,6 +18,7 @@ import {
   type OpenProduct,
 } from "@/lib/checkout/products";
 import { forgetHold, paidOrder, readHold, rememberPaid, type PaidOrder } from "@/lib/checkout/session";
+import { isPostLaunchReview } from "@/lib/checkout/review";
 import { paymentMethodLabel } from "@/lib/checkout/toss";
 import { ClosedCheckout } from "./CheckoutPage";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
@@ -123,7 +124,14 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     confirmCheckoutPayment(product, { checkoutId: hold.checkoutId, checkoutKey: hold.checkoutKey, ...details }).then(
       (result) => {
         // Its job is done: the tab keeps no key that opens the account's checkout any more.
-        rememberPaid(product, { orderId: result.orderId, pass: result.pass ?? null, environment: result.environment, review: result.review, receiptUrl: result.review === true ? safeLink(product, result.receiptUrl) : undefined });
+        rememberPaid(product, {
+          orderId: result.orderId,
+          pass: result.pass ?? null,
+          environment: result.environment,
+          review: result.review,
+          postLaunchReview: isPostLaunchReview(result) ? true : undefined,
+          receiptUrl: result.review === true ? safeLink(product, result.receiptUrl) : undefined,
+        });
         setState({ kind: "done", result });
       },
       (error: unknown) => {
@@ -247,6 +255,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
       break;
     }
     case "paid": {
+      const postLaunchReview = isPostLaunchReview(state.paid);
       const receiptUrl = state.paid.review === true ? safeLink(product, state.paid.receiptUrl ?? null) : null;
       body = (
         <>
@@ -260,8 +269,8 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
               </>
             )}
           </Notice>
-          {state.paid.review === true && <ReviewReceiptNotice lang={lang} />}
-          <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />
+          {state.paid.review === true && <ReviewReceiptNotice lang={lang} postLaunch={postLaunchReview} />}
+          {!postLaunchReview && <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />}
           <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: state.paid.orderId })}</p>
           <div className="flex flex-wrap gap-3">{backLinks(state.paid.review === true)}{receiptUrl && <LinkButton href={receiptUrl} newTab>{copy.receipt}</LinkButton>}</div>
         </>
@@ -270,6 +279,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     }
     case "done": {
       const { result } = state;
+      const postLaunchReview = isPostLaunchReview(result);
       const receiptUrl = safeLink(product, result.receiptUrl);
       body = (
         <>
@@ -288,8 +298,8 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
               </>
             )}
           </Notice>
-          {result.review === true && <ReviewReceiptNotice lang={lang} />}
-          <PassTerm product={product} lang={lang} pass={result.pass} environment={result.review === true && result.environment !== "test" ? undefined : result.environment} />
+          {result.review === true && <ReviewReceiptNotice lang={lang} postLaunch={postLaunchReview} />}
+          {!postLaunchReview && <PassTerm product={product} lang={lang} pass={result.pass} environment={result.review === true && result.environment !== "test" ? undefined : result.environment} />}
           <p className="text-sm text-muted-foreground">
             {fill(copy.details, {
               orderId: result.orderId,

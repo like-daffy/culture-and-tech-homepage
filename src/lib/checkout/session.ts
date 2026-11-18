@@ -104,6 +104,7 @@ export interface PaidOrder {
   /** From the confirm answer; a test payment's dates are not shown. */
   environment?: "test" | "live";
   review?: true;
+  postLaunchReview?: true;
   receiptUrl?: string | null;
 }
 
@@ -121,7 +122,7 @@ export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
       window.sessionStorage.setItem(environmentKey(product), JSON.stringify({ orderId: paid.orderId, environment: paid.environment }));
     }
     if (paid.review === true && paid.environment === "test") {
-      window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null }));
+      window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null, ...(paid.postLaunchReview === true ? { postLaunchReview: true } : {}) }));
     }
     if (paid.pass) {
       window.sessionStorage.setItem(passKey(product), JSON.stringify({ orderId: paid.orderId, ...paid.pass }));
@@ -143,16 +144,19 @@ export function paidOrder(product: OpenProduct): PaidOrder | null {
   if (orderId === null) return null;
   const environment = paidEnvironment(product, orderId);
   const review = environment === "test" ? paidReview(product, orderId) : null;
-  return { orderId, pass: paidPass(product, orderId), environment, ...(review ? { review: true as const, receiptUrl: review.receiptUrl } : {}) };
+  return { orderId, pass: paidPass(product, orderId), environment, ...(review ? { review: true as const, ...review } : {}) };
 }
 
-function paidReview(product: OpenProduct, orderId: string): { receiptUrl: string | null } | null {
+function paidReview(product: OpenProduct, orderId: string): { receiptUrl: string | null; postLaunchReview?: true } | null {
   try {
     const value: unknown = JSON.parse(window.sessionStorage.getItem(reviewKey(product)) ?? "null");
     if (typeof value !== "object" || value === null) return null;
     const saved = value as Record<string, unknown>;
     if (saved.orderId !== orderId || (saved.receiptUrl !== null && typeof saved.receiptUrl !== "string")) return null;
-    return { receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null };
+    return {
+      receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null,
+      ...(saved.postLaunchReview === true ? { postLaunchReview: true } : {}),
+    };
   } catch { return null; }
 }
 

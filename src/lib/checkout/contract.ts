@@ -68,7 +68,7 @@ export interface CheckoutOption {
   clientKey: string;
   variantKey: string;
   agreementVariantKey: string;
-  /** The PayPal TEST checkout: test keys, PayPal Sandbox accounts and a test amount. */
+  /** True for any TEST payment option. Older servers may only set it for USD; see isTestOption. */
   test: boolean;
 }
 
@@ -115,6 +115,7 @@ export interface CreateOrderResponse {
   /** The account's confirmed email, frozen on the order: Toss sends the receipt there. */
   receiptEmail: string | null;
   review?: true;
+  environment?: "test" | "live";
 }
 
 /** The query parameters Toss appends to the successUrl (`amount` as a number). */
@@ -135,6 +136,8 @@ export interface ConfirmPaymentResponse {
   receiptUrl: string | null;
   receiptEmail: string | null;
   review?: true;
+  /** Optional order-bound signal for continued review after the actual paid launch. */
+  postLaunchReview?: true;
   /** A pass's start and end (ISO 8601 instants), for a product sold as a pass: shown with their time zone. */
   pass?: { start: string; end: string };
   /**

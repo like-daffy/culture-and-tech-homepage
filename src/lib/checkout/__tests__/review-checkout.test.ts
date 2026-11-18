@@ -7,7 +7,7 @@ import { CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY, ALL_IN_O
 import type { OpenCheckoutResponse } from "../contract";
 import type { OpenProduct } from "../products";
 
-const options = [{ currency: "KRW", price: 100, test: true, clientKey: "fixture", variantKey: "fixture", agreementVariantKey: "fixture" }] as OpenCheckoutResponse["options"];
+const options = [{ currency: "KRW", price: 100, test: true, clientKey: "test_fixture", variantKey: "fixture", agreementVariantKey: "fixture" }] as OpenCheckoutResponse["options"];
 const base = { product: "fixture", lang: "en", orderName: "fixture", options, expiresAt: "2026-12-01" } as OpenCheckoutResponse;
 const credential = { checkoutId: "fixture", checkoutKey: "fixture" };
 
@@ -57,4 +57,41 @@ describe("All-in-one checkout before DJ V1", () => {
       expect(render(slug, copy)).not.toContain(label);
     }
   });
+});
+
+describe("domestic TEST review guard", () => {
+  const domestic = { ...options[0], test: false };
+  const live = { ...domestic, clientKey: "live_fixture" };
+  const paypal = { ...domestic, currency: "USD" as const, test: true };
+  const product = { slug: "chord-to-midi", copy: CHORD_TO_MIDI_COPY, origin: "https://example.invalid",
+    pages: { en: {}, ko: {} }, startPage: "account" } as unknown as OpenProduct;
+
+  for (const lang of ["en", "ko"] as const) {
+    const render = (options: OpenCheckoutResponse["options"], review: boolean) => renderToStaticMarkup(createElement(Checkout, {
+      product, lang, credential, checkout: { ...base, lang, options, ...(review ? { review: true as const, receiptEmail: null } :
+        { receiptEmail: "fixture@example.invalid" }) },
+    }));
+    const priceLabel = lang === "en" ? "Test amount" : "테스트 금액";
+    const neutral = lang === "en" ? "Nothing will be charged." : "실제로 청구되지 않습니다.";
+    const currencyLabel = lang === "en" ? "US dollars (USD)" : "미국 달러 (USD)";
+    it(`offers only KRW TEST in ${lang}, even when its old flag is false`, () => {
+      const safe = render([paypal, { ...live, test: true }, domestic], true);
+      expect(safe).toContain(priceLabel);
+      expect(safe).toContain(neutral);
+      expect(safe).not.toContain(currencyLabel);
+      expect(safe).not.toContain("Sandbox");
+    });
+    it(`fails closed in ${lang} for PayPal and a LIVE key mislabelled as TEST`, () => {
+      const refused = render([paypal, { ...live, test: true }], true);
+      expect(refused).toContain(lang === "en" ? "Nothing was charged." : "청구된 금액은 없습니다.");
+      expect(refused).not.toContain('<input');
+    });
+    it(`preserves ordinary pre-launch TEST labels and normal USD availability in ${lang}`, () => {
+      expect(render([domestic], false)).toContain(priceLabel);
+      const normal = render([live, { ...paypal, clientKey: "live_fixture", test: false }], false);
+      expect(normal).toContain(currencyLabel);
+      expect(normal).not.toContain(priceLabel);
+      expect(normal).not.toContain(neutral);
+    });
+  }
 });

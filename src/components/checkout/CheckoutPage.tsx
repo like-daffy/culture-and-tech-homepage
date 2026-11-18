@@ -23,7 +23,7 @@ import {
 } from "@/lib/checkout/products";
 import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type CheckoutHold } from "@/lib/checkout/session";
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
-import { sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
+import { allowsPaymentOption, isTestOption, sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
 import { ALL_IN_ONE_DJ_AT_V1 } from "@/lib/checkout/product-copy";
 import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
@@ -260,12 +260,8 @@ export function Checkout({
 }) {
   const copy = CHECKOUT_COPY[lang];
   const productCopy = product.copy[lang];
-  const { options } = checkout;
+  const options = checkout.options.filter((option) => allowsPaymentOption(checkout.review, option));
   const refundPhase = useRefundPhase();
-  const testOption = options.find((option) => option.test) ?? null;
-  // A product sold on Toss's test keys before its launch says so while a currency's client key is a test key.
-  const onTestKeys =
-    productCopy.testKeys !== undefined && options.some((option) => !option.test && /^test_/.test(option.clientKey));
   const [currency, setCurrency] = useState<Currency>(() => suggestedCurrency(lang, options));
   const option = options.find((candidate) => candidate.currency === currency) ?? options[0] ?? null;
   // The page states a pass's length in fixed words: a server that says otherwise stops the payment before it starts.
@@ -273,13 +269,17 @@ export function Checkout({
   const terms = <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>;
   const refund = <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>;
   if (!validCheckoutIdentity(checkout)) return <Notice tone="error">{copy.notConfigured}</Notice>;
+  if (checkout.review === true && !option) return <Notice tone="error">{copy.reviewOptionUnavailable}</Notice>;
+
+  const testNotice = option && isTestOption(option)
+    ? checkout.review === true ? copy.testPayment
+      : product.slug === "chord-to-midi" && option.currency === "KRW" ? productCopy.testKeys ?? copy.testPayment
+        : fill(productCopy.testMode, { price: formatPrice(option.price, option.currency, lang) })
+    : null;
 
   return (
     <>
-      {testOption && (
-        <Notice>{fill(productCopy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>
-      )}
-      {!testOption && onTestKeys && <Notice>{productCopy.testKeys}</Notice>}
+      {testNotice && <Notice>{testNotice}</Notice>}
       {checkout.review !== true && <Notice>
         {fill(productCopy.account, { email: checkout.receiptEmail })}{" "}
         <a className="underline" href={productUrl(product, lang, product.startPage)}>
@@ -372,7 +372,7 @@ function PriceText({ product, lang, option }: { product: OpenProduct; lang: Lang
   return (
     <span className="flex flex-col gap-0.5">
       <span className="text-lg font-semibold">{formatPrice(option.price, option.currency, lang)}</span>
-      {option.test && <span className="text-xs text-muted-foreground">{copy.testPrice}</span>}
+      {isTestOption(option) && <span className="text-xs text-muted-foreground">{copy.testPrice}</span>}
       <span className="text-sm">{copy.currencyNames[option.currency]}</span>
       <span className="text-xs text-muted-foreground">{product.copy[lang].currencyNotes[option.currency]}</span>
     </span>
@@ -454,11 +454,12 @@ function Payment({
   const [widget, setWidget] = useState<{ orderId: string; widget: PaymentWidget } | null>(null);
 
   useEffect(() => {
-    if (step.kind !== "paying") return;
+    if (step.kind !== "paying" || !allowsPaymentOption(review, option)) return;
     let cancelled = false;
     let rendered: PaymentWidget | null = null;
     renderPaymentWidget({
       customerKey: step.order.customerKey,
+      review,
       amount: step.order.amount,
       currency: step.order.currency,
       clientKey: option.clientKey,
@@ -487,11 +488,12 @@ function Payment({
       cancelled = true;
       void rendered?.destroy();
     };
-  }, [step, option, product]);
+  }, [step, option, product, review]);
 
   const ready = step.kind === "paying" && widget?.orderId === step.order.orderId ? widget.widget : null;
 
   const start = () => {
+    if (!allowsPaymentOption(review, option)) return;
     setStep({ kind: "preparing" });
     createCheckoutOrder(product, {
       ...credential,
@@ -503,6 +505,11 @@ function Payment({
       (order) => {
         if (!sameCheckoutIdentity({ review, receiptEmail }, order)) {
           setStep({ kind: "error", message: copy.notConfigured, ended: false });
+          return;
+        }
+        if (review === true && (order.currency !== "KRW" ||
+            (order.environment !== undefined && order.environment !== "test"))) {
+          setStep({ kind: "error", message: copy.reviewOptionUnavailable, ended: false });
           return;
         }
         // What Toss charges must be what this page showed: a price changed since stops here, before anything reaches Toss.
@@ -525,7 +532,7 @@ function Payment({
   };
 
   const pay = (order: CreateOrderResponse) => {
-    if (!ready || paying) return;
+    if (!ready || paying || !allowsPaymentOption(review, option)) return;
     setPaying(true);
     setWindowClosed(false);
     ready
@@ -552,6 +559,8 @@ function Payment({
   // The product's own label where its account email isn't a recovery address (Clean Space's contact email).
   const receiptLabel = productCopy.receiptEmail ?? copy.receiptEmail;
   const receipt = review === true ? <ReviewEmailNotice lang={lang} /> : <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail ?? "" })}</p>;
+
+  if (!allowsPaymentOption(review, option)) return <Notice tone="error">{copy.reviewOptionUnavailable}</Notice>;
 
   if (step.kind === "agree" || step.kind === "preparing") {
     return (
