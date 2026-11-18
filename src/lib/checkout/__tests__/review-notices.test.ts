@@ -16,18 +16,19 @@ describe("review payment notices", () => {
   });
 });
 
-describe("gated post-launch review receipt", () => {
+describe("approved post-launch review receipt", () => {
   afterEach(() => vi.unstubAllEnvs());
   it.each([
     ["en", "Review test payment only — nothing was charged, and no paid pass is granted."],
     ["ko", "심사용 테스트 결제입니다 — 실제 금액은 청구되지 않으며 유료 이용권은 부여되지 않습니다."],
-  ] as const)("keeps the %s candidate off until approved and post-launch", (lang, candidate) => {
+  ] as const)("defaults the %s approved wording on only after launch", (lang, candidate) => {
     const render = (postLaunch: boolean) => renderToStaticMarkup(createElement(ReviewReceiptNotice, { lang, postLaunch }));
     const neutral = render(false);
     vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", undefined);
-    expect(render(true)).toBe(neutral);
-    vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", "1");
     expect(render(false)).toBe(neutral);
-    expect(render(true)).toContain(candidate);
+    expect(render(true)).toBe(`<p>${candidate}</p>`);
+    vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", "0");
+    expect(render(false)).toBe(neutral);
+    expect(render(true)).toBe(neutral);
   });
 });

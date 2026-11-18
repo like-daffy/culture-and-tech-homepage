@@ -81,6 +81,7 @@ const pass = { start: "2026-12-12T14:00:00Z", end: "2027-12-11T14:00:00Z" };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", undefined);
   const records = new Map<string, string>();
   vi.stubGlobal("window", {
     sessionStorage: {
@@ -91,22 +92,30 @@ beforeEach(() => {
     location: { href: "https://example.invalid/checkout/all-in-one/success/", search: "?orderId=fixture-order&paymentKey=fixture&amount=100", reload: vi.fn() },
   });
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
+
+async function receiptOnConfirmAndReload(lang: Lang, answer: ConfirmPaymentResponse): Promise<string[]> {
+  mocks.confirm.mockResolvedValue(answer);
+  saveHold(product, credential);
+  const fresh = mount(CheckoutSuccess({ product, lang }) as View);
+  fresh();
+  await Promise.resolve();
+  const freshHtml = renderToStaticMarkup(fresh());
+  const reload = mount(CheckoutSuccess({ product, lang }) as View);
+  reload();
+  expect(mocks.confirm).toHaveBeenCalledTimes(1);
+  return [freshHtml, renderToStaticMarkup(reload())];
+}
 
 it.each(["en", "ko"] as const)("renders a settled All-in-one deletion as refund follow-up in %s, fresh and cached", async (lang) => {
   const answer: ConfirmPaymentResponse = {
     status: "PAID", orderId: "fixture-order", approvedAt: pass.start,
     method: null, environment: "live", receiptUrl, receiptEmail: null, afterDeletion: true, pass,
   };
-  mocks.confirm.mockResolvedValue(answer);
-  saveHold(product, credential);
-  const fresh = mount(CheckoutSuccess({ product, lang }) as View);
-  fresh();
-  await Promise.resolve();
-  const reload = mount(CheckoutSuccess({ product, lang }) as View);
-  reload();
-  for (const render of [fresh, reload]) {
-    const html = renderToStaticMarkup(render());
+  for (const html of await receiptOnConfirmAndReload(lang, answer)) {
     expect(html).toContain(ALL_IN_ONE_AFTER_DELETION[lang].noPass);
     expect(html).toContain(ALL_IN_ONE_AFTER_DELETION[lang].refund);
     expect(html).toContain("fixture-order");
@@ -114,11 +123,51 @@ it.each(["en", "ko"] as const)("renders a settled All-in-one deletion as refund 
     expect(html).not.toContain(ALL_IN_ONE_COPY[lang].successBody);
     expect(html).not.toContain("data-pass-term");
   }
-  expect(mocks.confirm).toHaveBeenCalledTimes(1);
   expect(paidOrder(product)).toMatchObject({ orderId: "fixture-order", pass: null, afterDeletion: true, receiptUrl });
   window.sessionStorage.setItem("bundle-fixture.paid", "other-order");
   expect(paidOrder(product)?.afterDeletion).toBeUndefined();
 });
+
+const row7a = {
+  en: "Review test payment only — nothing was charged, and no paid pass is granted.",
+  ko: "심사용 테스트 결제입니다 — 실제 금액은 청구되지 않으며 유료 이용권은 부여되지 않습니다.",
+};
+const preLaunchReview: ConfirmPaymentResponse = {
+  status: "PAID", orderId: "fixture-order", approvedAt: pass.start, method: null,
+  environment: "test", review: true, receiptUrl, receiptEmail: null, pass,
+};
+
+for (const lang of ["en", "ko"] as const) {
+  it(`keeps the ${lang} pre-launch review receipt and its TEST term on reload`, async () => {
+    for (const html of await receiptOnConfirmAndReload(lang, preLaunchReview)) {
+      expect(html).toContain(`<p>${CHECKOUT_COPY[lang].reviewReceipt}</p>`);
+      expect(html).toContain('data-pass-term="test"');
+      expect(html).not.toContain(row7a[lang]);
+    }
+  });
+
+  it.each([
+    { postLaunchReview: true },
+    { pass: { start: pass.start, end: pass.start } },
+    { pass: { start: pass.start, end: "2026-12-12T13:59:59Z" } },
+  ] as const)(`renders the exact ${lang} Row 7A on confirmation and reload for %j`, async (mark) => {
+    for (const html of await receiptOnConfirmAndReload(lang, { ...preLaunchReview, ...mark })) {
+      expect(html).toContain(`<p>${row7a[lang]}</p>`);
+      expect(html).not.toContain(`<p>${CHECKOUT_COPY[lang].reviewReceipt}</p>`);
+      expect(html).not.toContain('data-pass-term="test"');
+    }
+  });
+
+  it(`keeps the ${lang} normal LIVE receipt free of review and TEST lines`, async () => {
+    for (const html of await receiptOnConfirmAndReload(lang, { ...preLaunchReview, environment: "live", review: undefined })) {
+      expect(html).toContain(ALL_IN_ONE_COPY[lang].successBody.replaceAll("&", "&amp;"));
+      expect(html).toContain('data-pass-term=""');
+      expect(html).not.toContain(row7a[lang]);
+      expect(html).not.toContain(`<p>${CHECKOUT_COPY[lang].reviewReceipt}</p>`);
+      expect(html).not.toContain('data-pass-term="test"');
+    }
+  });
+}
 
 it.each([
   ["test_fixture", "live", false],
