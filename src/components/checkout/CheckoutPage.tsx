@@ -23,7 +23,7 @@ import {
 } from "@/lib/checkout/products";
 import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type CheckoutHold } from "@/lib/checkout/session";
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
-import { allowsPaymentOption, isTestOption, sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
+import { allowsPaymentOption, isTestOption, matchesOrderEnvironment, sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
 import { ALL_IN_ONE_DJ_AT_V1 } from "@/lib/checkout/product-copy";
 import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
@@ -383,6 +383,7 @@ type Step =
   | { kind: "agree" }
   | { kind: "preparing" }
   | { kind: "paying"; order: CreateOrderResponse }
+  | { kind: "offerChanged" }
   | { kind: "error"; message: string; ended: boolean };
 
 /** What to say when the order is refused for a reason of the product's backend (Toss's messages are shown as they come). */
@@ -454,7 +455,8 @@ function Payment({
   const [widget, setWidget] = useState<{ orderId: string; widget: PaymentWidget } | null>(null);
 
   useEffect(() => {
-    if (step.kind !== "paying" || !allowsPaymentOption(review, option)) return;
+    if (step.kind !== "paying" || !allowsPaymentOption(review, option) ||
+        !matchesOrderEnvironment(step.order.environment, option.clientKey)) return;
     let cancelled = false;
     let rendered: PaymentWidget | null = null;
     renderPaymentWidget({
@@ -507,6 +509,10 @@ function Payment({
           setStep({ kind: "error", message: copy.notConfigured, ended: false });
           return;
         }
+        if (!matchesOrderEnvironment(order.environment, option.clientKey)) {
+          setStep({ kind: "offerChanged" });
+          return;
+        }
         if (review === true && (order.currency !== "KRW" ||
             (order.environment !== undefined && order.environment !== "test"))) {
           setStep({ kind: "error", message: copy.reviewOptionUnavailable, ended: false });
@@ -532,7 +538,8 @@ function Payment({
   };
 
   const pay = (order: CreateOrderResponse) => {
-    if (!ready || paying || !allowsPaymentOption(review, option)) return;
+    if (!ready || paying || !allowsPaymentOption(review, option) ||
+        !matchesOrderEnvironment(order.environment, option.clientKey)) return;
     setPaying(true);
     setWindowClosed(false);
     ready
@@ -554,6 +561,15 @@ function Payment({
       })
       .finally(() => setPaying(false));
   };
+
+  if (step.kind === "offerChanged") {
+    return (
+      <>
+        <Notice tone="error">{copy.checkoutEnvironmentChanged}</Notice>
+        <Button type="button" variant="outline" onClick={() => window.location.reload()}>{copy.reloadCheckout}</Button>
+      </>
+    );
+  }
 
   const shownEmail = step.kind === "paying" ? step.order.receiptEmail : receiptEmail;
   // The product's own label where its account email isn't a recovery address (Clean Space's contact email).

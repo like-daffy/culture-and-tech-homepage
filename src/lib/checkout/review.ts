@@ -21,6 +21,13 @@ export function allowsPaymentOption(review: true | undefined, option: Pick<Check
   return review !== true || (option.currency === "KRW" && hasTestKey(option.clientKey));
 }
 
+/** Older create-order replies omit the environment. An explicit answer needs a matching widget key. */
+export function matchesOrderEnvironment(environment: unknown, clientKey: string): boolean {
+  if (environment === undefined) return true;
+  if (environment === "test") return hasTestKey(clientKey);
+  return environment === "live" && typeof clientKey === "string" && clientKey.startsWith("live_");
+}
+
 export function isPostLaunchReview(result: Pick<ConfirmPaymentResponse, "environment" | "review" | "postLaunchReview" | "pass">): boolean {
   if (result.review !== true || result.environment !== "test") return false;
   if (result.postLaunchReview === true) return true;
