@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Checkout } from "@/components/checkout/CheckoutPage";
@@ -29,6 +29,32 @@ describe("explicit review checkout identity", () => {
       const normal = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, lang, receiptEmail: "fixture@example.invalid" }, credential }));
       expect(normal).toContain("fixture@example.invalid");
       expect(normal).not.toContain(lang === "en" ? "This is Test payment mode." : "테스트 결제 모드입니다.");
+    }
+  });
+});
+
+describe("All-in-one checkout before DJ V1", () => {
+  afterEach(() => { vi.unstubAllEnvs(); });
+
+  it.each([
+    ["en", "DJ Duplicate Guard Expert joins All-in-one at its V1 release. If your All-in-one pass is active then, Expert is included automatically through your pass’s original end date."],
+    ["ko", "DJ Duplicate Guard Expert는 V1 출시 시 All-in-one에 포함됩니다. 출시 시 All-in-one 이용권이 유효하면 원래 종료일까지 Expert를 자동으로 이용할 수 있습니다."],
+  ] as const)("shows the %s label only for opted-in All-in-one checkout", (lang, label) => {
+    const render = (slug: string, copy: OpenProduct["copy"]) => {
+      const product = { slug, copy, origin: "https://example.invalid", pages: { en: {}, ko: {} }, startPage: "account" } as unknown as OpenProduct;
+      return renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, lang, review: true, receiptEmail: null }, credential }));
+    };
+    vi.stubEnv("NEXT_PUBLIC_DJ_JOINING_AT_V1", undefined);
+    const before = render("all-in-one", ALL_IN_ONE_COPY);
+    expect(before).not.toContain(label);
+    vi.stubEnv("NEXT_PUBLIC_DJ_JOINING_AT_V1", "0");
+    expect(render("all-in-one", ALL_IN_ONE_COPY)).toBe(before);
+    vi.stubEnv("NEXT_PUBLIC_DJ_JOINING_AT_V1", "1");
+    const after = render("all-in-one", ALL_IN_ONE_COPY);
+    expect(after).toContain(`<p>${label}</p>`);
+    expect(after.replace(`<p>${label}</p>`, "")).toBe(before);
+    for (const [slug, copy] of [["chord-to-midi", CHORD_TO_MIDI_COPY], ["clean-space", CLEAN_SPACE_COPY], ["dj-duplicate-guard", DJ_DUPLICATE_GUARD_COPY]] as const) {
+      expect(render(slug, copy)).not.toContain(label);
     }
   });
 });

@@ -25,6 +25,7 @@ import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type Check
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
 import { sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
+import { ALL_IN_ONE_DJ_AT_V1 } from "@/lib/checkout/product-copy";
 import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
 import { useRefundPhase } from "@/components/RefundAmendmentLink";
 import { ReviewEmailNotice } from "./ReviewPaymentNotices";
@@ -290,6 +291,9 @@ export function Checkout({
           {productCopy.productName}
         </h2>
         <p>{productCopy.lead}</p>
+        {process.env.NEXT_PUBLIC_DJ_JOINING_AT_V1 === "1" && product.slug === "all-in-one" && (
+          <p>{ALL_IN_ONE_DJ_AT_V1[lang]}</p>
+        )}
         {options.length > 1 ? (
           <fieldset className="space-y-2">
             <legend className="mb-2 text-sm font-medium">{copy.currencyLegend}</legend>
