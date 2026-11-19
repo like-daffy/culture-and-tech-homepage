@@ -161,7 +161,7 @@ export function checkSite(dir) {
         } else if (key !== "content") problems.push(`${p.file}: <${name} ${key}="${value}"> is relative to the page`);
       }
     }
-    if (/name="naver-site-verification"|name="keywords"/.test(html)) problems.push(`${p.file}: carries cultureand.tech's own head tags`);
+    if (/name="(?:naver-site-verification|keywords|msvalidate\.01)"/.test(html)) problems.push(`${p.file}: carries cultureand.tech's own head tags`);
     if (p === NOT_FOUND) continue;
 
     const url = `${ORIGIN}${p.path}`;

@@ -117,7 +117,7 @@ Next, the owner:
 | Service | Property | Verification | Then |
 | --- | --- | --- | --- |
 | Google Search Console | Domain `cultureand.tech` | TXT record at Porkbun (Host blank) | Submit `sitemap.xml`; inspect `/` and `/ko/` and request indexing |
-| Bing Webmaster Tools | Imported from Search Console | Import | Check the sitemap is listed |
+| Bing Webmaster Tools | `https://cultureand.tech` | Search Console import and HTML tag `<meta name="msvalidate.01" content="152EF7216E93659A2C0AA2CB6F356B92" />` in `src/pages/_document.tsx` | Check the sitemap is listed |
 | Naver Search Advisor | `https://cultureand.tech` | HTML tag (`naver-site-verification` in `src/pages/_document.tsx`, on every page; live since 2026-10-23) | Submit `sitemap.xml`; request collection of `/ko/` and the four app pages |
 
 ## Old address music.cafe24.com

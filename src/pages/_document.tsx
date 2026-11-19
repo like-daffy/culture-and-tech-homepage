@@ -26,10 +26,11 @@ export default function Document({ __NEXT_DATA__ }: DocumentProps) {
     <Html lang={pageLanguageFromPath(__NEXT_DATA__.page)}>
       <Head>
         {checkout && <script dangerouslySetInnerHTML={{ __html: TAKE_HANDOFF }} />}
-        {/* Neither of these two is on clean-space.app (__CLEAN_SPACE_APP_SITE__): they are cultureand.tech's own */}
+        {/* These tags belong to cultureand.tech and are excluded from the standalone Clean Space site. */}
         {__CLEAN_SPACE_APP_SITE__ ? null : <meta name="keywords" content="지하아이돌, 지하돌, 오리곡, 오리지널곡, 라이브아이돌" />}
         {/* Naver Search Advisor's ownership check for https://cultureand.tech (docs/seo.md, Registration); keep it */}
         {__CLEAN_SPACE_APP_SITE__ ? null : <meta name="naver-site-verification" content="1cb906c075f395477e7f5193106f23d39cda8fd6" />}
+        {__CLEAN_SPACE_APP_SITE__ ? null : <meta name="msvalidate.01" content="152EF7216E93659A2C0AA2CB6F356B92" />}
         {/* canonical, hreflang and robots are set per page: components/SEO.tsx, pages/404.tsx */}
         {!sensitive && (
           <link

@@ -120,6 +120,15 @@ describe("the staged site's check", () => {
     const problems = checkSite(site({ "culture/clean-space/direct-terms.html": "x", "robots.txt": "Sitemap: https://cultureand.tech/sitemap.xml\n" }));
     expect(problems).toEqual(["robots.txt is not the site's", "culture/clean-space/direct-terms.html is staged but nothing on the site loads it"]);
   });
+
+  it("refuses Bing verification metadata on either language page or the 404 page", () => {
+    const bing = '<meta name="msvalidate.01" content="fixture"/>';
+    for (const [file, html] of [["index.html", page("en")], ["ko/index.html", page("ko")], ["404.html", notFound]]) {
+      expect(checkSite(site({ [file]: html.replace("</head>", `${bing}</head>`) }))).toEqual([
+        `${file}: carries cultureand.tech's own head tags`,
+      ]);
+    }
+  });
 });
 
 describe("staging", () => {
