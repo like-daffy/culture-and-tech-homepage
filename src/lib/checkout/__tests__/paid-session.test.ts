@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { paidOrder, rememberPaid } from "../session";
+import { isPostLaunchReview } from "../review";
 import type { OpenProduct } from "../products";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -63,5 +64,32 @@ describe("paid checkout cache", () => {
     expect(render()).not.toContain('data-pass-term="test"');
     rememberPaid(product, { orderId: "order-three", pass });
     expect(render()).toBe("");
+  });
+});
+
+describe("post-launch review outcome", () => {
+  it("needs a TEST review confirmation and an explicit launch marker or a non-positive grant term", () => {
+    const result = { review: true, environment: "test", pass } as const;
+    expect(isPostLaunchReview(result)).toBe(false);
+    expect(isPostLaunchReview({ ...result, pass: null, postLaunchReview: true })).toBe(true);
+    for (const end of [pass.start, "2025-12-31T23:59:00Z"]) {
+      expect(isPostLaunchReview({ ...result, pass: { ...pass, end } })).toBe(true);
+    }
+    expect(isPostLaunchReview({ ...result, pass: { ...pass, end: "bad" } })).toBe(false);
+    expect(isPostLaunchReview({ ...result, environment: "live", postLaunchReview: true })).toBe(false);
+    expect(isPostLaunchReview({ ...result, review: undefined, postLaunchReview: true })).toBe(false);
+  });
+  it("retains the verified marker for the same TEST review order on reload", () => {
+    const currentIsPostLaunch = () => {
+      const cached = paidOrder(chord);
+      return cached !== null && isPostLaunchReview(cached);
+    };
+    rememberPaid(chord, { orderId: "order-one", pass: null, review: true, environment: "test", postLaunchReview: true });
+    expect(currentIsPostLaunch()).toBe(true);
+    expect(paidOrder(other)).toBeNull();
+    entries.set("checkout.chord.paid", "order-other");
+    expect(currentIsPostLaunch()).toBe(false);
+    rememberPaid(chord, { orderId: "order-two", pass: null, review: true, environment: "live", postLaunchReview: true });
+    expect(currentIsPostLaunch()).toBe(false);
   });
 });

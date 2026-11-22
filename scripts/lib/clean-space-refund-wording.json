@@ -1,0 +1,52 @@
+{
+  "en": {
+    "provisions": [
+      "Within seven days from the applicable payment or supply date, you may withdraw and receive a full refund of the amount actually paid, for any reason and even if you have already used the pass. We include the last day of the applicable period. If law or your contract gives you a longer withdrawal period or a larger refund, that right applies.",
+      "After that period, you may cancel at any time during the original 364-day term, for any reason and with no termination or cancellation fee. We multiply the amount actually paid for the order by the remaining part of the original term, divided by the whole original term. We count to the second and round up to the next whole won or US cent. We use the currency paid and the amount paid for that order. Total refunds cannot exceed that payment.",
+      "We count the time left from when Culture & Tech first receives your cancellation request, or from the applicable withdrawal or account-deletion event that ends the pass. If only the Korean calendar date can be established, we calculate from 00:00:00 Korea time on that date, or from the start of the original term if it began later. Later processing or expiry does not reduce a refund owed for an earlier cancellation.",
+      "Email {contact} with the order number and enough information to verify the purchase. You can write from an address where you can receive our reply even if you can no longer sign in. We first check the payment method used and process the cancellation within three business days of receiving it or, where an account action ends the pass, within three business days of the applicable event. The payment provider's posting time may differ. If the original route is unavailable, you can contact us about the status of your refund. A payment provider's cancellation window does not end your refund right.",
+      "After the original term there is no unused time to refund for a new change-of-mind cancellation. This does not affect a refund already owed or any stronger right for defects, non-supply, a service supplied differently from its description or contract, or service closure."
+    ],
+    "common": "During the original 364-day term, a member may cancel the affected order at any time after the applicable withdrawal period. The Operator refunds the unused portion in the original currency, without a fee, using the calculation and effective time in the Refund Policy. For an ordinary request the effective time is first receipt. Where a withdrawal or deletion ends the active grant, the effective time is the applicable account event and the Operator starts settlement without another refund request. The Operator processes the cancellation within three business days from the applicable effective time, subject to any stronger rights of the member. Processing an ordinary cancellation stops only the affected order's grant. A separate valid grant continues under its own terms.",
+    "product": "These refund terms apply to Clean Space Expert bought on the website. If a Clean Space withdrawal or shared-account deletion ends that active Expert order, we begin its refund without another request. When the cancellation is processed, only the affected order's grant stops. The app may keep working offline until its next access check or the end of its existing offline allowance, up to seven days from the last successful check and never beyond the original term. Files, settings and History on your Mac remain. Mac App Store purchases follow Apple's refund process.",
+    "notice": "Refund policy update. From {effective}, if you cancel during the original 364-day term after the applicable seven-day period, you may receive an unused-period refund without a fee.",
+    "link": "View the changes and effective date",
+    "comparison": [
+      [
+        "Change of mind after seven days",
+        "Chord, Clean Space website and All-in-one published wording limits ordinary change-of-mind refunds to seven days. DJ already refunds the unused part.",
+        "During the original term, we refund the unused part of the actual amount paid, in the currency paid, with no fee."
+      ],
+      [
+        "When we calculate",
+        "We count the time left from when Culture & Tech first receives your cancellation request, or from the applicable withdrawal or account-deletion event that ends the pass. If only the Korean calendar date can be established, we calculate from 00:00:00 Korea time on that date, or from the start of the original term if it began later. Later processing or expiry does not reduce a refund owed for an earlier cancellation.",
+        "컬처앤테크가 해지 요청을 처음 받은 때 또는 이용권을 종료시키는 탈퇴·계정 삭제의 해당 시점부터 남은 기간을 셉니다. 한국 시간 기준 날짜만 확인할 수 있으면 그날 00:00:00을 기준으로 계산하되, 원래 이용 기간이 그보다 늦게 시작했다면 그 시작 시점부터 계산합니다. 처리 시점이 늦어지거나 그 사이 기간이 만료되어도 이미 발생한 환불액은 줄지 않습니다."
+      ]
+    ]
+  },
+  "ko": {
+    "provisions": [
+      "결제일 또는 공급일 중 적용되는 날부터 7일 이내에는 이유나 이용 여부와 관계없이 청약을 철회하고 실제 결제액을 전액 환불받을 수 있습니다. 적용되는 기간의 마지막 날도 포함합니다. 법령이나 계약이 더 긴 청약철회 기간 또는 더 많은 환불을 보장하는 경우에는 그에 따릅니다.",
+      "그 기간이 지난 뒤에도 원래의 364일 이용 기간 중에는 이유와 관계없이 언제든지 해지할 수 있으며 해지 수수료는 없습니다. 해당 주문의 실제 결제액에 원래의 전체 이용 기간 중 남은 기간의 비율을 곱합니다. 초 단위로 계산한 뒤 1원 또는 미화 1센트 단위로 올립니다. 해당 주문의 결제 통화와 실제 결제액으로 계산하며, 환불 합계는 그 결제액을 넘지 않습니다.",
+      "컬처앤테크가 해지 요청을 처음 받은 때 또는 이용권을 종료시키는 탈퇴·계정 삭제의 해당 시점부터 남은 기간을 셉니다. 한국 시간 기준 날짜만 확인할 수 있으면 그날 00:00:00을 기준으로 계산하되, 원래 이용 기간이 그보다 늦게 시작했다면 그 시작 시점부터 계산합니다. 처리 시점이 늦어지거나 그 사이 기간이 만료되어도 이미 발생한 환불액은 줄지 않습니다.",
+      "주문번호와 구매를 확인할 수 있는 정보를 {contact}로 보내 주세요. 로그인할 수 없어도 답장을 받을 수 있는 주소에서 요청할 수 있습니다. 먼저 결제에 사용한 수단을 확인하고, 해지 요청을 받은 때부터 또는 계정 조치로 이용권이 종료되는 해당 시점부터 3영업일 이내에 결제 취소를 처리합니다. 결제수단에 실제로 반영되는 시점은 다를 수 있습니다. 원래 결제수단으로 처리할 수 없는 경우에는 환불 진행 상황을 문의할 수 있습니다. 결제업체의 취소 가능 기간이 지나도 이용자의 환불 권리는 없어지지 않습니다.",
+      "원래 이용 기간이 끝난 뒤 새로 단순 변심으로 해지하는 경우에는 환불할 남은 기간이 없습니다. 이미 발생한 환불 권리와 서비스 결함, 미제공, 표시·광고 또는 계약 내용과 다른 제공, 서비스 종료에 관한 더 유리한 권리는 그대로입니다."
+    ],
+    "common": "회원은 적용되는 청약철회 기간이 지난 뒤에도 원래의 364일 이용 기간 중에는 언제든지 해당 주문을 해지할 수 있습니다. 운영자는 환불정책에 정한 계산 방법과 기준 시점에 따라 남은 기간에 해당하는 금액을 결제 통화로 수수료 없이 환불합니다. 일반 해지의 기준은 요청을 처음 받은 때입니다. 탈퇴 또는 계정 삭제로 유효한 이용 권한이 종료되면 해당 계정 조치 시점을 기준으로 하며, 운영자는 별도 환불 요청 없이 환불 절차를 진행합니다. 운영자는 해당 기준 시점부터 3영업일 이내에 결제 취소를 처리하며, 회원에게 더 유리한 권리가 있으면 그에 따릅니다. 일반 해지 처리 시 해당 주문의 이용 권한만 종료되며, 별도의 유효한 이용 권한은 그 약관에 따라 유지됩니다.",
+    "product": "이 환불 조건은 웹사이트에서 구매한 Clean Space Expert에 적용됩니다. Clean Space 탈퇴나 통합 계정 삭제로 유효한 Expert 주문이 종료되면 별도의 요청 없이 환불 절차를 진행합니다. 해지 처리 시 해당 주문의 이용 권한만 종료됩니다. 오프라인에서는 다음 이용 확인 또는 기존 오프라인 허용 기간의 종료까지 기능이 유지될 수 있습니다. 허용 기간은 마지막 이용 확인부터 최대 7일이며 원래 이용 기간을 넘지 않습니다. Mac에 있는 파일, 설정과 작업 기록은 유지됩니다. Mac App Store에서 구매한 경우에는 Apple의 환불 절차를 이용해 주세요.",
+    "notice": "환불정책 변경 안내. {effective}부터 적용되는 7일이 지난 뒤에도 원래의 364일 이용 기간 중 해지하면 남은 기간만큼 수수료 없이 환불받을 수 있습니다.",
+    "link": "변경 내용과 시행 일시 보기",
+    "comparison": [
+      [
+        "7일이 지난 뒤의 단순 변심",
+        "Chord, Clean Space 웹사이트판 및 올인원 약관은 일반적인 단순 변심 환불을 7일 이내로 제한합니다. DJ는 이미 남은 기간을 환불합니다.",
+        "원래 이용 기간 중 해지하면 실제 결제액 중 남은 기간에 해당하는 금액을 결제 통화로 수수료 없이 환불합니다."
+      ],
+      [
+        "계산 기준",
+        "DJ는 요청을 처음 받은 때를 사용합니다. 다른 적용 대상의 기존 정책에는 일반적인 남은 기간 계산이 없습니다.",
+        "요청을 처음 받은 때 또는 해당 계정 조치 시점부터 초 단위로 셉니다. 날짜만 확인되는 경우 한국 시간으로 그날 0시를 적용하되, 원래 이용 기간이 더 늦게 시작했다면 그 시작 시점을 적용합니다."
+      ]
+    ]
+  }
+}

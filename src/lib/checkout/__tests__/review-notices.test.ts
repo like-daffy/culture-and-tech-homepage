@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ReviewEmailNotice, ReviewReceiptNotice } from "@/components/checkout/ReviewPaymentNotices";
@@ -13,5 +13,22 @@ describe("review payment notices", () => {
     expect(email).toContain(emailText);
     expect(result).toContain(resultText);
     expect(email + result).not.toMatch(/@|\.pdf|<a\b/i);
+  });
+});
+
+describe("approved post-launch review receipt", () => {
+  afterEach(() => vi.unstubAllEnvs());
+  it.each([
+    ["en", "Review test payment only — nothing was charged, and no paid pass is granted."],
+    ["ko", "심사용 테스트 결제입니다 — 실제 금액은 청구되지 않으며 유료 이용권은 부여되지 않습니다."],
+  ] as const)("defaults the %s approved wording on only after launch", (lang, candidate) => {
+    const render = (postLaunch: boolean) => renderToStaticMarkup(createElement(ReviewReceiptNotice, { lang, postLaunch }));
+    const neutral = render(false);
+    vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", undefined);
+    expect(render(false)).toBe(neutral);
+    expect(render(true)).toBe(`<p>${candidate}</p>`);
+    vi.stubEnv("NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY", "0");
+    expect(render(false)).toBe(neutral);
+    expect(render(true)).toBe(neutral);
   });
 });

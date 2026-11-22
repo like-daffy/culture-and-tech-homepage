@@ -5,8 +5,10 @@
  */
 import type { Currency } from "./contract";
 import { isCountryCode } from "./countries";
+import { allowsPaymentOption } from "./review";
 
 export interface PaymentWidgetOptions {
+  review?: true;
   /** From the order. */
   customerKey: string;
   amount: number;
@@ -57,6 +59,7 @@ let previousWidget: Promise<void> = Promise.resolve();
  * widget fails to render, the other is removed again.
  */
 export function renderPaymentWidget(options: PaymentWidgetOptions): Promise<PaymentWidget> {
+  if (!allowsPaymentOption(options.review, options)) return Promise.reject(new Error("Invalid review payment option"));
   const waitFor = previousWidget;
   let gone!: () => void;
   previousWidget = new Promise<void>((resolve) => {
@@ -107,7 +110,7 @@ export function renderPaymentWidget(options: PaymentWidgetOptions): Promise<Paym
             orderName: request.orderName,
             successUrl: request.successUrl,
             failUrl: request.failUrl,
-            ...(request.customerEmail ? { customerEmail: request.customerEmail } : {}),
+            ...(options.review !== true && request.customerEmail ? { customerEmail: request.customerEmail } : {}),
             customerName: null,
             ...paypal,
           });

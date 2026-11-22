@@ -350,6 +350,24 @@ const ALL_IN_ONE_TEST_PAYMENTS = {
  * MIDI's Toss-reviewed text. Which services it covers, and what it gives in each, is shown on the portal (terms
  * article 2), not claimed here. A build carries it only when it opens that checkout (products.ts).
  */
+export const ALL_IN_ONE_DJ_AT_V1: Record<Lang, string> = {
+  en: "DJ Duplicate Guard Expert joins All-in-one at its V1 release. If your All-in-one pass is active then, Expert is included automatically through your pass’s original end date.",
+  ko: "DJ Duplicate Guard Expert는 V1 출시 시 All-in-one에 포함됩니다. 출시 시 All-in-one 이용권이 유효하면 원래 종료일까지 Expert를 자동으로 이용할 수 있습니다.",
+};
+
+export const ALL_IN_ONE_AFTER_DELETION: Record<Lang, { heading: string; noPass: string; refund: string }> = {
+  en: {
+    heading: "Payment confirmed during account deletion",
+    noPass: "No All-in-one pass was added because account deletion was already in progress.",
+    refund: "A full refund to the original payment method was queued for follow-up.",
+  },
+  ko: {
+    heading: "계정 삭제 진행 중 결제가 확인되었습니다",
+    noPass: "이미 계정 삭제가 진행 중이어서 All-in-one 이용권이 추가되지 않았습니다.",
+    refund: "원래 결제수단으로 전액 환불하기 위한 후속 처리가 접수되었습니다.",
+  },
+};
+
 export const ALL_IN_ONE_COPY: Record<Lang, ProductCopy> = {
   en: {
     pageTitle: "Checkout: All-in-one — 364 Days | Culture & Tech",

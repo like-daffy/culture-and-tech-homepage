@@ -21,6 +21,7 @@ const paidKey = (product: OpenProduct) => `${product.storageKey}.paid`;
 const passKey = (product: OpenProduct) => `${product.storageKey}.pass`;
 /** Environment is bound to the order: absent or invalid values must never imply a live payment. */
 const environmentKey = (product: OpenProduct) => `${product.storageKey}.environment`;
+const afterDeletionKey = (product: OpenProduct) => `${product.storageKey}.afterDeletion`;
 const reviewKey = (product: OpenProduct) => `${product.storageKey}.review`;
 
 /** What the tab holds: the session's credential, and the handoff code until the session was opened with it. */
@@ -104,6 +105,8 @@ export interface PaidOrder {
   /** From the confirm answer; a test payment's dates are not shown. */
   environment?: "test" | "live";
   review?: true;
+  postLaunchReview?: true;
+  afterDeletion?: true;
   receiptUrl?: string | null;
 }
 
@@ -115,15 +118,24 @@ export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
   forgetHold(product);
   try {
     window.sessionStorage.removeItem(environmentKey(product));
+    if (product.slug === "all-in-one") {
+      window.sessionStorage.removeItem(afterDeletionKey(product));
+      if (paid.afterDeletion === true) {
+        // Save the outcome before making this order available as a paid cached result.
+        window.sessionStorage.setItem(afterDeletionKey(product), JSON.stringify({
+          orderId: paid.orderId, afterDeletion: true, receiptUrl: paid.receiptUrl ?? null,
+        }));
+      }
+    }
     window.sessionStorage.removeItem(reviewKey(product));
     window.sessionStorage.setItem(paidKey(product), paid.orderId);
     if (paid.environment === "test" || paid.environment === "live") {
       window.sessionStorage.setItem(environmentKey(product), JSON.stringify({ orderId: paid.orderId, environment: paid.environment }));
     }
     if (paid.review === true && paid.environment === "test") {
-      window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null }));
+      window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null, ...(paid.postLaunchReview === true ? { postLaunchReview: true } : {}) }));
     }
-    if (paid.pass) {
+    if (paid.pass && !(product.slug === "all-in-one" && paid.afterDeletion === true)) {
       window.sessionStorage.setItem(passKey(product), JSON.stringify({ orderId: paid.orderId, ...paid.pass }));
     } else {
       window.sessionStorage.removeItem(passKey(product));
@@ -143,16 +155,31 @@ export function paidOrder(product: OpenProduct): PaidOrder | null {
   if (orderId === null) return null;
   const environment = paidEnvironment(product, orderId);
   const review = environment === "test" ? paidReview(product, orderId) : null;
-  return { orderId, pass: paidPass(product, orderId), environment, ...(review ? { review: true as const, receiptUrl: review.receiptUrl } : {}) };
+  const afterDeletion = product.slug === "all-in-one" ? paidAfterDeletion(product, orderId) : null;
+  return {
+    orderId, pass: afterDeletion ? null : paidPass(product, orderId), environment,
+    ...(review ? { review: true as const, ...review } : {}), ...afterDeletion,
+  };
 }
 
-function paidReview(product: OpenProduct, orderId: string): { receiptUrl: string | null } | null {
+function paidAfterDeletion(product: OpenProduct, orderId: string): Pick<PaidOrder, "afterDeletion" | "receiptUrl"> | null {
+  try {
+    const saved = JSON.parse(window.sessionStorage.getItem(afterDeletionKey(product)) ?? "null");
+    if (!saved || saved.orderId !== orderId || saved.afterDeletion !== true) return null;
+    return { afterDeletion: true, receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null };
+  } catch { return null; }
+}
+
+function paidReview(product: OpenProduct, orderId: string): { receiptUrl: string | null; postLaunchReview?: true } | null {
   try {
     const value: unknown = JSON.parse(window.sessionStorage.getItem(reviewKey(product)) ?? "null");
     if (typeof value !== "object" || value === null) return null;
     const saved = value as Record<string, unknown>;
     if (saved.orderId !== orderId || (saved.receiptUrl !== null && typeof saved.receiptUrl !== "string")) return null;
-    return { receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null };
+    return {
+      receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null,
+      ...(saved.postLaunchReview === true ? { postLaunchReview: true } : {}),
+    };
   } catch { return null; }
 }
 

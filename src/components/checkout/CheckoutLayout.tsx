@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { RefundAmendmentLink } from "@/components/RefundAmendmentLink";
 import { cn } from "@/lib/utils";
 import { BUSINESS } from "@/lib/checkout/config";
 import type { Lang } from "@/lib/checkout/contract";
@@ -82,6 +83,7 @@ export function CheckoutLayout({
           </div>
         </header>
         <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
+          {product.enabled && product.slug !== "dj-duplicate-guard" && <RefundAmendmentLink lang={lang} />}
           {children}
         </main>
         <footer className="border-t border-border bg-muted/30">

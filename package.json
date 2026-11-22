@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "postbuild": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/apply-clean-space-refund-wording.mjs",
     "start": "next start",
     "lint": "eslint src",
     "test": "vitest run"

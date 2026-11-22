@@ -23,8 +23,11 @@ import {
 } from "@/lib/checkout/products";
 import { forgetHold, newCheckoutKey, readHold, saveHold, takeHandoff, type CheckoutHold } from "@/lib/checkout/session";
 import { renderPaymentWidget, sdkErrorCode, type PaymentWidget } from "@/lib/checkout/toss";
-import { sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
+import { allowsPaymentOption, isTestOption, matchesOrderEnvironment, sameCheckoutIdentity, validCheckoutIdentity } from "@/lib/checkout/review";
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
+import { ALL_IN_ONE_DJ_AT_V1 } from "@/lib/checkout/product-copy";
+import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
+import { useRefundPhase } from "@/components/RefundAmendmentLink";
 import { ReviewEmailNotice } from "./ReviewPaymentNotices";
 
 /** `text` with each `{name}` replaced by a node (a link). */
@@ -257,11 +260,8 @@ export function Checkout({
 }) {
   const copy = CHECKOUT_COPY[lang];
   const productCopy = product.copy[lang];
-  const { options } = checkout;
-  const testOption = options.find((option) => option.test) ?? null;
-  // A product sold on Toss's test keys before its launch says so while a currency's client key is a test key.
-  const onTestKeys =
-    productCopy.testKeys !== undefined && options.some((option) => !option.test && /^test_/.test(option.clientKey));
+  const options = checkout.options.filter((option) => allowsPaymentOption(checkout.review, option));
+  const refundPhase = useRefundPhase();
   const [currency, setCurrency] = useState<Currency>(() => suggestedCurrency(lang, options));
   const option = options.find((candidate) => candidate.currency === currency) ?? options[0] ?? null;
   // The page states a pass's length in fixed words: a server that says otherwise stops the payment before it starts.
@@ -269,13 +269,17 @@ export function Checkout({
   const terms = <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>;
   const refund = <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>;
   if (!validCheckoutIdentity(checkout)) return <Notice tone="error">{copy.notConfigured}</Notice>;
+  if (checkout.review === true && !option) return <Notice tone="error">{copy.reviewOptionUnavailable}</Notice>;
+
+  const testNotice = option && isTestOption(option)
+    ? checkout.review === true ? copy.testPayment
+      : product.slug === "chord-to-midi" && option.currency === "KRW" ? productCopy.testKeys ?? copy.testPayment
+        : fill(productCopy.testMode, { price: formatPrice(option.price, option.currency, lang) })
+    : null;
 
   return (
     <>
-      {testOption && (
-        <Notice>{fill(productCopy.testMode, { price: formatPrice(testOption.price, testOption.currency, lang) })}</Notice>
-      )}
-      {!testOption && onTestKeys && <Notice>{productCopy.testKeys}</Notice>}
+      {testNotice && <Notice>{testNotice}</Notice>}
       {checkout.review !== true && <Notice>
         {fill(productCopy.account, { email: checkout.receiptEmail })}{" "}
         <a className="underline" href={productUrl(product, lang, product.startPage)}>
@@ -287,6 +291,9 @@ export function Checkout({
           {productCopy.productName}
         </h2>
         <p>{productCopy.lead}</p>
+        {process.env.NEXT_PUBLIC_DJ_JOINING_AT_V1 === "1" && product.slug === "all-in-one" && (
+          <p>{ALL_IN_ONE_DJ_AT_V1[lang]}</p>
+        )}
         {options.length > 1 ? (
           <fieldset className="space-y-2">
             <legend className="mb-2 text-sm font-medium">{copy.currencyLegend}</legend>
@@ -329,7 +336,7 @@ export function Checkout({
           </p>
         )}
         <ul className="list-disc space-y-1 pl-5 text-sm">
-          {productCopy.includes.map((line) => (
+          {checkoutRefundSummary(productCopy.includes, lang, refundPhase).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
@@ -365,7 +372,7 @@ function PriceText({ product, lang, option }: { product: OpenProduct; lang: Lang
   return (
     <span className="flex flex-col gap-0.5">
       <span className="text-lg font-semibold">{formatPrice(option.price, option.currency, lang)}</span>
-      {option.test && <span className="text-xs text-muted-foreground">{copy.testPrice}</span>}
+      {isTestOption(option) && <span className="text-xs text-muted-foreground">{copy.testPrice}</span>}
       <span className="text-sm">{copy.currencyNames[option.currency]}</span>
       <span className="text-xs text-muted-foreground">{product.copy[lang].currencyNotes[option.currency]}</span>
     </span>
@@ -376,6 +383,7 @@ type Step =
   | { kind: "agree" }
   | { kind: "preparing" }
   | { kind: "paying"; order: CreateOrderResponse }
+  | { kind: "offerChanged" }
   | { kind: "error"; message: string; ended: boolean };
 
 /** What to say when the order is refused for a reason of the product's backend (Toss's messages are shown as they come). */
@@ -447,11 +455,13 @@ function Payment({
   const [widget, setWidget] = useState<{ orderId: string; widget: PaymentWidget } | null>(null);
 
   useEffect(() => {
-    if (step.kind !== "paying") return;
+    if (step.kind !== "paying" || !allowsPaymentOption(review, option) ||
+        !matchesOrderEnvironment(step.order.environment, option.clientKey)) return;
     let cancelled = false;
     let rendered: PaymentWidget | null = null;
     renderPaymentWidget({
       customerKey: step.order.customerKey,
+      review,
       amount: step.order.amount,
       currency: step.order.currency,
       clientKey: option.clientKey,
@@ -480,11 +490,12 @@ function Payment({
       cancelled = true;
       void rendered?.destroy();
     };
-  }, [step, option, product]);
+  }, [step, option, product, review]);
 
   const ready = step.kind === "paying" && widget?.orderId === step.order.orderId ? widget.widget : null;
 
   const start = () => {
+    if (!allowsPaymentOption(review, option)) return;
     setStep({ kind: "preparing" });
     createCheckoutOrder(product, {
       ...credential,
@@ -496,6 +507,15 @@ function Payment({
       (order) => {
         if (!sameCheckoutIdentity({ review, receiptEmail }, order)) {
           setStep({ kind: "error", message: copy.notConfigured, ended: false });
+          return;
+        }
+        if (!matchesOrderEnvironment(order.environment, option.clientKey)) {
+          setStep({ kind: "offerChanged" });
+          return;
+        }
+        if (review === true && (order.currency !== "KRW" ||
+            (order.environment !== undefined && order.environment !== "test"))) {
+          setStep({ kind: "error", message: copy.reviewOptionUnavailable, ended: false });
           return;
         }
         // What Toss charges must be what this page showed: a price changed since stops here, before anything reaches Toss.
@@ -518,7 +538,8 @@ function Payment({
   };
 
   const pay = (order: CreateOrderResponse) => {
-    if (!ready || paying) return;
+    if (!ready || paying || !allowsPaymentOption(review, option) ||
+        !matchesOrderEnvironment(order.environment, option.clientKey)) return;
     setPaying(true);
     setWindowClosed(false);
     ready
@@ -541,10 +562,21 @@ function Payment({
       .finally(() => setPaying(false));
   };
 
+  if (step.kind === "offerChanged") {
+    return (
+      <>
+        <Notice tone="error">{copy.checkoutEnvironmentChanged}</Notice>
+        <Button type="button" variant="outline" onClick={() => window.location.reload()}>{copy.reloadCheckout}</Button>
+      </>
+    );
+  }
+
   const shownEmail = step.kind === "paying" ? step.order.receiptEmail : receiptEmail;
   // The product's own label where its account email isn't a recovery address (Clean Space's contact email).
   const receiptLabel = productCopy.receiptEmail ?? copy.receiptEmail;
   const receipt = review === true ? <ReviewEmailNotice lang={lang} /> : <p className="text-sm text-muted-foreground">{fill(receiptLabel, { email: shownEmail ?? "" })}</p>;
+
+  if (!allowsPaymentOption(review, option)) return <Notice tone="error">{copy.reviewOptionUnavailable}</Notice>;
 
   if (step.kind === "agree" || step.kind === "preparing") {
     return (

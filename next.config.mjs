@@ -62,6 +62,9 @@ const nextConfig = {
   // leaves its offer out of the bundle (src/lib/checkout/products.ts, src/lib/apps.ts; README, "DJ Duplicate Guard" and
   // "Clean Space").
   env: {
+    NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY: process.env.NEXT_PUBLIC_CHECKOUT_POST_LAUNCH_REVIEW_COPY ?? "1",
+    // Copy only, off through Toss review. Does not open checkouts or change entitlement.
+    NEXT_PUBLIC_DJ_JOINING_AT_V1: process.env.NEXT_PUBLIC_DJ_JOINING_AT_V1 ?? "",
     NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT: process.env.NEXT_PUBLIC_DJ_DUPLICATE_GUARD_CHECKOUT ?? "",
     NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT: process.env.NEXT_PUBLIC_CLEAN_SPACE_CHECKOUT ?? "",
     NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT: process.env.NEXT_PUBLIC_ALL_IN_ONE_CHECKOUT ?? "",
