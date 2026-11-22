@@ -13,8 +13,12 @@ for (const [file, kind] of [["direct-terms.html", "terms"], ["direct-refunds.htm
     assert.equal(exportRefundPolicyVersions(source, kind, refundWindow(undefined, E)), source);
     assert.equal(exportRefundPolicyVersions(source, kind, refundWindow(P, "2026-12-12T11:59:59+09:00")), source);
   });
+  test(file + " keeps the published version and its archive link even with a stale notice window", () => {
+    assert.equal(exportRefundPolicyVersions(source, kind, refundWindow(P, E)), source);
+  });
   test(file + " has two dated versions in each locale and preserves existing protections", () => {
-    const updated = exportRefundPolicyVersions(source, kind, refundWindow(P, E));
+    const archived = readFileSync(new URL("../public/culture/clean-space/" + file.replace(".html", "-2026-11-10.html"), import.meta.url), "utf8");
+    const updated = exportRefundPolicyVersions(archived, kind, refundWindow(P, E));
     assert.equal([...updated.matchAll(/<details open>/g)].length, 2);
     assert.equal([...updated.matchAll(/id="(en|ko)-amendment"/g)].length, 2);
     assert.match(updated, /23:00 KST/);
@@ -27,7 +31,7 @@ for (const [file, kind] of [["direct-terms.html", "terms"], ["direct-refunds.htm
     assert.match(updated, /"https:\/\/portal.cultureand.tech\/refund-policy-update"/);
     assert.doesNotMatch(updated, /<script|\{contact\}|REFUND_CONTACT/);
     for (const locale of ["en", "ko"]) {
-      const old = new RegExp('<article id="' + locale + '" lang="' + locale + '">([\\s\\S]*?)</article>').exec(source)[1];
+      const old = new RegExp('<article id="' + locale + '" lang="' + locale + '">([\\s\\S]*?)</article>').exec(archived)[1];
       assert.ok(updated.includes(old), "the archived version remains byte-identical");
     }
   });

@@ -23,11 +23,14 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 site="https://cultureand.tech/culture/clean-space"
 appstore_pages=(privacy.html)
 direct_pages=(direct-terms.html direct-refunds.html direct-privacy.html)
+archive_version=2026-11-10
+archive_pages=()
+for name in "${direct_pages[@]}"; do archive_pages+=("${name%.html}-$archive_version.html"); done
 
 fail() { echo "sync-mac-get-space-legal: $*" >&2; exit 1; }
 
 validate() {
-  local dir="$1" f name body links found=0
+  local dir="$1" f name body links current canonical found=0 archives=0
   for f in "${appstore_pages[@]}" styles.css; do
     if [ ! -f "$dir/$f" ]; then fail "missing $dir/$f"; fi
   done
@@ -37,21 +40,33 @@ validate() {
   if [ "$found" -ne 0 ] && [ "$found" -ne "${#direct_pages[@]}" ]; then
     fail "$dir has $found of the ${#direct_pages[@]} direct-sale pages (${direct_pages[*]}): publish all three or none"
   fi
+  for name in "${archive_pages[@]}"; do
+    if [ -f "$dir/$name" ]; then archives=$((archives + 1)); fi
+  done
+  if [ "$archives" -ne 0 ] && { [ "$archives" -ne "${#archive_pages[@]}" ] || [ "$found" -ne "${#direct_pages[@]}" ]; }; then
+    fail "$dir must hold all three archived and all three current policies when publishing archives"
+  fi
   for f in "$dir"/*.html; do
     name="$(basename "$f")"
-    case " ${appstore_pages[*]} ${direct_pages[*]} " in *" $name "*) ;; *) fail "unexpected page $f (add it to this script on purpose)";; esac
+    case " ${appstore_pages[*]} ${direct_pages[*]} ${archive_pages[*]} " in *" $name "*) ;; *) fail "unexpected page $f (add it to this script on purpose)";; esac
     body="$(cat "$f")"
     if grep -q 'class="draft"' <<<"$body"; then fail "draft banner in $f"; fi
     if grep -qE '\[[A-Z][A-Z_]{2,}\]' <<<"$body"; then fail "placeholder left in $f"; fi
     if grep -qi '<script' <<<"$body"; then fail "script tag in $f"; fi
     if ! grep -q '<meta name="robots" content="index,follow">' <<<"$body"; then fail "robots is not index,follow in $f"; fi
-    if ! grep -qF "<link rel=\"canonical\" href=\"$site/$name\">" <<<"$body"; then fail "canonical in $f is not $site/$name"; fi
+    canonical="${name%-$archive_version.html}"
+    if [ "$canonical" != "$name" ]; then
+      canonical="$canonical.html"
+      current="$dir/$canonical"
+      if ! grep -qF "href=\"$name\"" "$current"; then fail "$current does not link to $name"; fi
+    fi
+    if ! grep -qF "<link rel=\"canonical\" href=\"$site/$canonical\">" <<<"$body"; then fail "canonical in $f is not $site/$canonical"; fi
     links="$(grep -o '<link[^>]*>' <<<"$body" | grep -vE '^<link rel="stylesheet" href="styles\.css">$|^<link rel="canonical" href="https://cultureand\.tech/[^"]*">$' || true)"
     if [ -n "$links" ]; then fail "unexpected <link> in $f: $links"; fi
     # Links are https pages, mailto: or the pages beside it: never http:, javascript: or data: (the direct-sale privacy
     # policy links official bodies such as KISA, as Chord to MIDI's does).
     links="$(grep -oE 'href="[^"]*"' <<<"$body" | grep -vE '^href="(https://|mailto:|#|styles\.css")' \
-      | grep -vE "^href=\"($(IFS='|'; echo "${appstore_pages[*]} ${direct_pages[*]}" | sed 's/ /|/g; s/\./\\./g'))\"$" || true)"
+      | grep -vE "^href=\"($(IFS='|'; echo "${appstore_pages[*]} ${direct_pages[*]} ${archive_pages[*]}" | sed 's/ /|/g; s/\./\\./g'))\"$" || true)"
     if [ -n "$links" ]; then fail "unexpected link in $f: $links"; fi
   done
   if grep -qiE '@import|url\(' "$dir/styles.css"; then fail "styles.css loads another resource"; fi
@@ -72,6 +87,9 @@ app="${1:-$(dirname "$(dirname "$common")")/mac-get-space}"
 if [ "$set_name" = direct ]; then
   src="$app/build/legal-upload/clean-space-direct"
   pages=("${direct_pages[@]}")
+  for f in "${archive_pages[@]}"; do
+    if [ -f "$src/$f" ]; then pages+=("$f"); fi
+  done
   sources=(docs/13-direct-sale scripts/build-direct-sale-pages.py scripts/lib/legal-page.css)
   maker="scripts/build-direct-sale-pages.py --release"
 else

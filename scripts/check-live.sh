@@ -22,6 +22,19 @@ fi
 for p in index terms privacy privacy-consent; do expect 200 "https://$host/culture/thai-learn/$p.html"; done
 expect 200 "https://$host/culture/thai-learn/styles.css"
 expect 200 "https://$host/culture/clean-space/privacy.html"
+# The current direct-sale documents keep their canonical URLs. Each links its exact prior-version file.
+for policy in terms refunds privacy; do
+  direct="https://$host/culture/clean-space/direct-$policy"
+  archive="direct-$policy-2026-11-10.html"
+  expect 200 "$direct.html"
+  expect 200 "https://$host/culture/clean-space/$archive"
+  body=$(curl -s -m 20 "$direct.html")
+  if grep -qF "href=\"$archive\"" <<<"$body"; then
+    echo "ok   $direct.html links to $archive"
+  else
+    echo "FAIL $direct.html has no link to $archive"; fail=1
+  fi
+done
 expect 200 "https://$host/culture/clean-space/styles.css"
 for p in privacy support; do expect 200 "https://$host/culture/english-thai-learn/$p.html"; done
 expect 200 "https://$host/culture/english-thai-learn/styles.css"

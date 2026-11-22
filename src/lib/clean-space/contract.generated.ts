@@ -1,7 +1,7 @@
 // GENERATED FILE: a pinned copy of the Clean Space licensing contract. Do not edit.
 // Source: mac-get-space services/licensing/contract/src/index.ts (node scripts/export.mjs <this file>).
 // contract-version: 1
-// sha256: 3febe84b59da3beac2176927b4176f69ddecc713e7eaa4a0be45f7d31b5fe9c1
+// sha256: 7f134dcb618e90c25ff6f844bf0547ed0ec637ffc13c9c5e58780ef5e550ff6e
 // Clean Space licensing contract, version 1 (docs/plans/364-days-option.md §5.2, §7, §8).
 //
 // The one description of what the Clean Space licensing service, the cultureand.tech pages and the website build of the
@@ -52,8 +52,12 @@ export type ProductId = typeof PRODUCT_ID;
 export const OFFER_VERSION = 'clean_space_unlock_364d_v1' as const;
 /** The display name of the paid option, in every language until the owner reviews a translation. */
 export const PRODUCT_DISPLAY_NAME = '364 days Unlock' as const;
-/** The order name sent to Toss Payments (what the buyer's receipt shows). */
-export const ORDER_NAME = 'Clean Space 364 days Unlock' as const;
+/**
+ * The order name sent to Toss Payments (what its payment page and the buyer's receipt show). Not the option's name:
+ * that stays PRODUCT_DISPLAY_NAME. At most 25 characters: Toss's payment page cuts a longer name (2026-11-11, the
+ * earlier "Clean Space 364 days Unlock" appeared as "Clean Space 364 days Unlo").
+ */
+export const ORDER_NAME = 'Clean Space 364 days' as const;
 
 export const DURATION_DAYS = 364 as const;
 /** 364 × 86,400 seconds. A term is exactly this long: never a calendar year or twelve months. */
@@ -267,6 +271,50 @@ export const ERROR_CODE = {
   tooManyRequests: 'TOO_MANY_REQUESTS',
   notFound: 'NOT_FOUND',
   internal: 'INTERNAL',
+  /**
+   * Portal mode (docs/15): the portal's token failed verification (the portal's `portal_token_invalid`); the portal
+   * session or this product session no longer counts (`portal_session_ended`, also for an account being deleted); the
+   * portal's central service could not be reached (503: the app keeps a held lease, as for any 5xx); a sign-in method
+   * of the service's own that portal mode replaces (sign-in, linking and the contact email live on the portal).
+   */
+  portalTokenInvalid: 'PORTAL_TOKEN_INVALID',
+  portalSessionEnded: 'PORTAL_SESSION_ENDED',
+  portalUnavailable: 'PORTAL_UNAVAILABLE',
+  usePortal: 'USE_PORTAL',
+  /**
+   * exchangePortalSession with mode 'existing' for a subject with no connected Clean Space account (never connected, or
+   * withdrawn): nothing is created. The portal's own code, spelled exactly as the portal contract has it (rev 4.8 §5.1b).
+   */
+  productNotConnected: 'product_not_connected',
+  /**
+   * Terms Article 16(2)-(3): the order changed since the operator looked at it (`expectedVersion`), or while it was being
+   * moved, or the transferId was used for another transfer: look again (portal contract 4.19).
+   */
+  transferConflict: 'TRANSFER_CONFLICT',
+  /** The order has no remaining term to move (ended, refunded or not paid). */
+  notTransferable: 'NOT_TRANSFERABLE',
+  /**
+   * The target portal account can't receive the term: choose another account. It is not active, not verified, has no
+   * connected Clean Space account, is a review account (which never receives a transfer), already holds this order, or
+   * holds its own Unlock that hasn't ended (portal contract 4.19).
+   */
+  targetUnavailable: 'TARGET_UNAVAILABLE',
+  /**
+   * A review account (the portal's temporary accounts for the payment provider's review, IDENTITY.md §18) may order
+   * and pay on Toss's test keys only: refused whenever the keys in force are not test keys, so it never makes a real
+   * charge. The portal's own code, spelled exactly as the portal contract has it (rev 4.16 §18.4).
+   */
+  reviewTestOnly: 'review_test_only',
+  /**
+   * The operator callables (portal contract 4.18 §19): the portal account behind `portalIdToken` doesn't hold the
+   * operator role at central, or its session isn't current. Central's code, spelled as the portal contract has it.
+   */
+  notOperator: 'not_operator',
+  /** An operator change with a portal sign-in older than 300 seconds (portal contract 4.18 §19.1; central's spelling). */
+  operatorRecentSignInRequired: 'recent_sign_in_required',
+  /** Only a paid order whose payment is recorded can be refunded (portal contract 4.18's REFUND_NOT_POSSIBLE). */
+  refundNotPossible: 'REFUND_NOT_POSSIBLE',
+  refundConflict: 'REFUND_CONFLICT',
 } as const;
 export type ErrorCode = (typeof ERROR_CODE)[keyof typeof ERROR_CODE];
 
@@ -291,12 +339,21 @@ export type LicenseStatus = (typeof LICENSE_STATUSES)[number];
 export interface LicenseSummary {
   productID: ProductId;
   status: LicenseStatus;
+  /** Order ID of the individual website purchase currently providing access. Omitted when there is no such order. */
+  orderID?: string | null;
   /** Present for active, expired and revoked. */
   startsAt: number | null;
   /** Exclusive end. */
   expiresAt: number | null;
   /** Increases with every change to the projection (grant, refund, revocation). 0 when there never was one. */
   revision: number;
+  /** The payment environment of the term shown (test = Toss test keys, before the live cutover); null without a term. */
+  environment?: 'test' | 'live' | null;
+  /**
+   * For a test term: when test access ends, the actual live cutover (LAUNCH_AT) once set; null while none is set (show
+   * "test access until the live launch", never an invented date). Null for live terms. expiresAt stays the term.
+   */
+  testCutoverAt?: number | null;
 }
 
 /**
@@ -594,6 +651,16 @@ export const NATIVE_CLAIM = { channel: 'cs', channelValue: 'native', nativeSessi
  * payment over (2026-11-09): they stay the service's own handlers, whose rules the checkout's callables share. A
  * refund is asked for by email (the account page opens a message with the order number): there is no refund callable.
  */
+/**
+ * The product adapter's callables of the shared account portal (docs/15; the portal contract's PRODUCT_CALLABLE, the
+ * ones Clean Space needs: the portal's pages exchange a portal session and withdraw). Central's events reach the HTTP
+ * function `portalEvents`.
+ */
+export const PORTAL_CALLABLE = {
+  exchangePortalSession: 'exchangePortalSession',
+  withdrawFromProduct: 'withdrawFromProduct',
+} as const;
+
 export const CALLABLE = {
   getOffer: 'getOffer',
   signInWithProvider: 'signInWithProvider',
@@ -619,12 +686,10 @@ export const CALLABLE = {
 } as const;
 export type CallableName = (typeof CALLABLE)[keyof typeof CALLABLE];
 
-/** Operator-only callables (custom claim `cleanSpaceOperator: true`, recent sign-in, audited; plan §7.3). */
-export const OPERATOR_CALLABLE = {
-  lookupOrder: 'operatorLookupOrder',
-  refundOrder: 'operatorRefundOrder',
-  reconcileOrder: 'operatorReconcileOrder',
-} as const;
+/**
+ * No operator callables (portal contract 4.20, call path c): the portal's admin page calls central, which relays an
+ * operator action to Clean Space's portalEvents route `/operator` over S2S. OPERATOR_CALLABLE was removed on 2026-11-16.
+ */
 
 export type GetOfferRequest = Record<string, never>;
 export type GetOfferResponse = Omit<OfferResponse, 'contractVersion'> & { contractVersion: ContractVersion };
@@ -824,8 +889,8 @@ export interface CreateOrderResponse {
   orderName: string;
   /** Random, opaque Toss customerKey of this account (never its email or uid). */
   customerKey: string;
-  /** The verified contact frozen on the order (the receipt address). */
-  receiptEmail: string;
+  /** The verified contact frozen on the order (the receipt address); null for a review account, which has none. */
+  receiptEmail: string | null;
   /** The order can be paid until then (seconds). */
   payableUntil: number;
   /** What the page renders: the currency's own client key and widget variant from the service, so test and live never mix. */
@@ -850,6 +915,10 @@ export interface ConfirmPaymentResponse {
   /** Toss's receipt page; null is a normal outcome (PayPal often has none). Never made up. */
   receiptURL: string | null;
   serverTime: number;
+  /** The payment environment (test = Toss test keys before the live cutover; never a live purchase). Rev 4.13. */
+  environment: 'test' | 'live';
+  /** A review account's purchase (ReviewPurchase). Absent otherwise. */
+  review?: true;
 }
 
 export interface FailOrderRequest {
@@ -1163,7 +1232,7 @@ export interface CheckoutOption {
   clientKey: string;
   variantKey: string;
   agreementVariantKey: string;
-  /** The PayPal TEST checkout: US dollars on Toss's test keys, PayPal Sandbox accounts. */
+  /** True for every option that uses Toss TEST, including won review checkout. */
   test: boolean;
 }
 
@@ -1174,12 +1243,25 @@ export interface OfferVersions {
   refundPolicyVersion?: string;
 }
 
+/**
+ * How the checkout's answers mark a review account's purchase (the portal's temporary accounts for the payment
+ * provider's review; portal contract rev 4.17, IDENTITY.md §18.4): `review: true`, and no receipt address
+ * (`receiptEmail: null`), because such an account has no contact email. The page then sends Toss no customer email, and
+ * nobody sends mail for the purchase. For every other account `review` is absent and `receiptEmail` is the address.
+ */
+export interface ReviewPurchase {
+  review: true;
+  receiptEmail: null;
+}
+
 export interface OpenCheckoutResponse extends OfferVersions {
   product: ProductId;
   lang: PageLang;
   orderName: string;
-  /** The account's verified contact: the receipt address of an order made now. */
-  receiptEmail: string;
+  /** The account's verified contact: the receipt address of an order made now. Null for a review account (ReviewPurchase). */
+  receiptEmail: string | null;
+  /** A review account's checkout (ReviewPurchase). Absent otherwise. */
+  review?: true;
   /** The currencies of the checkout's language on sale now, won first (Korean: won only). */
   options: CheckoutOption[];
   /** DURATION_DAYS: the page states the period in fixed words and takes no payment when this says otherwise. */
@@ -1200,14 +1282,18 @@ export interface CreateCheckoutOrderRequest extends CheckoutCredential, OfferVer
 }
 export interface CreateCheckoutOrderResponse {
   orderId: string;
+  /** The payment environment frozen on this order. */
+  environment: 'test' | 'live';
   /** In `currency`, Toss's units; always the server's price. */
   amount: number;
   currency: Currency;
   orderName: string;
   /** Random, opaque Toss customerKey of the account. */
   customerKey: string;
-  /** The verified contact frozen on the order: Toss sends the receipt there. */
-  receiptEmail: string;
+  /** The verified contact frozen on the order: Toss sends the receipt there. Null for a review account (ReviewPurchase). */
+  receiptEmail: string | null;
+  /** A review account's order (ReviewPurchase). Absent otherwise. */
+  review?: true;
 }
 
 /** The query parameters Toss appends to the successUrl (`amount` as a number). */
@@ -1232,6 +1318,12 @@ export interface ConfirmCheckoutPaymentResponse {
   receiptEmail: string | null;
   /** The term: its start and exclusive end, ISO 8601 instants. */
   pass?: { start: string; end: string };
+  /** The payment environment (test = Toss test keys before the live cutover; never a live purchase). Rev 4.13. */
+  environment: 'test' | 'live';
+  /** A review account's purchase (ReviewPurchase): `receiptEmail` is null, and the page shows Toss's receipt link. Absent otherwise. */
+  review?: true;
+  /** A review TEST payment approved after live sales opened, with no counted grant. */
+  postLaunchReview?: true;
 }
 
 export interface FailCheckoutOrderRequest extends CheckoutCredential {

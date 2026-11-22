@@ -1,5 +1,5 @@
-// Apply the dated amendment to the exported direct-sale documents. The public/ originals are the generated,
-// previously published documents from mac-get-space. Keeping them intact also keeps the unset build byte-identical.
+// Apply the dated amendment only to the previous direct-sale documents. Builds with published version history
+// use the canonical exports from mac-get-space as supplied.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -62,7 +62,8 @@ function amendedTerms(body, lang) {
 }
 
 export function exportRefundPolicyVersions(input, kind, window) {
-  if (!window) return input;
+  const archived = kind === "terms" ? "direct-terms-2026-11-10.html" : "direct-refunds-2026-11-10.html";
+  if (!window || input.includes('href="' + archived + '"')) return input;
   const contact = /href="mailto:([^"]+)"/.exec(input)?.[1];
   // The baseline is the canonical published export. No contact literal is maintained by this overlay.
   if (!contact || !/^[\w.+-]+@[\w.-]+$/.test(contact)) throw new Error("Missing published Clean Space support contact");
