@@ -79,7 +79,7 @@ function nodes(node: ReactNode): View[] {
 
 const product = {
   slug: "all-in-one", enabled: true, copy: ALL_IN_ONE_COPY, storageKey: "bundle-fixture",
-  origin: "https://portal.cultureand.tech", pages: { terms: "terms", refund: "refund" }, footerPages: [], startPage: "account",
+  origin: "https://portal.cultureand.tech", pages: { terms: "terms", refund: "refund" }, footerPages: ["terms", "refund"], startPage: "account",
   firebase: { apiKey: "public-fixture", projectId: "fixture", appId: "fixture" }, recaptchaSiteKey: "fixture",
 } as unknown as OpenProduct;
 const bundleVersions = {
@@ -312,7 +312,7 @@ for (const { target, versions } of datedOffers) {
         if (!checkout) throw new Error("Expected an opened checkout");
         const checkoutView = mount(checkout);
         return {
-          markup: () => renderToStaticMarkup(checkoutView()),
+          markup: () => renderToStaticMarkup(page()),
           agree: () => {
             const payment = nodes(checkoutView()).find((node) => typeof node.type === "function" && node.type.name === "Payment");
             if (!payment) throw new Error("Expected a payment component");
@@ -329,7 +329,7 @@ for (const { target, versions } of datedOffers) {
         const markup = page.markup();
         const expected = policyUrls(target, lang, date);
         const anchors = [...markup.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
-        for (const url of expected) expect(anchors.filter((href) => href === url)).toHaveLength(2);
+        for (const url of expected) expect(anchors.filter((href) => href === url)).toHaveLength(3);
         const other = date === "2026-11-10" ? "2026-11-23" : "2026-11-10";
         for (const url of policyUrls(target, lang, other)) expect(anchors).not.toContain(url);
         expect(markup).toContain(date === "2026-11-23" ? approvedLineStart[lang] : priorLine[lang]);

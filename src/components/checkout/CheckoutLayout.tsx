@@ -5,6 +5,7 @@ import { RefundAmendmentLink } from "@/components/RefundAmendmentLink";
 import { cn } from "@/lib/utils";
 import { BUSINESS } from "@/lib/checkout/config";
 import type { Lang } from "@/lib/checkout/contract";
+import type { CheckoutPolicies } from "@/lib/checkout/policy-links";
 import { CHECKOUT_COPY } from "@/lib/checkout/copy";
 import { productUrl, type CheckoutProduct, type ProductPage } from "@/lib/checkout/products";
 import { CLEAN_SPACE_PORTAL } from "@/lib/clean-space/site";
@@ -40,10 +41,12 @@ export function CheckoutLayout({
   product,
   lang,
   children,
+  footerPolicies,
 }: {
   product: CheckoutProduct;
   lang: Lang;
   children: ReactNode;
+  footerPolicies?: Pick<CheckoutPolicies, "terms" | "refund"> | null;
 }) {
   const copy = CHECKOUT_COPY[lang];
   const business = BUSINESS[lang];
@@ -110,11 +113,14 @@ export function CheckoutLayout({
             <p className="flex flex-wrap gap-x-4 gap-y-1 pt-2">
               {(product.enabled ? product.footerPages : []).map((page) => {
                 const label = FOOTER_LABELS[page];
-                return label ? (
+                const href = (page === "terms" || page === "refund") && footerPolicies !== undefined
+                  ? footerPolicies?.[page]
+                  : productUrl(product, lang, page);
+                return label && href ? (
                   <a
                     key={page}
                     className="underline"
-                    href={productUrl(product, lang, page)}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

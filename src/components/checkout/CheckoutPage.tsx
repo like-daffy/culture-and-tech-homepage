@@ -233,8 +233,9 @@ function OpenCheckout({ product, lang }: { product: OpenProduct; lang: Lang }) {
       break;
   }
 
+  const footerPolicies = state.kind === "open" ? checkoutPolicies(product, lang, state.checkout, "inactive") : undefined;
   return (
-    <CheckoutLayout product={product} lang={lang}>
+    <CheckoutLayout product={product} lang={lang} footerPolicies={footerPolicies}>
       <h1 className="text-2xl font-semibold">{productCopy.productName}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{productCopy.seller}</p>
       <div className="mt-6 space-y-6">{body}</div>
