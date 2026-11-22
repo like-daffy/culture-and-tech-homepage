@@ -28,6 +28,7 @@ for policy in terms refunds privacy; do
   archive="direct-$policy-2026-11-10.html"
   expect 200 "$direct.html"
   expect 200 "https://$host/culture/clean-space/$archive"
+  expect 200 "$direct-2026-11-23.html"
   body=$(curl -s -m 20 "$direct.html")
   if grep -qF "href=\"$archive\"" <<<"$body"; then
     echo "ok   $direct.html links to $archive"

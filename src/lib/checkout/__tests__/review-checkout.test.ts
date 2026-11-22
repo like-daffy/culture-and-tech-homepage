@@ -10,6 +10,13 @@ import type { OpenProduct } from "../products";
 const options = [{ currency: "KRW", price: 100, test: true, clientKey: "test_fixture", variantKey: "fixture", agreementVariantKey: "fixture" }] as OpenCheckoutResponse["options"];
 const base = { product: "fixture", lang: "en", orderName: "fixture", options, expiresAt: "2026-12-01" } as OpenCheckoutResponse;
 const credential = { checkoutId: "fixture", checkoutKey: "fixture" };
+const policyIds = {
+  "clean-space": { termsVersion: "2026-11-10-705b9411bb55", refundPolicyVersion: "2026-11-10-8b6b7b622d43" },
+  "all-in-one": {
+    termsVersion: "terms-6d509c3ba8a0533291667570b4a90238f2aae6a3f094c8c06dfd959520de80c9",
+    refundPolicyVersion: "refunds-e7d429a08df19cf49bede77684aeb82670757154d414905b7222332f5f76a1c3",
+  },
+};
 
 describe("explicit review checkout identity", () => {
   it("never infers review from missing email and rejects inconsistent order answers", () => {
@@ -19,14 +26,18 @@ describe("explicit review checkout identity", () => {
     expect(sameCheckoutIdentity({ review: true, receiptEmail: null }, { receiptEmail: "fixture@example.invalid" })).toBe(false);
     expect(sameCheckoutIdentity({ receiptEmail: "fixture@example.invalid" }, { review: true, receiptEmail: null })).toBe(false);
   });
-  it.each([CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY, DJ_DUPLICATE_GUARD_COPY, ALL_IN_ONE_COPY])("shows review wording and no account prompt for each product", (copy) => {
-    const product = { copy, origin: "https://example.invalid", pages: { en: {}, ko: {} }, startPage: "account" } as unknown as OpenProduct;
+  it.each([
+    ["chord-to-midi", CHORD_TO_MIDI_COPY], ["clean-space", CLEAN_SPACE_COPY],
+    ["dj-duplicate-guard", DJ_DUPLICATE_GUARD_COPY], ["all-in-one", ALL_IN_ONE_COPY],
+  ] as const)("shows review wording and no account prompt for %s", (slug, copy) => {
+    const product = { slug, enabled: true, copy, origin: "https://example.invalid",
+      pages: { terms: "terms.html", refund: "refunds.html" }, startPage: "account" } as unknown as OpenProduct;
     for (const lang of ["en", "ko"] as const) {
-      const markup = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, lang, review: true, receiptEmail: null }, credential }));
+      const markup = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, ...policyIds[slug], lang, review: true, receiptEmail: null }, credential }));
       expect(markup).toContain(lang === "en" ? "This is Test payment mode." : "테스트 결제 모드입니다.");
       expect(markup).not.toContain("fixture@example.invalid");
       expect(markup).not.toContain(copy[lang].notYou);
-      const normal = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, lang, receiptEmail: "fixture@example.invalid" }, credential }));
+      const normal = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, ...policyIds[slug], lang, receiptEmail: "fixture@example.invalid" }, credential }));
       expect(normal).toContain("fixture@example.invalid");
       expect(normal).not.toContain(lang === "en" ? "This is Test payment mode." : "테스트 결제 모드입니다.");
     }
@@ -41,8 +52,9 @@ describe("All-in-one checkout before DJ V1", () => {
     ["ko", "DJ Duplicate Guard Expert는 V1 출시 시 All-in-one에 포함됩니다. 출시 시 All-in-one 이용권이 유효하면 원래 종료일까지 Expert를 자동으로 이용할 수 있습니다."],
   ] as const)("shows the %s label only for opted-in All-in-one checkout", (lang, label) => {
     const render = (slug: string, copy: OpenProduct["copy"]) => {
-      const product = { slug, copy, origin: "https://example.invalid", pages: { en: {}, ko: {} }, startPage: "account" } as unknown as OpenProduct;
-      return renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, lang, review: true, receiptEmail: null }, credential }));
+      const product = { slug, enabled: true, copy, origin: "https://example.invalid",
+        pages: { terms: "terms.html", refund: "refunds.html" }, startPage: "account" } as unknown as OpenProduct;
+      return renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, ...policyIds[slug], lang, review: true, receiptEmail: null }, credential }));
     };
     vi.stubEnv("NEXT_PUBLIC_DJ_JOINING_AT_V1", undefined);
     const before = render("all-in-one", ALL_IN_ONE_COPY);

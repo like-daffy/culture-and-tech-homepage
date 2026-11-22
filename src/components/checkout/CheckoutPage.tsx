@@ -27,6 +27,7 @@ import { allowsPaymentOption, isTestOption, matchesOrderEnvironment, sameCheckou
 import { CheckoutLayout, LinkButton, Notice, Spinner } from "./CheckoutLayout";
 import { ALL_IN_ONE_DJ_AT_V1 } from "@/lib/checkout/product-copy";
 import { checkoutRefundSummary } from "@/lib/checkout/refund-summary";
+import { checkoutPolicies, type CheckoutPolicies } from "@/lib/checkout/policy-links";
 import { useRefundPhase } from "@/components/RefundAmendmentLink";
 import { ReviewEmailNotice } from "./ReviewPaymentNotices";
 
@@ -266,11 +267,14 @@ export function Checkout({
   const option = options.find((candidate) => candidate.currency === currency) ?? options[0] ?? null;
   // The page states a pass's length in fixed words: a server that says otherwise stops the payment before it starts.
   const termOutOfDate = product.passDays !== undefined && checkout.passDays !== product.passDays;
-  const terms = <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>;
-  const refund = <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>;
+  const versions = offerVersions(checkout);
+  const policies = checkoutPolicies(product, lang, versions, refundPhase);
+  if (!policies) return <Notice tone="error">{copy.termChanged}</Notice>;
   if (!validCheckoutIdentity(checkout)) return <Notice tone="error">{copy.notConfigured}</Notice>;
   if (checkout.review === true && !option) return <Notice tone="error">{copy.reviewOptionUnavailable}</Notice>;
 
+  const terms = <NewTabLink href={policies.terms}>{copy.termsLink}</NewTabLink>;
+  const refund = <NewTabLink href={policies.refund}>{copy.refundLink}</NewTabLink>;
   const testNotice = option && isTestOption(option)
     ? checkout.review === true ? copy.testPayment
       : product.slug === "chord-to-midi" && option.currency === "KRW" ? productCopy.testKeys ?? copy.testPayment
@@ -328,7 +332,7 @@ export function Checkout({
           <p className="text-sm text-muted-foreground">
             {richText(productCopy.periodTerms.text, {
               terms: (
-                <NewTabLink href={`${productUrl(product, lang, "terms")}#${productCopy.periodTerms.anchor}`}>
+                <NewTabLink href={`${policies.terms}#${productCopy.periodTerms.anchor}`}>
                   {productCopy.periodTerms.link}
                 </NewTabLink>
               ),
@@ -336,7 +340,7 @@ export function Checkout({
           </p>
         )}
         <ul className="list-disc space-y-1 pl-5 text-sm">
-          {checkoutRefundSummary(productCopy.includes, lang, refundPhase).map((line) => (
+          {checkoutRefundSummary(productCopy.includes, lang, policies.refundPhase).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
@@ -353,7 +357,8 @@ export function Checkout({
             lang={lang}
             option={option}
             credential={credential}
-            versions={offerVersions(checkout)}
+            versions={versions}
+            policies={policies}
             orderName={checkout.orderName}
             receiptEmail={checkout.receiptEmail}
             review={checkout.review}
@@ -383,7 +388,7 @@ type Step =
   | { kind: "agree" }
   | { kind: "preparing" }
   | { kind: "paying"; order: CreateOrderResponse }
-  | { kind: "offerChanged" }
+  | { kind: "offerChanged"; message: string }
   | { kind: "error"; message: string; ended: boolean };
 
 /** What to say when the order is refused for a reason of the product's backend (Toss's messages are shown as they come). */
@@ -404,8 +409,6 @@ function orderRefusal(product: OpenProduct, lang: Lang, info: CallableErrorInfo)
       return copy.unavailable;
     case APP_ERROR.salesClosed:
       return productCopy.salesClosed;
-    case APP_ERROR.offerChanged:
-      return copy.offerChanged;
     default:
       return info.message;
   }
@@ -426,6 +429,7 @@ function Payment({
   option,
   credential,
   versions,
+  policies,
   orderName,
   receiptEmail,
   review,
@@ -436,6 +440,7 @@ function Payment({
   credential: CheckoutCredential;
   /** What the server gave with the checkout, sent back with the order. */
   versions: OfferVersions;
+  policies: CheckoutPolicies;
   orderName: string;
   receiptEmail: string | null;
   review?: true;
@@ -510,7 +515,7 @@ function Payment({
           return;
         }
         if (!matchesOrderEnvironment(order.environment, option.clientKey)) {
-          setStep({ kind: "offerChanged" });
+          setStep({ kind: "offerChanged", message: copy.checkoutEnvironmentChanged });
           return;
         }
         if (review === true && (order.currency !== "KRW" ||
@@ -527,6 +532,10 @@ function Payment({
       },
       (error: unknown) => {
         const info = describeCallableError(error);
+        if (info.code === APP_ERROR.offerChanged) {
+          setStep({ kind: "offerChanged", message: copy.offerChanged });
+          return;
+        }
         if (info.code === APP_ERROR.checkoutExpired) forgetHold(product);
         setStep({
           kind: "error",
@@ -565,7 +574,7 @@ function Payment({
   if (step.kind === "offerChanged") {
     return (
       <>
-        <Notice tone="error">{copy.checkoutEnvironmentChanged}</Notice>
+        <Notice tone="error">{step.message}</Notice>
         <Button type="button" variant="outline" onClick={() => window.location.reload()}>{copy.reloadCheckout}</Button>
       </>
     );
@@ -593,8 +602,8 @@ function Payment({
             />
             <span>
               {richText(copy.agreeTerms, {
-                terms: <NewTabLink href={productUrl(product, lang, "terms")}>{copy.termsLink}</NewTabLink>,
-                refund: <NewTabLink href={productUrl(product, lang, "refund")}>{copy.refundLink}</NewTabLink>,
+                terms: <NewTabLink href={policies.terms}>{copy.termsLink}</NewTabLink>,
+                refund: <NewTabLink href={policies.refund}>{copy.refundLink}</NewTabLink>,
               })}
             </span>
           </label>
