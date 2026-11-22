@@ -31,7 +31,7 @@ describe("explicit review checkout identity", () => {
     ["dj-duplicate-guard", DJ_DUPLICATE_GUARD_COPY], ["all-in-one", ALL_IN_ONE_COPY],
   ] as const)("shows review wording and no account prompt for %s", (slug, copy) => {
     const product = { slug, enabled: true, copy, origin: "https://example.invalid",
-      pages: { terms: "terms.html", refund: "refunds.html" }, startPage: "account" } as unknown as OpenProduct;
+      pages: { terms: "terms.html", refund: "refunds.html", privacy: "privacy.html" }, startPage: "account" } as unknown as OpenProduct;
     for (const lang of ["en", "ko"] as const) {
       const markup = renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, ...policyIds[slug], lang, review: true, receiptEmail: null }, credential }));
       expect(markup).toContain(lang === "en" ? "This is Test payment mode." : "테스트 결제 모드입니다.");
@@ -53,7 +53,7 @@ describe("All-in-one checkout before DJ V1", () => {
   ] as const)("shows the %s label only for opted-in All-in-one checkout", (lang, label) => {
     const render = (slug: string, copy: OpenProduct["copy"]) => {
       const product = { slug, enabled: true, copy, origin: "https://example.invalid",
-        pages: { terms: "terms.html", refund: "refunds.html" }, startPage: "account" } as unknown as OpenProduct;
+        pages: { terms: "terms.html", refund: "refunds.html", privacy: "privacy.html" }, startPage: "account" } as unknown as OpenProduct;
       return renderToStaticMarkup(createElement(Checkout, { product, lang, checkout: { ...base, ...policyIds[slug], lang, review: true, receiptEmail: null }, credential }));
     };
     vi.stubEnv("NEXT_PUBLIC_DJ_JOINING_AT_V1", undefined);

@@ -73,14 +73,14 @@ export interface CheckoutOption {
 }
 
 /**
- * The versions of the offer and of the terms and refund policy that a product's server gives with the checkout and
- * takes back with its order: the page sends exactly what it was given, and the server takes only its current ones
- * (OFFER_CHANGED otherwise). Chord to MIDI's server gives them; a server that gives none gets none back.
+ * The offer and policy versions the server gives with the checkout. The page sends exactly what it was given.
+ * The server accepts only its current versions (OFFER_CHANGED otherwise).
  */
 export interface OfferVersions {
   productVersion?: string;
   termsVersion?: string;
   refundPolicyVersion?: string;
+  privacyPolicyVersion?: string;
 }
 
 export interface OpenCheckoutResponse extends OfferVersions {

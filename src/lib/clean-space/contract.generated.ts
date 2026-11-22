@@ -1,7 +1,7 @@
 // GENERATED FILE: a pinned copy of the Clean Space licensing contract. Do not edit.
 // Source: mac-get-space services/licensing/contract/src/index.ts (node scripts/export.mjs <this file>).
 // contract-version: 1
-// sha256: 7f134dcb618e90c25ff6f844bf0547ed0ec637ffc13c9c5e58780ef5e550ff6e
+// sha256: 6d52251bfde8ec9f7e98e378fb2fb09c10efc8382d2cf13a87f096e1e02f5541
 // Clean Space licensing contract, version 1 (docs/plans/364-days-option.md §5.2, §7, §8).
 //
 // The one description of what the Clean Space licensing service, the cultureand.tech pages and the website build of the
@@ -1241,6 +1241,8 @@ export interface OfferVersions {
   productVersion?: string;
   termsVersion?: string;
   refundPolicyVersion?: string;
+  /** The privacy disclosure shown by the checkout. Optional for older services and callers. */
+  privacyPolicyVersion?: string;
 }
 
 /**
@@ -1377,18 +1379,20 @@ export function parseOpenCheckout(value: unknown): Parsed<OpenCheckoutRequest> {
 }
 
 export function parseCreateCheckoutOrder(value: unknown): Parsed<CreateCheckoutOrderRequest> {
-  const keys = ['checkoutId', 'checkoutKey', 'termsAccepted', 'ageConfirmed', 'currency', 'productVersion', 'termsVersion', 'refundPolicyVersion'];
+  const keys = ['checkoutId', 'checkoutKey', 'termsAccepted', 'ageConfirmed', 'currency', 'productVersion', 'termsVersion', 'refundPolicyVersion', 'privacyPolicyVersion'];
   if (!isRecord(value) || !exactKeys(value, keys)) return invalid('Unexpected request.');
   const credential = parseCredential(value);
   if (credential.ok === false) return credential;
   if (value.termsAccepted !== true) return { ok: false, code: ERROR_CODE.termsNotAccepted, message: 'Agree to the terms and the refund policy first.' };
   if (value.ageConfirmed !== true) return { ok: false, code: ERROR_CODE.ageNotConfirmed, message: 'Confirm your age first.' };
   if (!isCurrency(value.currency)) return invalid('Unknown currency.');
-  if (!isOfferVersion(value.productVersion) || !isOfferVersion(value.termsVersion) || !isOfferVersion(value.refundPolicyVersion)) return invalid('Bad version.');
+  if (!isOfferVersion(value.productVersion) || !isOfferVersion(value.termsVersion) ||
+    !isOfferVersion(value.refundPolicyVersion) || !isOfferVersion(value.privacyPolicyVersion)) return invalid('Bad version.');
   const versions: OfferVersions = {};
   if (typeof value.productVersion === 'string') versions.productVersion = value.productVersion;
   if (typeof value.termsVersion === 'string') versions.termsVersion = value.termsVersion;
   if (typeof value.refundPolicyVersion === 'string') versions.refundPolicyVersion = value.refundPolicyVersion;
+  if (typeof value.privacyPolicyVersion === 'string') versions.privacyPolicyVersion = value.privacyPolicyVersion;
   return { ok: true, value: { ...credential.value, ...versions, termsAccepted: true, ageConfirmed: true, currency: value.currency } };
 }
 

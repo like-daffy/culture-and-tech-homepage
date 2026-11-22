@@ -416,11 +416,14 @@ function orderRefusal(product: OpenProduct, lang: Lang, info: CallableErrorInfo)
 }
 
 /** The versions the server gave with the checkout, to send back with the order: those it gave, and nothing else. */
-function offerVersions({ productVersion, termsVersion, refundPolicyVersion }: OpenCheckoutResponse): OfferVersions {
+function offerVersions({
+  productVersion, termsVersion, refundPolicyVersion, privacyPolicyVersion,
+}: OpenCheckoutResponse): OfferVersions {
   return {
     ...(productVersion !== undefined && { productVersion }),
     ...(termsVersion !== undefined && { termsVersion }),
     ...(refundPolicyVersion !== undefined && { refundPolicyVersion }),
+    ...(privacyPolicyVersion !== undefined && { privacyPolicyVersion }),
   };
 }
 

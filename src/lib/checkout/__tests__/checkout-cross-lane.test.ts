@@ -3,11 +3,12 @@ import { createElement, isValidElement, type ReactElement, type ReactNode } from
 import { renderToStaticMarkup } from "react-dom/server";
 import { Checkout, CheckoutPage } from "@/components/checkout/CheckoutPage";
 import { CheckoutSuccess } from "@/components/checkout/CheckoutResult";
+import { parseCreateCheckoutOrder } from "@/lib/clean-space/contract.generated";
 import { CHECKOUT_COPY } from "../copy";
 import { ALL_IN_ONE_AFTER_DELETION, ALL_IN_ONE_COPY, CHORD_TO_MIDI_COPY, CLEAN_SPACE_COPY } from "../product-copy";
 import { paidOrder, saveHold } from "../session";
 import type { ConfirmPaymentResponse, Lang, OfferVersions, OpenCheckoutResponse } from "../contract";
-import type { OpenProduct } from "../products";
+import { productUrl, type OpenProduct } from "../products";
 
 type Hooks = { cursor: number; slots: unknown[]; effects: Array<() => unknown> };
 const mocks = vi.hoisted(() => ({
@@ -79,7 +80,7 @@ function nodes(node: ReactNode): View[] {
 
 const product = {
   slug: "all-in-one", enabled: true, copy: ALL_IN_ONE_COPY, storageKey: "bundle-fixture",
-  origin: "https://portal.cultureand.tech", pages: { terms: "terms", refund: "refund" }, footerPages: ["terms", "refund"], startPage: "account",
+  origin: "https://portal.cultureand.tech", pages: { terms: "terms", refund: "refund", privacy: "privacy" }, footerPages: ["terms", "refund", "privacy"], startPage: "account",
   firebase: { apiKey: "public-fixture", projectId: "fixture", appId: "fixture" }, recaptchaSiteKey: "fixture",
 } as unknown as OpenProduct;
 const bundleVersions = {
@@ -93,13 +94,23 @@ const bundleVersions = {
   },
 };
 const cleanSpaceVersions = {
-  prior: { termsVersion: "2026-11-10-705b9411bb55", refundPolicyVersion: "2026-11-10-8b6b7b622d43" },
-  published: { termsVersion: "2026-11-23.7c994dc70ccb", refundPolicyVersion: "2026-11-23.5cb47964694c" },
+  prior: {
+    termsVersion: "2026-11-10-705b9411bb55", refundPolicyVersion: "2026-11-10-8b6b7b622d43",
+    privacyPolicyVersion: "2026-11-10-d34cf0a5e3a3",
+  },
+  published: {
+    termsVersion: "2026-11-23.7c994dc70ccb", refundPolicyVersion: "2026-11-23.5cb47964694c",
+    privacyPolicyVersion: "2026-11-23.e0e48c8570dc",
+  },
 };
 const cleanSpace: OpenProduct = {
   ...product, slug: "clean-space", copy: CLEAN_SPACE_COPY, storageKey: "clean-space-fixture",
   origin: "https://cultureand.tech",
-  pages: { terms: "/culture/clean-space/direct-terms.html", refund: "/culture/clean-space/direct-refunds.html" },
+  pages: {
+    terms: "/culture/clean-space/direct-terms.html",
+    refund: "/culture/clean-space/direct-refunds.html",
+    privacy: "/culture/clean-space/direct-privacy.html",
+  },
 };
 const credential = { checkoutId: "i".repeat(22), checkoutKey: "k".repeat(43) };
 const receiptUrl = "https://example.invalid/receipt";
@@ -119,6 +130,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
@@ -280,19 +292,42 @@ const priorLine = {
 function policyUrls(target: OpenProduct, lang: Lang, date: string) {
   if (target.slug === "clean-space") {
     const root = "https://cultureand.tech/culture/clean-space";
-    return [`${root}/direct-terms-${date}.html`, `${root}/direct-refunds-${date}.html`];
+    return ["terms", "refunds", "privacy"].map((name) => `${root}/direct-${name}-${date}.html`);
   }
   const root = "https://portal.cultureand.tech" + (lang === "ko" ? "/ko" : "");
-  return [`${root}/terms/${date}`, `${root}/refund/${date}`];
+  return ["terms", "refund", "privacy"].map((name) => `${root}/${name}/${date}`);
+}
+
+async function openReviewerCheckout(target: OpenProduct, lang: Lang) {
+  const page = mount(CheckoutPage({ product: target, lang }) as View);
+  page();
+  await Promise.resolve();
+  const checkout = nodes(page()).find((node) => node.type === Checkout);
+  if (!checkout) throw new Error("Expected an opened checkout");
+  const checkoutView = mount(checkout);
+  return {
+    markup: () => renderToStaticMarkup(page()),
+    agree: () => {
+      const payment = nodes(checkoutView()).find((node) => typeof node.type === "function" && node.type.name === "Payment");
+      if (!payment) throw new Error("Expected a payment component");
+      const paymentView = mount(payment);
+      const checks = nodes(paymentView()).filter((node) => node.type === "input" && node.props.type === "checkbox");
+      expect(checks).toHaveLength(2);
+      for (const check of checks) check.props.onChange?.({ target: { checked: true } });
+      nodes(paymentView()).find((node) => node.props.children === CHECKOUT_COPY[lang].continue)?.props.onClick?.();
+      return paymentView;
+    },
+  };
 }
 
 for (const { target, versions } of datedOffers) {
   for (const lang of ["en", "ko"] as const) {
     it.each(["BC", "KB"])("%s review stays bound through " + target.slug + " " + lang + " cutover and rollback", async () => {
-      let offered = versions.prior;
+      let offered: OfferVersions = versions.prior;
       mocks.open.mockImplementation(async () => reviewer(lang, offered));
       mocks.order.mockImplementation(async (_product: OpenProduct, consent: OfferVersions) => {
-        if (consent.termsVersion !== offered.termsVersion || consent.refundPolicyVersion !== offered.refundPolicyVersion) {
+        if (consent.termsVersion !== offered.termsVersion || consent.refundPolicyVersion !== offered.refundPolicyVersion ||
+            consent.privacyPolicyVersion !== offered.privacyPolicyVersion) {
           throw { code: "functions/failed-precondition", details: { code: "OFFER_CHANGED" } };
         }
         return {
@@ -304,32 +339,12 @@ for (const { target, versions } of datedOffers) {
 
       // The real entry consumes a synthetic fragment once. Reopening uses its saved tab credential.
       window.__checkoutHandoff = "#handoff=" + "i".repeat(22) + "." + "h".repeat(43);
-      const open = async () => {
-        const page = mount(CheckoutPage({ product: target, lang }) as View);
-        page();
-        await Promise.resolve();
-        const checkout = nodes(page()).find((node) => node.type === Checkout);
-        if (!checkout) throw new Error("Expected an opened checkout");
-        const checkoutView = mount(checkout);
-        return {
-          markup: () => renderToStaticMarkup(page()),
-          agree: () => {
-            const payment = nodes(checkoutView()).find((node) => typeof node.type === "function" && node.type.name === "Payment");
-            if (!payment) throw new Error("Expected a payment component");
-            const paymentView = mount(payment);
-            const checks = nodes(paymentView()).filter((node) => node.type === "input" && node.props.type === "checkbox");
-            expect(checks).toHaveLength(2);
-            for (const check of checks) check.props.onChange?.({ target: { checked: true } });
-            nodes(paymentView()).find((node) => node.props.children === CHECKOUT_COPY[lang].continue)?.props.onClick?.();
-            return paymentView;
-          },
-        };
-      };
+      const open = () => openReviewerCheckout(target, lang);
       const assertPublished = (page: Awaited<ReturnType<typeof open>>, date: string) => {
         const markup = page.markup();
         const expected = policyUrls(target, lang, date);
         const anchors = [...markup.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
-        for (const url of expected) expect(anchors.filter((href) => href === url)).toHaveLength(3);
+        expected.forEach((url, index) => expect(anchors.filter((href) => href === url)).toHaveLength(index === 2 ? 1 : 3));
         const other = date === "2026-11-10" ? "2026-11-23" : "2026-11-10";
         for (const url of policyUrls(target, lang, other)) expect(anchors).not.toContain(url);
         expect(markup).toContain(date === "2026-11-23" ? approvedLineStart[lang] : priorLine[lang]);
@@ -378,6 +393,7 @@ for (const { target, versions } of datedOffers) {
     it.each([
       { termsVersion: "unexpected" }, { termsVersion: undefined },
       { refundPolicyVersion: "unexpected" }, { refundPolicyVersion: undefined },
+      { termsVersion: versions.prior.termsVersion }, { refundPolicyVersion: versions.prior.refundPolicyVersion },
     ])("blocks unknown " + target.slug + " " + lang + " versions %j", (invalid) => {
       const checkout = reviewer(lang, { ...versions.published, ...invalid });
       const html = renderToStaticMarkup(createElement(Checkout, { product: target, lang, checkout, credential }));
@@ -392,7 +408,7 @@ for (const { target, versions } of datedOffers) {
 it.each(["en", "ko"] as const)("keeps the Chord %s policy URLs, period anchor and no-notice summary", (lang) => {
   const chord = {
     ...product, slug: "chord-to-midi", copy: CHORD_TO_MIDI_COPY, origin: "https://chord-to-midi.app",
-    pages: { terms: "terms", refund: "refund" },
+    pages: { terms: "terms", refund: "refund", privacy: "privacy" },
   } as OpenProduct;
   const html = renderToStaticMarkup(createElement(Checkout, { product: chord, lang, checkout: reviewer(lang, {}), credential }));
   const root = "https://chord-to-midi.app" + (lang === "ko" ? "/ko" : "");
@@ -402,4 +418,82 @@ it.each(["en", "ko"] as const)("keeps the Chord %s policy URLs, period anchor an
   }
   expect(html).toContain(priorLine[lang]);
   expect(html).not.toContain(approvedLineStart[lang]);
+});
+
+const priorDate = "2026-11-10";
+const publishedDate = "2026-11-23";
+
+it.each([
+  { stage: "transition", edition: "prior", available: [priorDate] },
+  { stage: "3b-before-IDs", edition: "prior", available: [priorDate, publishedDate] },
+  { stage: "3c", edition: "published", available: [priorDate, publishedDate] },
+  { stage: "post-publication-ui-containment", edition: "published", available: [priorDate, publishedDate] },
+  { stage: "post-publication-prior-IDs", edition: "prior", available: [priorDate, publishedDate] },
+  { stage: "pre-publication abort", edition: "prior", available: [priorDate] },
+] as const)("keeps Terms, Refund and Privacy available in both locales at $stage", async ({ stage, edition, available }) => {
+  const abort = stage === "pre-publication abort";
+  if (abort) vi.setSystemTime(new Date("2026-11-23T10:00:00+09:00"));
+  for (const { target, versions } of datedOffers) {
+    for (const lang of ["en", "ko"] as const) {
+      let offered: OfferVersions = versions[edition];
+      const date = edition === "prior" ? priorDate : publishedDate;
+      // The original Clean Space service omits this field before Stage 1. Only the old pair may omit it.
+      if (stage === "transition" && target.slug === "clean-space" && lang === "ko") {
+        offered = { ...offered, privacyPolicyVersion: undefined };
+      }
+      mocks.open.mockResolvedValue(reviewer(lang, offered));
+      window.__checkoutHandoff = "#handoff=" + "i".repeat(22) + "." + "h".repeat(43);
+      const openedAt = Date.now();
+      const page = await openReviewerCheckout(target, lang);
+      if (abort) {
+        vi.setSystemTime(new Date(openedAt + 1_000));
+        expect(Date.now() - openedAt).toBe(1_000);
+      }
+
+      const anchors = [...page.markup().matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+      const expected = policyUrls(target, lang, date);
+      const served = available.flatMap((editionDate) => policyUrls(target, lang, editionDate));
+      expect(expected.filter((url) => !served.includes(url))).toEqual([]);
+      expected.forEach((url, index) => expect(anchors.filter((href) => href === url)).toHaveLength(index === 2 ? 1 : 3));
+      for (const url of policyUrls(target, lang, date === priorDate ? publishedDate : priorDate)) {
+        expect(anchors).not.toContain(url);
+      }
+      for (const item of ["terms", "refund", "privacy"] as const) {
+        expect(anchors).not.toContain(productUrl(target, lang, item));
+      }
+
+      mocks.order.mockResolvedValue({
+        orderId: "fixture-order", orderName: "fixture", customerKey: "fixture", currency: "KRW", amount: 100,
+        environment: "test", review: true, receiptEmail: null,
+      });
+      page.agree();
+      await Promise.resolve();
+      const order = mocks.order.mock.lastCall?.[1];
+      expect(order).toMatchObject({
+        termsVersion: offered.termsVersion, refundPolicyVersion: offered.refundPolicyVersion, currency: "KRW",
+      });
+      if (target.slug === "clean-space") expect(parseCreateCheckoutOrder(order)).toEqual({ ok: true, value: order });
+      if (offered.privacyPolicyVersion) {
+        expect(order.privacyPolicyVersion).toBe(offered.privacyPolicyVersion);
+      } else {
+        expect(order).not.toHaveProperty("privacyPolicyVersion");
+      }
+    }
+  }
+});
+
+it.each([
+  { privacyPolicyVersion: undefined },
+  { privacyPolicyVersion: "unexpected" },
+  { privacyPolicyVersion: cleanSpaceVersions.prior.privacyPolicyVersion },
+])("suppresses the Clean Space footer and payment on invalid November 23 privacy %j", async (invalid) => {
+  for (const lang of ["en", "ko"] as const) {
+    mocks.open.mockResolvedValue(reviewer(lang, { ...cleanSpaceVersions.published, ...invalid }));
+    window.__checkoutHandoff = "#handoff=" + "i".repeat(22) + "." + "h".repeat(43);
+    const html = (await openReviewerCheckout(cleanSpace, lang)).markup();
+    expect(html).toContain(CHECKOUT_COPY[lang].termChanged);
+    expect(html).not.toMatch(/<input|<button|direct-(terms|refunds|privacy)/);
+    expect(mocks.order).not.toHaveBeenCalled();
+    expect(mocks.widget).not.toHaveBeenCalled();
+  }
 });

@@ -25,12 +25,17 @@ const policies = {
       ["2026-11-10-8b6b7b622d43", prior],
       ["2026-11-23.5cb47964694c", published],
     ]),
+    privacy: new Map([
+      ["2026-11-10-d34cf0a5e3a3", prior],
+      ["2026-11-23.e0e48c8570dc", published],
+    ]),
   },
 };
 
 export interface CheckoutPolicies {
   terms: string;
   refund: string;
+  privacy: string;
   refundPhase: RefundPhase;
 }
 
@@ -43,17 +48,28 @@ export function checkoutPolicies(
 ): CheckoutPolicies | null {
   const terms = productUrl(product, lang, "terms");
   const refund = productUrl(product, lang, "refund");
+  const privacy = productUrl(product, lang, "privacy");
   const slug = product.slug;
-  if (slug !== "all-in-one" && slug !== "clean-space") return { terms, refund, refundPhase: scheduledPhase };
+  if (slug !== "all-in-one" && slug !== "clean-space") return { terms, refund, privacy, refundPhase: scheduledPhase };
 
-  const termsDate = policies[slug].terms.get(versions.termsVersion ?? "");
+  const date = policies[slug].terms.get(versions.termsVersion ?? "");
   const refundDate = policies[slug].refund.get(versions.refundPolicyVersion ?? "");
-  if (!termsDate || !refundDate) return null;
-  if (slug === "clean-space" && (!terms.endsWith(".html") || !refund.endsWith(".html"))) return null;
+  if (!date || date !== refundDate) return null;
+  const refundPhase = date === published ? "effective" : "inactive";
 
-  return {
-    terms: slug === "clean-space" ? terms.replace(/\.html$/, `-${termsDate}.html`) : `${terms}/${termsDate}`,
-    refund: slug === "clean-space" ? refund.replace(/\.html$/, `-${refundDate}.html`) : `${refund}/${refundDate}`,
-    refundPhase: refundDate === published ? "effective" : "inactive",
-  };
+  if (slug === "clean-space") {
+    // The pre-Stage-1 backend omitted privacy and used the November 10 policy.
+    const privacyDate = versions.privacyPolicyVersion === undefined
+      ? prior
+      : policies[slug].privacy.get(versions.privacyPolicyVersion);
+    if (privacyDate !== date || ![terms, refund, privacy].every((url) => url.endsWith(".html"))) return null;
+    return {
+      terms: terms.replace(/\.html$/, `-${date}.html`),
+      refund: refund.replace(/\.html$/, `-${date}.html`),
+      privacy: privacy.replace(/\.html$/, `-${privacyDate}.html`),
+      refundPhase,
+    };
+  }
+
+  return { terms: `${terms}/${date}`, refund: `${refund}/${date}`, privacy: `${privacy}/${date}`, refundPhase };
 }

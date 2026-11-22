@@ -46,7 +46,7 @@ export function CheckoutLayout({
   product: CheckoutProduct;
   lang: Lang;
   children: ReactNode;
-  footerPolicies?: Pick<CheckoutPolicies, "terms" | "refund"> | null;
+  footerPolicies?: Pick<CheckoutPolicies, "terms" | "refund" | "privacy"> | null;
 }) {
   const copy = CHECKOUT_COPY[lang];
   const business = BUSINESS[lang];
@@ -113,7 +113,7 @@ export function CheckoutLayout({
             <p className="flex flex-wrap gap-x-4 gap-y-1 pt-2">
               {(product.enabled ? product.footerPages : []).map((page) => {
                 const label = FOOTER_LABELS[page];
-                const href = (page === "terms" || page === "refund") && footerPolicies !== undefined
+                const href = (page === "terms" || page === "refund" || page === "privacy") && footerPolicies !== undefined
                   ? footerPolicies?.[page]
                   : productUrl(product, lang, page);
                 return label && href ? (
