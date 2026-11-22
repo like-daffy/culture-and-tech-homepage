@@ -158,14 +158,42 @@ for (const lang of ["en", "ko"] as const) {
     }
   });
 
-  it(`keeps the ${lang} normal LIVE receipt free of review and TEST lines`, async () => {
-    for (const html of await receiptOnConfirmAndReload(lang, { ...preLaunchReview, environment: "live", review: undefined })) {
-      expect(html).toContain(ALL_IN_ONE_COPY[lang].successBody.replaceAll("&", "&amp;"));
-      expect(html).toContain('data-pass-term=""');
+  it(`shows the ${lang} normal LIVE term on fresh confirmation and labels an unrefreshed reload historical`, async () => {
+    const [fresh, cached] = await receiptOnConfirmAndReload(lang, { ...preLaunchReview, environment: "live", review: undefined });
+    const copy = CHECKOUT_COPY[lang];
+    const successBody = ALL_IN_ONE_COPY[lang].successBody.replaceAll("&", "&amp;");
+    expect(fresh).toContain(successBody);
+    expect(fresh).toContain('data-pass-term=""');
+    expect(cached).toContain(copy.historicalTitle);
+    expect(cached).toContain(copy.historicalBody);
+    expect(cached).toContain(copy.seeAccount);
+    expect(cached).toContain("fixture-order");
+    expect(cached).not.toContain(successBody);
+    expect(cached).not.toContain("data-pass-term");
+    for (const html of [fresh, cached]) {
       expect(html).not.toContain(row7a[lang]);
       expect(html).not.toContain(`<p>${CHECKOUT_COPY[lang].reviewReceipt}</p>`);
       expect(html).not.toContain('data-pass-term="test"');
     }
+  });
+
+  it.each([receiptUrl, "javascript:alert(1)"])(`shows the ${lang} refund on fresh confirmation and same-order reload with receipt %s`, async (url) => {
+    const copy = CHECKOUT_COPY[lang];
+    const html = await receiptOnConfirmAndReload(lang, {
+      ...preLaunchReview, environment: "live", review: undefined, refunded: true, afterDeletion: true, pass: undefined, receiptUrl: url,
+    });
+    for (const result of html) {
+      expect(result).toContain(copy.refundedTitle);
+      expect(result).toContain(copy.refundedBody);
+      expect(result).toContain(copy.seeAccount);
+      expect(result).toContain("fixture-order");
+      expect(result.includes(url)).toBe(url === receiptUrl);
+      expect(result).not.toContain(copy.historicalTitle);
+      expect(result).not.toContain(ALL_IN_ONE_AFTER_DELETION[lang].refund);
+      expect(result).not.toContain(ALL_IN_ONE_COPY[lang].successBody.replaceAll("&", "&amp;"));
+      expect(result).not.toContain("data-pass-term");
+    }
+    expect(paidOrder(product)).toMatchObject({ orderId: "fixture-order", refunded: true, pass: null, receiptUrl: url === receiptUrl ? url : null });
   });
 }
 

@@ -52,6 +52,20 @@ describe("paid checkout cache", () => {
     rememberPaid(chord, { orderId: "order-two", pass: null, environment: "live", review: true });
     expect(paidOrder(chord)?.review).toBeUndefined();
   });
+  it("retains a refund only for the same product and order and discards its prior term", () => {
+    const receiptUrl = "https://example.invalid/refund-receipt";
+    rememberPaid(chord, { orderId: "order-one", pass, environment: "live" });
+    rememberPaid(chord, { orderId: "order-one", pass, environment: "live", refunded: true, receiptUrl });
+    expect(paidOrder(chord)).toEqual({ orderId: "order-one", pass: null, environment: "live", refunded: true, receiptUrl });
+    expect(paidOrder(other)).toBeNull();
+    entries.set("checkout.chord.paid", "order-two");
+    expect(paidOrder(chord)?.refunded).toBeUndefined();
+    rememberPaid(chord, { orderId: "order-two", pass, environment: "live" });
+    expect(entries.has("checkout.chord.refunded")).toBe(false);
+    expect(paidOrder(chord)).toEqual({ orderId: "order-two", pass, environment: "live" });
+    entries.set("checkout.chord.refunded", '{"orderId":"order-two","refunded":"true"}');
+    expect(paidOrder(chord)?.refunded).toBeUndefined();
+  });
   it.each(["en", "ko"] as const)("renders the cached %s test, live, and unknown terms safely", (lang) => {
     const product = { ...chord, copy: CHORD_TO_MIDI_COPY } as OpenProduct;
     const render = () => { const paid = paidOrder(product)!; return renderToStaticMarkup(createElement(PassTerm, { product, lang, pass: paid.pass, environment: paid.environment })); };

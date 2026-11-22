@@ -138,6 +138,8 @@ export interface ConfirmPaymentResponse {
   review?: true;
   /** All-in-one took the payment during account deletion; no pass was granted. */
   afterDeletion?: true;
+  /** The order was refunded and provides no pass. */
+  refunded?: true;
   /** Optional order-bound signal for continued review after the actual paid launch. */
   postLaunchReview?: true;
   /** A pass's start and end (ISO 8601 instants), for a product sold as a pass: shown with their time zone. */

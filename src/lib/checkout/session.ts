@@ -22,6 +22,7 @@ const passKey = (product: OpenProduct) => `${product.storageKey}.pass`;
 /** Environment is bound to the order: absent or invalid values must never imply a live payment. */
 const environmentKey = (product: OpenProduct) => `${product.storageKey}.environment`;
 const afterDeletionKey = (product: OpenProduct) => `${product.storageKey}.afterDeletion`;
+const refundedKey = (product: OpenProduct) => `${product.storageKey}.refunded`;
 const reviewKey = (product: OpenProduct) => `${product.storageKey}.review`;
 
 /** What the tab holds: the session's credential, and the handoff code until the session was opened with it. */
@@ -107,20 +108,26 @@ export interface PaidOrder {
   review?: true;
   postLaunchReview?: true;
   afterDeletion?: true;
+  refunded?: true;
   receiptUrl?: string | null;
 }
 
 /**
- * The payment went through: the checkout is forgotten, and only its order number stays (no key, nothing personal),
- * with the pass's start and end for a product sold as a pass.
+ * Forget the checkout credentials. Keep the order number and receipt metadata for this tab's confirmation page.
  */
 export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
   forgetHold(product);
   try {
     window.sessionStorage.removeItem(environmentKey(product));
+    window.sessionStorage.removeItem(refundedKey(product));
+    if (paid.refunded === true) {
+      window.sessionStorage.setItem(refundedKey(product), JSON.stringify({
+        orderId: paid.orderId, refunded: true, receiptUrl: paid.receiptUrl ?? null,
+      }));
+    }
     if (product.slug === "all-in-one") {
       window.sessionStorage.removeItem(afterDeletionKey(product));
-      if (paid.afterDeletion === true) {
+      if (paid.afterDeletion === true && paid.refunded !== true) {
         // Save the outcome before making this order available as a paid cached result.
         window.sessionStorage.setItem(afterDeletionKey(product), JSON.stringify({
           orderId: paid.orderId, afterDeletion: true, receiptUrl: paid.receiptUrl ?? null,
@@ -135,7 +142,7 @@ export function rememberPaid(product: OpenProduct, paid: PaidOrder): void {
     if (paid.review === true && paid.environment === "test") {
       window.sessionStorage.setItem(reviewKey(product), JSON.stringify({ orderId: paid.orderId, receiptUrl: paid.receiptUrl ?? null, ...(paid.postLaunchReview === true ? { postLaunchReview: true } : {}) }));
     }
-    if (paid.pass && !(product.slug === "all-in-one" && paid.afterDeletion === true)) {
+    if (paid.pass && paid.refunded !== true && !(product.slug === "all-in-one" && paid.afterDeletion === true)) {
       window.sessionStorage.setItem(passKey(product), JSON.stringify({ orderId: paid.orderId, ...paid.pass }));
     } else {
       window.sessionStorage.removeItem(passKey(product));
@@ -156,10 +163,19 @@ export function paidOrder(product: OpenProduct): PaidOrder | null {
   const environment = paidEnvironment(product, orderId);
   const review = environment === "test" ? paidReview(product, orderId) : null;
   const afterDeletion = product.slug === "all-in-one" ? paidAfterDeletion(product, orderId) : null;
+  const refund = paidRefund(product, orderId);
   return {
-    orderId, pass: afterDeletion ? null : paidPass(product, orderId), environment,
-    ...(review ? { review: true as const, ...review } : {}), ...afterDeletion,
+    orderId, pass: refund || afterDeletion ? null : paidPass(product, orderId), environment,
+    ...(review ? { review: true as const, ...review } : {}), ...afterDeletion, ...refund,
   };
+}
+
+function paidRefund(product: OpenProduct, orderId: string): Pick<PaidOrder, "refunded" | "receiptUrl"> | null {
+  try {
+    const saved = JSON.parse(window.sessionStorage.getItem(refundedKey(product)) ?? "null");
+    if (saved?.orderId !== orderId || saved.refunded !== true) return null;
+    return { refunded: true, receiptUrl: typeof saved.receiptUrl === "string" ? saved.receiptUrl : null };
+  } catch { return null; }
 }
 
 function paidAfterDeletion(product: OpenProduct, orderId: string): Pick<PaidOrder, "afterDeletion" | "receiptUrl"> | null {

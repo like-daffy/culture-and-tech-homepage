@@ -91,6 +91,30 @@ export function CheckoutSuccess({ product, lang }: { product: CheckoutProduct; l
   return <Success product={product} lang={lang} />;
 }
 
+function RefundedResult({ product, lang, order }: {
+  product: OpenProduct;
+  lang: Lang;
+  order: Pick<PaidOrder, "orderId" | "receiptUrl">;
+}) {
+  const copy = CHECKOUT_COPY[lang];
+  const receiptUrl = safeLink(product, order.receiptUrl ?? null);
+  return (
+    <CheckoutLayout product={product} lang={lang}>
+      <h1 className="text-2xl font-semibold">{copy.refundedTitle}</h1>
+      <div className="mt-6 space-y-6">
+        <Notice>{copy.refundedBody}</Notice>
+        <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: order.orderId })}</p>
+        <div className="flex flex-wrap gap-3">
+          {product.slug === "chord-to-midi"
+            ? <LinkButton primary href={productUrl(product, lang, "home")}>{product.copy[lang].backToProduct}</LinkButton>
+            : <LinkButton primary href={productUrl(product, lang, "account")}>{copy.seeAccount}</LinkButton>}
+          {receiptUrl && <LinkButton href={receiptUrl} newTab>{copy.receipt}</LinkButton>}
+        </div>
+      </div>
+    </CheckoutLayout>
+  );
+}
+
 function AfterDeletionResult({ product, lang, order }: {
   product: OpenProduct;
   lang: Lang;
@@ -148,12 +172,13 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
         const afterDeletion = product.slug === "all-in-one" && result.afterDeletion === true;
         rememberPaid(product, {
           orderId: result.orderId,
-          pass: result.pass ?? null,
+          pass: result.refunded === true ? null : result.pass ?? null,
           environment: result.environment,
           review: result.review,
           postLaunchReview: isPostLaunchReview(result) ? true : undefined,
           afterDeletion: afterDeletion ? true : undefined,
-          receiptUrl: afterDeletion || result.review === true ? safeLink(product, result.receiptUrl) : undefined,
+          refunded: result.refunded === true ? true : undefined,
+          receiptUrl: result.refunded === true || afterDeletion || result.review === true ? safeLink(product, result.receiptUrl) : undefined,
         });
         setState({ kind: "done", result });
       },
@@ -197,6 +222,7 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
 
   let body: ReactNode;
   const settled = state.kind === "done" ? state.result : state.kind === "paid" ? state.paid : null;
+  if (settled?.refunded === true) return <RefundedResult product={product} lang={lang} order={settled} />;
   if (product.slug === "all-in-one" && settled?.afterDeletion === true) {
     return <AfterDeletionResult product={product} lang={lang} order={settled} />;
   }
@@ -283,21 +309,16 @@ function Success({ product, lang }: { product: OpenProduct; lang: Lang }) {
     }
     case "paid": {
       const postLaunchReview = isPostLaunchReview(state.paid);
+      const historical = state.paid.review !== true && state.paid.environment === "live";
       const receiptUrl = state.paid.review === true ? safeLink(product, state.paid.receiptUrl ?? null) : null;
       body = (
         <>
-          <Notice tone="success">
-            <strong>{copy.successTitle}</strong>
-            {/* A test payment creates no paid pass: the 364-day body is left out; PassTerm shows the test wording. */}
-            {state.paid.review !== true && state.paid.environment === "live" && (
-              <>
-                <br />
-                {productCopy.successBody}
-              </>
-            )}
+          <Notice tone={historical ? undefined : "success"}>
+            <strong>{historical ? copy.historicalTitle : copy.successTitle}</strong>
+            {historical && <><br />{copy.historicalBody}</>}
           </Notice>
           {state.paid.review === true && <ReviewReceiptNotice lang={lang} postLaunch={postLaunchReview} />}
-          {!postLaunchReview && <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />}
+          {!historical && !postLaunchReview && <PassTerm product={product} lang={lang} pass={state.paid.pass} environment={state.paid.environment} />}
           <p className="text-sm text-muted-foreground">{fill(copy.orderNumber, { orderId: state.paid.orderId })}</p>
           <div className="flex flex-wrap gap-3">{backLinks(state.paid.review === true)}{receiptUrl && <LinkButton href={receiptUrl} newTab>{copy.receipt}</LinkButton>}</div>
         </>
